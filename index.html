@@ -1128,6 +1128,44 @@ function drawDrop(d) {
   ctx.restore();
 }
 
+/* ===== chefe: bolha de blindagem, aviso e núcleo exposto ===== */
+function drawBossShield() {
+  const sh = boss.shield, cx = boss.x + boss.w / 2, cy = boss.y + boss.h / 2;
+  const rx = boss.w * .62 + 16, ry = boss.h * .95 + 12;
+  ctx.save();
+  if (sh.on) {
+    const flick = sh.warn ? .35 + .65 * Math.abs(Math.sin(animT * 28)) : 1;
+    const glow = 1 + (sh.hit || 0) * 3;
+    ctx.globalAlpha = flick;
+    const g = ctx.createRadialGradient(cx, cy, 6, cx, cy, rx);
+    g.addColorStop(0, 'rgba(150,215,255,0.04)'); g.addColorStop(1, 'rgba(150,215,255,' + (.2 * glow).toFixed(2) + ')');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#bfeaff'; ctx.lineWidth = 2.2 + (sh.hit || 0) * 10; ctx.shadowColor = '#7fd0ff'; ctx.shadowBlur = 16;
+    ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2); ctx.stroke();
+    ctx.shadowBlur = 0; ctx.lineWidth = 1; ctx.globalAlpha = flick * .5;
+    for (let i = 0; i < 3; i++) {      // arcos de varredura
+      const a = animT * 1.4 + i * 2.1;
+      ctx.beginPath(); ctx.ellipse(cx, cy, rx - 4, ry - 4, 0, a, a + .7); ctx.stroke();
+    }
+    drawIcon(ctx, 'shield', cx, boss.y - 12, 14, '#bfeaff');
+  } else if (sh.warn && shieldCfg()) {   // carregando: anel tracejado se fechando
+    ctx.globalAlpha = .4 + .5 * Math.abs(Math.sin(animT * 14));
+    ctx.strokeStyle = '#9fe0ff'; ctx.lineWidth = 1.6; ctx.setLineDash([5, 5]);
+    ctx.beginPath(); ctx.ellipse(cx, cy, rx + (1 - Math.min(1, (sh.t || 0) / .9)) * -6 + 6, ry + 6, 0, 0, Math.PI * 2); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  ctx.restore();
+}
+function drawBossExposed() {
+  const cx = boss.x + boss.w / 2, cy = boss.y + boss.h / 2;
+  const left = Math.max(0, (boss.exposedUntil - gameNow()) / 1400);
+  ctx.save();
+  ctx.globalAlpha = .35 + .5 * left;
+  ctx.strokeStyle = '#ffe66d'; ctx.lineWidth = 2; ctx.shadowColor = '#ffe66d'; ctx.shadowBlur = 18;
+  ctx.beginPath(); ctx.arc(cx, cy, boss.coreR + 8 + Math.sin(animT * 14) * 2.5, 0, Math.PI * 2); ctx.stroke();
+  ctx.restore();
+}
+
 /* ---- render.js ---- */
 function createStars() {
   stars = [];
@@ -1484,6 +1522,7 @@ function draw() {
       }
     }
 
+    if (boss.shield) drawBossShield();
     // núcleo crítico (comum, mas com anel)
     ctx.fillStyle = '#120818';
     ctx.beginPath();
@@ -1505,6 +1544,7 @@ function draw() {
     ctx.beginPath();
     ctx.arc(cx, cy, boss.coreR + 3, 0, Math.PI * 2);
     ctx.stroke();
+    if (bossExposed()) drawBossExposed();
 
     // barra de vida
     const barX = 12, barY = 90, barW = W - 24, barH = 9;
@@ -1525,7 +1565,7 @@ function draw() {
     ctx.fillStyle = '#eef3ff';
     ctx.font = 'bold 10px system-ui';
     ctx.textAlign = 'center';
-    ctx.fillText((isW ? 'GUARDIÃO' : 'RAIDERS') + '  ·  FASE ' + boss.stage + '  ·  ' + boss.hp + '/' + boss.maxHp, W / 2, 111);
+    ctx.fillText((isW ? 'GUARDIÃO' : 'RAIDERS') + '  ·  FASE ' + boss.stage + '  ·  ' + boss.hp + '/' + boss.maxHp + (boss.shield && boss.shield.on ? '  ·  ESCUDO' : bossExposed() ? '  ·  EXPOSTO' : ''), W / 2, 111);
     ctx.restore();
   }
 
@@ -1689,7 +1729,7 @@ function enterReady(kind) {
     const isW = boss && boss.kind === 'warden';
     announce = {
       title: isW ? 'CHEFE · GUARDIÃO' : 'CHEFE · RAIDERS',
-      sub: isW ? 'Fragmentos lentos · faixas seguras · 3 fases' : 'Bombas em padrões · núcleo dourado · 3 fases',
+      sub: isW ? 'Escudo intermitente · mire o núcleo dourado · 3 fases' : 'Bombas em padrões · mire o núcleo dourado · 3 fases',
       life: 2.4, max: 2.4, color: isW ? '#7ec8ff' : '#ff6b9a'
     };
   } else if (kind === 'crystal_storm') {
@@ -1909,14 +1949,15 @@ function spawnBoss() {
   const pressure = eventMods.bossPressure || 0;
   // Setores ímpares = Raider (bombas). Pares = Warden (fragmentos lentos, ritmo diferente)
   const kind = sector % 2 === 0 ? 'warden' : 'raider';
-  const hp = 34 + (sector - 1) * 12 + pressure * 4 + (kind === 'warden' ? 4 : 0);
+  const hp = 30 + (sector - 1) * 8 + pressure * 4 + (kind === 'warden' ? 4 : 0);
   boss = {
     x: W / 2 - bw / 2, y: Math.max(125, Math.min(H * .22, paddle.y - 180)),
     w: bw, h: 46, hp, maxHp: hp,
     dir: Math.random() < .5 ? -1 : 1, flash: 0, phase: 0,
     attackTimer: kind === 'warden' ? 2.1 : (sector === 1 ? 1.9 : 1.7),
     lastHitAt: gameNow(), regenTimer: 0,
-    damageReadyAt: 0, coreR: 6.5, stage: 1, dashCooldown: 3.0, baseY: 0,
+    damageReadyAt: 0, coreR: 10, stage: 1, dashCooldown: 3.0, baseY: 0,
+    shield: { on: false, t: 3.5, warn: false, hit: 0 }, exposedUntil: 0, blockReadyAt: 0, aoeReadyAt: 0, lastDropAt: 0, shieldTold: false,
     sector, patternIndex: 0, kind
   };
   boss.baseY = boss.y;
@@ -1944,6 +1985,7 @@ function onBossStageChange(prev, next) {
   setHint('<span class="power">' + announce.title + '!</span>');
   burst(boss.x + boss.w / 2, boss.y + boss.h / 2, isW ? '#7ec8ff' : '#ff6b9a', 28);
   boss.attackTimer = 1.2; boss.patternIndex = 0;
+  boss.shield = { on: false, t: 2.4, warn: false, hit: 0 };
 }
 function dropBossBomb(x, vyExtra = 0, asShard = false) {
   if (countBossBombs() >= maxBossBombs()) return false;
@@ -2038,7 +2080,8 @@ function updateBoss(dt) {
   const bob = Math.sin(boss.phase * (isW ? 1.2 : 1.6)) * (isW ? 7 : 9) + (boss.stage >= 2 ? Math.sin(boss.phase * 2.8) * 4 : 0);
   boss.y = Math.max(105, Math.min((boss.baseY || H * .2), paddle.y - 180)) + bob;
   boss.flash = Math.max(0, boss.flash - dt);
-  boss.attackTimer -= dt * (1 / Math.max(0.5, chronoFactor())); // cronos também atrasa ataques
+  boss.attackTimer -= dt * chronoFactor();   // Cronos atrasa os ataques (antes acelerava por engano)
+  updateBossShield(dt);
   if (boss.attackTimer <= 0) bossAttack();
   if (boss.stage >= 3) {
     boss.dashCooldown -= dt;
@@ -2049,63 +2092,93 @@ function updateBoss(dt) {
       burst(boss.x + boss.w / 2, boss.y + boss.h / 2, isW ? '#7ec8ff' : '#ff6b9a', 10);
     }
   }
-  const regenDelay = sector === 1 ? 5000 : 4500;
+  const regenDelay = sector === 1 ? 6500 : 6000;
   if (gameNow() - boss.lastHitAt > regenDelay) {
     boss.regenTimer += dt;
-    if (boss.regenTimer >= 1.8) {
+    if (boss.regenTimer >= 2.4) {
       boss.regenTimer = 0;
-      boss.hp = Math.min(boss.maxHp, boss.hp + 1);
+      // regeneração nunca desfaz o progresso: não passa do teto da fase atual do chefe
+      const ceil = boss.stage === 1 ? boss.maxHp : Math.floor(boss.maxHp * [1, .66, .33][boss.stage - 1]);
+      boss.hp = Math.min(ceil, boss.hp + 1);
       burst(boss.x + boss.w / 2, boss.y + boss.h / 2, '#ff6c98', 5);
     }
   } else boss.regenTimer = 0;
 }
 
-function hitBoss(b, px, py) {
-  if (!boss || boss.hp <= 0) return false;
-  const coreX = boss.x + boss.w / 2, coreY = boss.y + boss.h / 2;
-  const coreR = boss.coreR + b.r;
-  const critical = (b.x - coreX) ** 2 + (b.y - coreY) ** 2 <= coreR * coreR;
-  const cx = clamp(b.x, boss.x, boss.x + boss.w), cy = clamp(b.y, boss.y, boss.y + boss.h);
-  if (!critical && (b.x - cx) ** 2 + (b.y - cy) ** 2 > b.r * b.r) return false;
-  const now = gameNow();
-  if (now >= boss.damageReadyAt) {
-    const prevStage = boss.stage;
-    const damage = critical ? 2 : 1;
-    boss.hp = Math.max(0, boss.hp - damage);
-    boss.damageReadyAt = now + 160;
-    boss.lastHitAt = now;
-    boss.regenTimer = 0;
-    boss.flash = .12;
-    const nextStage = bossStageFromHp();
-    if (nextStage !== prevStage) { boss.stage = nextStage; onBossStageChange(prevStage, nextStage); }
-    sfx(critical ? 'boss' : 'hit');
-    vibrate(critical ? 22 : 8);
-    burst(b.x, b.y, critical ? '#ffe66d' : boss.hp % 3 ? '#ff5e83' : '#ffd166', critical ? 16 : 8);
-    if (critical) {
-      addScore(75, coreX, coreY);
-      shake = Math.min(10, shake + 2.5);
-      const chance = Math.min(.45, .2 + lv('scavenger') * .05 * rarityMult('scavenger'));
-      if (Math.random() < chance) {
-        drops.push({ x: coreX, y: coreY + boss.h / 2, vy: 105, type: randomPowerType(), r: 10, spin: 0, fromCritical: true });
-        burst(coreX, coreY, '#62f4c5', 16);
-      }
-    } else {
-      addScore(15, b.x, b.y);
-      shake = Math.min(8, shake + 1.2);
-    }
+/* ========== CHEFE: NÚCLEO, CORPO ATRAVESSÁVEL E BLINDAGEM ==========
+   - A bola ATRAVESSA o corpo na vertical (só as laterais são sólidas): dá para alcançar o núcleo.
+   - Núcleo = dano crítico (2) e chance de soltar power-up útil contra chefe.
+   - Blindagem alterna ativa/desativada: ativa = o corpo vira parede e nada causa dano.
+     Estrela (★) atravessa a blindagem · Cronos derruba a blindagem · ao cair, o núcleo fica EXPOSTO (+1 dano crítico). */
+const SHIELD_CFG = {
+  raider: [null, { on: 1.8, off: 4.6 }, { on: 2.2, off: 3.8 }],
+  warden: [{ on: 1.4, off: 5.0 }, { on: 1.9, off: 4.2 }, { on: 2.4, off: 3.6 }]
+};
+function shieldCfg() {
+  const c = SHIELD_CFG[boss.kind][boss.stage - 1];
+  if (!c) return null;
+  const bonus = Math.min(.6, (boss.sector - 1) * .15);
+  return { on: c.on + bonus, off: c.off };
+}
+function bossShieldOn() { return !!(boss && boss.shield && boss.shield.on); }
+function bossExposed() { return !!(boss && gameNow() < boss.exposedUntil); }
+function updateBossShield(dt) {
+  const sh = boss.shield, cfg = shieldCfg();
+  if (!cfg) { sh.on = false; sh.warn = false; return; }
+  const chronoOn = gameNow() < chronoUntil;
+  if (chronoOn) {                         // Cronos derruba e segura a blindagem
+    if (sh.on) { sh.on = false; boss.exposedUntil = gameNow() + 1400; floatText(boss.x + boss.w / 2, boss.y + boss.h + 18, 'ESCUDO CONGELADO!', '#8fd6ff', 14); sfx('phase'); }
+    sh.t = Math.max(sh.t, 1.2); sh.warn = false; return;
   }
-  if (px + b.r <= boss.x || px - b.r >= boss.x + boss.w) {
-    const left = b.x < coreX;
-    b.vx = (left ? -1 : 1) * Math.abs(b.vx);
-    b.x = left ? boss.x - b.r - 0.5 : boss.x + boss.w + b.r + 0.5;
-  } else if (b.y >= coreY) {
-    b.vy = Math.abs(b.vy); b.y = boss.y + boss.h + b.r + 0.5;
+  sh.t -= dt; sh.hit = Math.max(0, (sh.hit || 0) - dt);
+  sh.warn = sh.t < (sh.on ? .6 : .9);
+  if (sh.t > 0) return;
+  const cx = boss.x + boss.w / 2;
+  if (sh.on) {
+    sh.on = false; sh.t = cfg.off; boss.exposedUntil = gameNow() + 1400;
+    floatText(cx, boss.y + boss.h + 18, 'NÚCLEO EXPOSTO!', '#ffe66d', 15); sfx('phase'); burst(cx, boss.y + boss.h / 2, '#ffe66d', 14);
   } else {
-    b.vy = -Math.abs(b.vy); b.y = boss.y - b.r - 0.5;
+    sh.on = true; sh.t = cfg.on;
+    floatText(cx, boss.y + boss.h + 18, 'ESCUDO ATIVO', '#9fe0ff', 14); sfx('shield'); burst(cx, boss.y + boss.h / 2, '#9fe0ff', 14);
+    if (!boss.shieldTold) { boss.shieldTold = true; setHint('<span style="color:#9fe0ff;font-weight:900">ESCUDO!</span> espere cair ou use ★ Estrela / Cronos'); }
   }
-  normalizeBall(b, 310, 450);
+}
+function bossPowerType() {
+  const r = Math.random();
+  if (r < .27) return 'pierce';
+  if (r < .53) return 'overcharge';
+  if (r < .78) return 'grenade';
+  if (r < .90) return 'chrono';
+  return 'multi';
+}
+function damageBoss(dmg, crit, x, y) {
+  if (!boss || boss.hp <= 0) return;
+  const now = gameNow(), prevStage = boss.stage;
+  boss.hp = Math.max(0, boss.hp - dmg);
+  boss.lastHitAt = now; boss.regenTimer = 0; boss.flash = .12;
+  const coreX = boss.x + boss.w / 2, coreY = boss.y + boss.h / 2;
+  const nextStage = bossStageFromHp();
+  if (nextStage !== prevStage) { boss.stage = nextStage; onBossStageChange(prevStage, nextStage); }
+  sfx(crit ? 'boss' : 'hit');
+  vibrate(crit ? 22 : 8);
+  burst(x, y, crit ? '#ffe66d' : boss.hp % 3 ? '#ff5e83' : '#ffd166', crit ? 16 : 8);
+  if (crit) {
+    addScore(75, coreX, coreY);
+    shake = Math.min(10, shake + 2.5);
+    floatText(coreX, coreY - 26, bossExposed() ? 'CRÍTICO ×3' : 'CRÍTICO', '#ffe66d', 14);
+    const onField = drops.filter(d => d.fromCritical && !d.dead).length;
+    const chance = Math.min(.5, .28 + lv('scavenger') * .05 * rarityMult('scavenger') + (bossExposed() ? .12 : 0));
+    if (onField < 2 && now - (boss.lastDropAt || 0) > 3500 && Math.random() < chance) {
+      boss.lastDropAt = now;
+      drops.push({ x: coreX, y: coreY + boss.h / 2, vy: 105, type: bossPowerType(), r: 10, spin: 0, fromCritical: true });
+      burst(coreX, coreY, '#62f4c5', 16);
+    }
+  } else {
+    addScore(15, x, y);
+    shake = Math.min(8, shake + 1.2);
+  }
   if (boss.hp <= 0) {
-    const bx = boss.x + boss.w / 2, by = boss.y + boss.h / 2;
+    const bx = coreX, by = coreY;
     addScore(600 + level * 55, bx, by);
     burst(bx, by, '#ffcf68', 80); burst(bx, by, '#ff5e83', 40);
     shake = Math.min(14, shake + 8);
@@ -2116,9 +2189,52 @@ function hitBoss(b, px, py) {
     boss = null;
     completeStage();
   }
+}
+/* explosões (granada) também ferem o chefe, mas não atravessam a blindagem */
+function bossAoe(x, y, radius, dmg) {
+  if (!boss || boss.hp <= 0 || bossShieldOn() || gameNow() < (boss.aoeReadyAt || 0)) return;
+  const cx = clamp(x, boss.x, boss.x + boss.w), cy = clamp(y, boss.y, boss.y + boss.h);
+  if (Math.hypot(cx - x, cy - y) > radius) return;
+  boss.aoeReadyAt = gameNow() + 400;
+  const coreD = Math.hypot(boss.x + boss.w / 2 - x, boss.y + boss.h / 2 - y);
+  damageBoss(coreD <= radius * .5 ? dmg + 1 : dmg, false, cx, cy);
+}
+function hitBoss(b, px, py) {
+  if (!boss || boss.hp <= 0) return false;
+  const coreX = boss.x + boss.w / 2, coreY = boss.y + boss.h / 2;
+  const coreR = boss.coreR + b.r;
+  const coreHit = (b.x - coreX) ** 2 + (b.y - coreY) ** 2 <= coreR * coreR;
+  const cx = clamp(b.x, boss.x, boss.x + boss.w), cy = clamp(b.y, boss.y, boss.y + boss.h);
+  if (!coreHit && (b.x - cx) ** 2 + (b.y - cy) ** 2 > b.r * b.r) return false;
+  const now = gameNow();
+  const piercing = now < pierceUntil;
+  const sideEntry = px + b.r <= boss.x || px - b.r >= boss.x + boss.w;
+  // blindagem ativa: o corpo vira parede (estrela atravessa)
+  if (bossShieldOn() && !piercing) {
+    if (sideEntry) { const left = b.x < coreX; b.vx = (left ? -1 : 1) * Math.abs(b.vx); b.x = left ? boss.x - b.r - .5 : boss.x + boss.w + b.r + .5; }
+    else if (b.y >= coreY) { b.vy = Math.abs(b.vy); b.y = boss.y + boss.h + b.r + .5; }
+    else { b.vy = -Math.abs(b.vy); b.y = boss.y - b.r - .5; }
+    if (now >= (boss.blockReadyAt || 0)) { boss.blockReadyAt = now + 120; boss.shield.hit = .22; sfx('wall'); burst(b.x, b.y, '#bfe9ff', 5); }
+    normalizeBall(b, 310, 450);
+    return true;
+  }
+  if (now >= boss.damageReadyAt) {
+    let dmg = coreHit ? 3 : 1;
+    if (coreHit && bossExposed()) dmg += 1;
+    if (overchargeHits > 0) { dmg += 1; overchargeHits--; }
+    boss.damageReadyAt = now + 160;
+    damageBoss(dmg, coreHit, b.x, b.y);
+    if (!boss) return true;               // derrotado
+  }
+  // laterais são sólidas; na vertical a bola ATRAVESSA o corpo (alcança o núcleo)
+  if (sideEntry && !piercing) {
+    const left = b.x < coreX;
+    b.vx = (left ? -1 : 1) * Math.abs(b.vx);
+    b.x = left ? boss.x - b.r - .5 : boss.x + boss.w + b.r + .5;
+    normalizeBall(b, 310, 450);
+  }
   return true;
 }
-
 
 /* ---- bricks.js ---- */
 function addScore(n, x, y) {
@@ -2225,6 +2341,7 @@ function grenadeBlast(x, y) {
   burst(x, y, '#ff6b3d', 16); burst(x, y, '#ffd166', 8);
   sfx('explode'); shake = Math.min(10, shake + 2.5); vibrate(18);
   areaDamage(x, y, radius, 1 + extraDmg, 10);
+  bossAoe(x, y, radius, 1 + extraDmg);
 }
 function maybeDrop(br, forcePower = false) {
   const c = bc(br);
