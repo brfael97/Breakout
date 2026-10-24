@@ -1105,7 +1105,7 @@ function drawDrop(d) {
   ctx.save();
   ctx.translate(d.x, d.y);
   const pulse = 1 + Math.sin(animT * 8 + d.spin) * .05;
-  const col = d.type === 'bomb' && d.shard ? '#5eb0ff' : DROP_COL[d.type] || '#ffd166';
+  const col = d.type === 'bomb' && d.lava ? '#ff7a2c' : d.type === 'bomb' && d.shard ? '#5eb0ff' : DROP_COL[d.type] || '#ffd166';
   ctx.shadowBlur = 16; ctx.shadowColor = col;
   if (d.type === 'heart') {
     ctx.rotate(Math.sin(d.spin) * .12);
@@ -1157,7 +1157,7 @@ function drawBossShield() {
   ctx.restore();
 }
 function drawBossExposed() {
-  const cx = boss.x + boss.w / 2, cy = boss.y + boss.h / 2;
+  const cc = bossCore(), cx = cc.x, cy = cc.y;
   const left = Math.max(0, (boss.exposedUntil - gameNow()) / 1400);
   ctx.save();
   ctx.globalAlpha = .35 + .5 * left;
@@ -1402,172 +1402,20 @@ function draw() {
     ctx.restore();
   }
 
-  // ---- CHEFES (silhuetas próprias) ----
+  // ---- CHEFES (arte por setor em bossart.js) ----
   if (boss) {
-    const isW = boss.kind === 'warden';
-    const stageCol = isW
-      ? (boss.stage === 3 ? '#4db3ff' : boss.stage === 2 ? '#6ec8ff' : '#3d9ae0')
-      : (boss.stage === 3 ? '#ff3d6a' : boss.stage === 2 ? '#ff6b4a' : '#e03a5c');
-    const accent = isW ? '#c8ecff' : '#ffc0d4';
-    const bx = boss.x, by = boss.y, bw = boss.w, bh = boss.h;
-    const cx = bx + bw / 2, cy = by + bh / 2;
-    const pulse = 1 + Math.sin(boss.phase * 3) * 0.04;
+    const en = clamp((animT - boss.born) / 1.1, 0, 1);
+    drawBossBeams(boss);
     ctx.save();
-
-    if (isW) {
-      // GUARDIÃO — corpo octogonal + asas de cristal + anel
-      ctx.shadowBlur = 30 + boss.stage * 4;
-      ctx.shadowColor = stageCol;
-      // asas
-      ctx.fillStyle = boss.flash ? '#fff' : stageCol + 'aa';
-      ctx.beginPath();
-      ctx.moveTo(bx + 8, cy);
-      ctx.lineTo(bx - 14, by + 4);
-      ctx.lineTo(bx - 8, cy);
-      ctx.lineTo(bx - 14, by + bh - 4);
-      ctx.closePath();
-      ctx.fill();
-      ctx.beginPath();
-      ctx.moveTo(bx + bw - 8, cy);
-      ctx.lineTo(bx + bw + 14, by + 4);
-      ctx.lineTo(bx + bw + 8, cy);
-      ctx.lineTo(bx + bw + 14, by + bh - 4);
-      ctx.closePath();
-      ctx.fill();
-      // corpo octógono
-      const ox = bx + 4, oy = by + 2, ow = bw - 8, oh = bh - 4, cut = 8;
-      ctx.beginPath();
-      ctx.moveTo(ox + cut, oy);
-      ctx.lineTo(ox + ow - cut, oy);
-      ctx.lineTo(ox + ow, oy + cut);
-      ctx.lineTo(ox + ow, oy + oh - cut);
-      ctx.lineTo(ox + ow - cut, oy + oh);
-      ctx.lineTo(ox + cut, oy + oh);
-      ctx.lineTo(ox, oy + oh - cut);
-      ctx.lineTo(ox, oy + cut);
-      ctx.closePath();
-      if (boss.flash) {
-        ctx.fillStyle = '#fff';
-      } else {
-        const bg = ctx.createLinearGradient(ox, oy, ox, oy + oh);
-        bg.addColorStop(0, '#a8e0ff');
-        bg.addColorStop(0.4, stageCol);
-        bg.addColorStop(1, '#0a3060');
-        ctx.fillStyle = bg;
-      }
-      ctx.fill();
-      ctx.shadowBlur = 0;
-      ctx.strokeStyle = accent;
-      ctx.lineWidth = 2;
-      ctx.stroke();
-      // anel orbitando (visual)
-      const ringR = Math.max(bw, bh) * 0.42 * pulse;
-      ctx.strokeStyle = '#ffffff44';
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.ellipse(cx, cy, ringR, ringR * 0.35, 0, 0, Math.PI * 2);
-      ctx.stroke();
-    } else {
-      // RAIDERS — casco agressivo com aletas e queixo
-      ctx.shadowBlur = 28 + boss.stage * 4;
-      ctx.shadowColor = stageCol;
-      // aletas laterais
-      ctx.fillStyle = boss.flash ? '#fff' : '#801030';
-      ctx.beginPath();
-      ctx.moveTo(bx + 10, by + 6);
-      ctx.lineTo(bx - 12, cy - 4);
-      ctx.lineTo(bx + 6, by + bh - 4);
-      ctx.closePath();
-      ctx.fill();
-      ctx.beginPath();
-      ctx.moveTo(bx + bw - 10, by + 6);
-      ctx.lineTo(bx + bw + 12, cy - 4);
-      ctx.lineTo(bx + bw - 6, by + bh - 4);
-      ctx.closePath();
-      ctx.fill();
-      // corpo principal (trapézio arredondado)
-      ctx.beginPath();
-      ctx.moveTo(bx + 12, by + 2);
-      ctx.lineTo(bx + bw - 12, by + 2);
-      ctx.quadraticCurveTo(bx + bw - 2, by + 2, bx + bw - 4, by + 12);
-      ctx.lineTo(bx + bw - 8, by + bh - 4);
-      ctx.quadraticCurveTo(cx, by + bh + 4, bx + 8, by + bh - 4);
-      ctx.lineTo(bx + 4, by + 12);
-      ctx.quadraticCurveTo(bx + 2, by + 2, bx + 12, by + 2);
-      ctx.closePath();
-      if (boss.flash) {
-        ctx.fillStyle = '#fff';
-      } else {
-        const bg = ctx.createLinearGradient(bx, by, bx, by + bh);
-        bg.addColorStop(0, '#ff8aa8');
-        bg.addColorStop(0.4, stageCol);
-        bg.addColorStop(1, '#4a0820');
-        ctx.fillStyle = bg;
-      }
-      ctx.fill();
-      ctx.shadowBlur = 0;
-      ctx.strokeStyle = accent;
-      ctx.lineWidth = 2;
-      ctx.stroke();
-      // “dentes” inferiores
-      ctx.fillStyle = '#2a0810';
-      for (let i = 0; i < 5; i++) {
-        const tx = bx + 18 + i * ((bw - 36) / 4);
-        ctx.beginPath();
-        ctx.moveTo(tx - 4, by + bh - 6);
-        ctx.lineTo(tx, by + bh + 3);
-        ctx.lineTo(tx + 4, by + bh - 6);
-        ctx.closePath();
-        ctx.fill();
-      }
-    }
-
+    if (en < 1) { ctx.globalAlpha = Math.min(1, en * 2.2); ctx.translate(0, -(1 - easeOutBack(en)) * 170); }
+    drawBossArt(boss);
     if (boss.shield) drawBossShield();
-    // núcleo crítico (comum, mas com anel)
-    ctx.fillStyle = '#120818';
-    ctx.beginPath();
-    ctx.arc(cx, cy, boss.coreR + 6, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.shadowBlur = 22;
-    ctx.shadowColor = '#ffe66d';
-    const coreG = ctx.createRadialGradient(cx - 1.5, cy - 1.5, 0, cx, cy, boss.coreR + 1);
-    coreG.addColorStop(0, '#ffffff');
-    coreG.addColorStop(0.35, '#ffe66d');
-    coreG.addColorStop(1, '#a87800');
-    ctx.fillStyle = boss.flash ? '#fff' : coreG;
-    ctx.beginPath();
-    ctx.arc(cx, cy, boss.coreR * pulse, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.shadowBlur = 0;
-    ctx.strokeStyle = '#fff6b0';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.arc(cx, cy, boss.coreR + 3, 0, Math.PI * 2);
-    ctx.stroke();
+    drawBossCore(boss);
     if (bossExposed()) drawBossExposed();
-
-    // barra de vida
-    const barX = 12, barY = 90, barW = W - 24, barH = 9;
-    ctx.fillStyle = '#0e1528';
-    roundedRect(barX, barY, barW, barH, 5);
-    ctx.fill();
-    const hpW = barW * boss.hp / boss.maxHp;
-    const hpG = ctx.createLinearGradient(barX, 0, barX + barW, 0);
-    hpG.addColorStop(0, stageCol);
-    hpG.addColorStop(1, accent);
-    ctx.fillStyle = hpG;
-    roundedRect(barX, barY, Math.max(5, hpW), barH, 5);
-    ctx.fill();
-    ctx.strokeStyle = '#ffffff25';
-    ctx.lineWidth = 1;
-    roundedRect(barX + 0.5, barY + 0.5, barW - 1, barH - 1, 4.5);
-    ctx.stroke();
-    ctx.fillStyle = '#eef3ff';
-    ctx.font = 'bold 10px system-ui';
-    ctx.textAlign = 'center';
-    ctx.fillText((isW ? 'GUARDIÃO' : 'RAIDERS') + '  ·  FASE ' + boss.stage + '  ·  ' + boss.hp + '/' + boss.maxHp + (boss.shield && boss.shield.on ? '  ·  ESCUDO' : bossExposed() ? '  ·  EXPOSTO' : ''), W / 2, 111);
     ctx.restore();
+    drawBossBar(boss);
   }
+  if (bossDeath) drawBossDeath();
 
   for (const e of explosions) {
     const p = 1 - e.life / e.max;
@@ -1726,12 +1574,8 @@ function enterReady(kind) {
   stageStartTime = gameNow();
   stagePowerDropped = false;
   if (kind === 'boss') {
-    const isW = boss && boss.kind === 'warden';
-    announce = {
-      title: isW ? 'CHEFE · GUARDIÃO' : 'CHEFE · RAIDERS',
-      sub: isW ? 'Escudo intermitente · mire o núcleo dourado · 3 fases' : 'Bombas em padrões · mire o núcleo dourado · 3 fases',
-      life: 2.4, max: 2.4, color: isW ? '#7ec8ff' : '#ff6b9a'
-    };
+    const bd = boss ? boss.def : BOSS_DEFS.raider;
+    announce = { title: bd.title, sub: bd.sub + ' · 3 fases', life: 2.6, max: 2.6, color: bd.c };
   } else if (kind === 'crystal_storm') {
     announce = { title: 'TEMPESTADE DE CRISTAIS', sub: 'Cristais em cadeia · cuidado com o combo', life: 2.2, max: 2.2, color: '#7ef6ff' };
   } else if (kind === 'elite_hunt') {
@@ -1774,7 +1618,7 @@ function buildLevel() {
   paddle.w = paddle.baseW;
   paddle.x = clamp(paddle.x, 5, W - paddle.w - 5);
   bricks = []; drops = []; particles = []; explosions = []; floatingTexts = [];
-  boss = null; shieldUses = 0; combo = 0; comboTimer = 0; electricCooldown = 0; comboTier = 0;
+  boss = null; bossDeath = null; shieldUses = 0; combo = 0; comboTimer = 0; electricCooldown = 0; comboTier = 0;
   stagePowerDropped = false; perfectStreak = 0; regenTimer = 0;
   stage = { maxCombo: 0, perfects: 0, lostLife: false };
   if (level === 1 || level % 4 === 1) {
@@ -1935,32 +1779,626 @@ function loseBall() {
 }
 
 
-/* ---- boss.js ---- */
-/* ========== BOSS (padrões legíveis) ========== */
-function countBossBombs() { return drops.filter(d => d.type === 'bomb' && d.fromBoss && !d.dead).length; }
+/* ---- bossdefs.js ---- */
+/* ========== ROSTER DE CHEFES ==========
+   1 chefe por setor (mesma ordem dos temas). Cada um mistura as peças de um jeito:
+     RAIDER (ÓRBITA)      bombas em padrões + investida                      (ensina o núcleo)
+     FORJADOR (MAGMA)    orbes orbitais que protegem o núcleo + leque de lava
+     ABISSAL (ABISMO)     núcleo que muda de lugar (3 encaixes) + estilhaços mirados
+     GUARDIÃO (CRISTALINO)    blindagem alternante + estilhaços em faixas
+     SENTINELA (SOLAR)   raios telegrafados + superaquecimento (núcleo exposto após disparar)
+     SINGULARIDADE (VAZIO) gravidade que curva a bola + teleporte + blindagem rara
+   Para balancear: hpBonus, speed, shield (on/off em segundos por fase) e os tempos dentro de cada attack/update. */
+const BOSS_ORDER = ['raider', 'forge', 'abyss', 'warden', 'sun', 'void'];
+function bossKindForSector(s) { return BOSS_ORDER[(s - 1) % BOSS_ORDER.length]; }
+
+const BOSS_DEFS = {
+  raider: {
+    name: 'RAIDER ORBITAL', title: 'CHEFE · RAIDER', sub: 'Bombas em padrões · mire o núcleo dourado', c: '#ff6b9a', c2: '#ffc0d4',
+    hpBonus: 0, speed: 1, wMul: 1, bob: [1.6, 9], atk0: 1.9, shield: [null, { on: 1.8, off: 4.6 }, { on: 2.2, off: 3.8 }], dash: true,
+    stageNames: ['FASE 2 · ACELERAÇÃO', 'FASE FINAL · FÚRIA'], stageSubs: ['Mais pressão, com faixas seguras', 'Padrões mais rápidos — ainda há espaço']
+  },
+  forge: {
+    name: 'FORJADOR DE MAGMA', title: 'CHEFE · FORJADOR', sub: 'Quebre os orbes para expor o núcleo', c: '#ff8a3c', c2: '#ffd27a',
+    hpBonus: 4, speed: .78, wMul: 1.1, bob: [1.1, 6], atk0: 2.3, shield: null, dash: false, maxBombs: 4,
+    stageNames: ['FASE 2 · FUNDIÇÃO', 'FASE FINAL · FORNALHA'], stageSubs: ['Orbes mais rápidos', 'Leque de lava mais amplo']
+  },
+  abyss: {
+    name: 'LEVIATÃ ABISSAL', title: 'CHEFE · ABISSAL', sub: 'O núcleo muda de lugar · siga o brilho', c: '#35e8c8', c2: '#bffff4',
+    hpBonus: 2, speed: .7, wMul: 1.25, bob: [.9, 12], atk0: 2.4, shield: null, dash: false,
+    stageNames: ['FASE 2 · MARÉ', 'FASE FINAL · ABISMO'], stageSubs: ['O núcleo troca mais rápido', 'Estilhaços mirados em sequência']
+  },
+  warden: {
+    name: 'GUARDIÃO DE CRISTAL', title: 'CHEFE · GUARDIÃO', sub: 'Escudo intermitente · ★ Estrela e Cronos quebram', c: '#7ec8ff', c2: '#c8ecff',
+    hpBonus: 4, speed: .85, wMul: 1, bob: [1.2, 7], atk0: 2.1, dash: true,
+    shield: [{ on: 1.4, off: 5.0 }, { on: 1.9, off: 4.2 }, { on: 2.4, off: 3.6 }],
+    stageNames: ['FASE 2 · PRISMA', 'FASE FINAL · REFRAÇÃO'], stageSubs: ['Fragmentos lentos, leia o padrão', 'Fragmentos em ritmo rápido — faixas seguras']
+  },
+  sun: {
+    name: 'SENTINELA SOLAR', title: 'CHEFE · SENTINELA', sub: 'Desvie dos raios · depois de disparar, o núcleo superaquece', c: '#ffd84a', c2: '#fff3b0',
+    hpBonus: 4, speed: 1.15, wMul: .95, bob: [2, 6], atk0: 2.4, shield: null, dash: true,
+    stageNames: ['FASE 2 · CLARÃO', 'FASE FINAL · SUPERNOVA'], stageSubs: ['Dois raios por disparo', 'Raios cruzados — procure o vão']
+  },
+  void: {
+    name: 'SINGULARIDADE', title: 'CHEFE · SINGULARIDADE', sub: 'A gravidade curva a bola · cuidado com o teleporte', c: '#b06bff', c2: '#e8d4ff',
+    hpBonus: 6, speed: .9, wMul: 1.05, bob: [1.4, 8], atk0: 2.2, dash: false,
+    shield: [null, { on: 1.5, off: 5.2 }, { on: 2.0, off: 4.4 }],
+    stageNames: ['FASE 2 · HORIZONTE', 'FASE FINAL · COLAPSO'], stageSubs: ['Teleporte ativado', 'Gravidade mais forte']
+  }
+};
+
+/* ---------- núcleo: posição / atividade (Abissal troca de encaixe) ---------- */
+function bossCore(b = boss) {
+  if (b.kind === 'abyss') return { x: b.x + b.w / 2 + [-.3, 0, .3][b.sock] * b.w, y: b.y + b.h / 2, active: b.coreHide <= 0 };
+  return { x: b.x + b.w / 2, y: b.y + b.h / 2, active: true };
+}
 function maxBossBombs() {
   if (!boss) return 2;
+  if (boss.def.maxBombs) return boss.def.maxBombs;
   const s = (boss.sector || 1) + (eventMods.bossPressure || 0);
   return s <= 1 ? 2 : s === 2 ? 3 : 4;
 }
+
+/* ---------- init por chefe ---------- */
+const BOSS_INIT = {
+  forge(b) {
+    b.orbAng = 0; b.orbs = [0, 1, 2].map(i => ({ off: i * Math.PI * 2 / 3, hp: 2, alive: true, r: 9, respawnAt: 0, flash: 0, hitReady: 0 }));
+  },
+  abyss(b) { b.sock = 1; b.nextSock = 1; b.hopT = 3.4; b.coreHide = 0; },
+  sun(b) { b.beams = []; },
+  void(b) { b.gp = 2.8; b.pulling = false; b.blinkT = 6; b.blinkTo = null; b.blinkWarn = 0; }
+};
+
+/* ---------- ataques ---------- */
+function laneSafeX(x, px, spread) {
+  const near = Math.abs(x - px) < paddle.w * spread;
+  return near ? (x < W / 2 ? x - paddle.w * .9 : x + paddle.w * .9) : x;
+}
+const BOSS_ATTACK = {
+  raider(b) {
+    const stage = b.stage, sector = b.sector || 1, cx = b.x + b.w / 2, px = paddle.x + paddle.w / 2, pressure = eventMods.bossPressure || 0;
+    const p = b.patternIndex % 4, L = W * .22, M = W * .5, R = W * .78, slots = [];
+    if (stage === 1) {
+      slots.push(p % 2 === 0 ? L + rand(-20, 20) : R + rand(-20, 20));
+      b.attackTimer = (sector === 1 ? 1.85 : 1.55) - pressure * .08;
+    } else if (stage === 2) {
+      if (p === 0) slots.push(L, M); else if (p === 1) slots.push(M, R); else if (p === 2) slots.push(L, R); else slots.push(cx, px > W / 2 ? L : R);
+      b.attackTimer = (sector === 1 ? 1.45 : 1.25) - pressure * .06;
+    } else {
+      if (sector === 1 && pressure === 0) {
+        if (p % 2 === 0) slots.push(L, R); else slots.push(M, px > W / 2 ? L : R);
+        b.attackTimer = 1.2;
+      } else {
+        if (p === 0) slots.push(L, M); else if (p === 1) slots.push(M, R); else if (p === 2) slots.push(L, R); else slots.push(L, M, R);
+        b.attackTimer = sector >= 3 ? 1.0 : 1.1;
+      }
+    }
+    for (const x of slots) dropBossBomb(laneSafeX(x, px, .7), 0, false);
+  },
+  warden(b) {
+    const stage = b.stage, px = paddle.x + paddle.w / 2, pressure = eventMods.bossPressure || 0;
+    const p = b.patternIndex % 4, L = W * .22, M = W * .5, R = W * .78, slots = [];
+    if (stage === 1) { slots.push(p % 2 === 0 ? L : R); b.attackTimer = 2.0 - pressure * .06; }
+    else if (stage === 2) { if (p % 2 === 0) slots.push(L, R); else slots.push(M); b.attackTimer = 1.65 - pressure * .05; }
+    else { if (p === 0) slots.push(L, M); else if (p === 1) slots.push(M, R); else slots.push(L, R); b.attackTimer = 1.35; }
+    for (const x of slots) {
+      const near = Math.abs(x - px) < paddle.w * .65;
+      dropBossBomb(near ? (x < W / 2 ? M : L) : x, 0, true);
+    }
+  },
+  /* leque de lava: bombas que se abrem em ângulo a partir do corpo */
+  forge(b) {
+    const stage = b.stage, cx = b.x + b.w / 2, spread = [55, 70, 88][stage - 1];
+    const vxs = stage === 1 ? [-spread, spread] : [-spread, 0, spread];
+    for (const vx of vxs) dropBossBomb(cx, -20, false, vx, true);
+    b.attackTimer = [2.5, 2.2, 1.9][stage - 1];
+  },
+  /* estilhaços MIRADOS: nascem na direção da plataforma, lentos */
+  abyss(b) {
+    const stage = b.stage, px = paddle.x + paddle.w / 2;
+    const offs = stage === 1 ? [0] : stage === 2 ? [-paddle.w * .6, paddle.w * .6] : [-paddle.w * .9, 0, paddle.w * .9];
+    for (const o of offs) dropBossBomb(px + o + rand(-14, 14), -30, true);
+    b.attackTimer = [2.4, 2.1, 1.9][stage - 1];
+  },
+  /* raios: telegrafa 1s e dispara; só começa nova onda quando a anterior acabou */
+  sun(b) {
+    if (b.beams.length) { b.attackTimer = .5; return; }
+    const stage = b.stage, px = paddle.x + paddle.w / 2, bw = 38;
+    const tel = [1.15, 1.0, .9][stage - 1], lanes = [px + rand(-26, 26)];
+    if (stage === 2) lanes.push(clamp(px + (px < W / 2 ? 1 : -1) * (paddle.w * 1.6 + bw + rand(0, 40)), 30, W - 30));
+    if (stage === 3) { lanes.push(clamp(W - px, 30, W - 30)); if (Math.abs(lanes[1] - lanes[0]) < paddle.w * 1.2) lanes.pop(); }
+    for (const x of lanes) b.beams.push({ x: clamp(x, 24, W - 24), w: bw, t: 0, tel, fire: .5, hit: false });
+    b.attackTimer = tel + .5 + [2.3, 2.0, 1.7][stage - 1];
+    sfx('boss');
+  },
+  void(b) {      // detritos: poucos e rápidos, vindos de faixas aleatórias
+    const stage = b.stage, px = paddle.x + paddle.w / 2, n = stage === 1 ? 1 : 2;
+    for (let i = 0; i < n; i++) {
+      let x = rand(40, W - 40); if (Math.abs(x - px) < paddle.w * .8) x = x < W / 2 ? x + paddle.w : x - paddle.w;
+      dropBossBomb(x, 40, false);
+    }
+    b.attackTimer = [2.1, 1.75, 1.5][stage - 1];
+  }
+};
+
+/* ---------- mecânicas contínuas por chefe ---------- */
+function orbPos(b, o) {
+  const c = bossCore(b), rx = b.w * .5 + 8, ry = 34, a = b.orbAng + o.off;
+  return { x: c.x + Math.cos(a) * rx, y: c.y + Math.sin(a) * ry };
+}
+function coreProtected(b = boss) { return !!b && b.kind === 'forge' && b.orbs.some(o => o.alive); }
+function killOrb(b, o, p) {
+  o.alive = false; o.respawnAt = gameNow() + 8500;
+  burst(p.x, p.y, '#ffb454', 16); burst(p.x, p.y, '#fff3b0', 8); sfx('explode'); shake = Math.min(10, shake + 2.5);
+  addScore(40, p.x, p.y);
+  if (!b.orbs.some(x => x.alive)) {
+    b.exposedUntil = gameNow() + 2600;
+    floatText(b.x + b.w / 2, b.y + b.h + 20, 'ORBES QUEBRADOS! NÚCLEO EXPOSTO', '#ffe66d', 13);
+    announce = { title: 'NÚCLEO EXPOSTO', sub: 'Orbes destruídos — ataque o núcleo!', life: 1.4, max: 1.4, color: '#ffe66d' };
+  }
+  if (Math.random() < .4) drops.push({ x: p.x, y: p.y, vy: 100, type: bossPowerType(), r: 10, spin: 0, fromCritical: true });
+}
+/* colisão bola x orbe; retorna true se a bola foi desviada (estrela atravessa) */
+function orbCollide(b) {
+  const now = gameNow(), piercing = now < pierceUntil;
+  for (const o of boss.orbs) {
+    if (!o.alive) continue;
+    const p = orbPos(boss, o), d = Math.hypot(b.x - p.x, b.y - p.y);
+    if (d > b.r + o.r) continue;
+    if (now >= o.hitReady) {
+      o.hitReady = now + 180; o.flash = .15;
+      let dmg = 1; if (overchargeHits > 0) { dmg = 2; overchargeHits--; }
+      o.hp -= dmg; sfx('hit'); burst(p.x, p.y, '#ffb454', 6); addScore(10, p.x, p.y);
+      if (o.hp <= 0) killOrb(boss, o, p);
+    }
+    if (piercing) return false;
+    const nx = (b.x - p.x) / (d || 1), ny = (b.y - p.y) / (d || 1), dot = b.vx * nx + b.vy * ny;
+    if (dot < 0) { b.vx -= 2 * dot * nx; b.vy -= 2 * dot * ny; }
+    b.x = p.x + nx * (b.r + o.r + .5); b.y = p.y + ny * (b.r + o.r + .5);
+    normalizeBall(b, 310, 450);
+    return true;
+  }
+  return false;
+}
+const BOSS_UPDATE = {
+  forge(b, dt) {
+    const f = chronoFactor(), now = gameNow();
+    b.orbAng += dt * f * [1.5, 1.9, 2.3][b.stage - 1];
+    for (const o of b.orbs) {
+      o.flash = Math.max(0, o.flash - dt);
+      if (!o.alive && now >= o.respawnAt) { o.alive = true; o.hp = 2; o.flash = .3; burst(orbPos(b, o).x, orbPos(b, o).y, '#ffb454', 8); }
+    }
+  },
+  abyss(b, dt) {
+    const f = chronoFactor(), cfg = [3.6, 2.8, 2.2][b.stage - 1];
+    b.coreHide = Math.max(0, b.coreHide - dt);
+    b.hopT -= dt * f;
+    if (b.hopT < .9 && b.nextSock === b.sock) { do { b.nextSock = Math.floor(Math.random() * 3); } while (b.nextSock === b.sock); }
+    if (b.hopT <= 0) {
+      const c = bossCore(); burst(c.x, c.y, '#35e8c8', 10);
+      b.sock = b.nextSock; b.coreHide = .2; b.hopT = cfg; sfx('phase');
+      const n = bossCore(); burst(n.x, n.y, '#bffff4', 12);
+    }
+  },
+  sun(b, dt) {
+    const f = chronoFactor(), now = gameNow();
+    for (const bm of b.beams) {
+      const before = bm.t; bm.t += dt * f;
+      if (before < bm.tel && bm.t >= bm.tel) { shake = Math.min(10, shake + 3); sfx('explode'); burst(bm.x, b.y + b.h, '#fff3b0', 12); }
+      if (bm.t >= bm.tel && bm.t < bm.tel + bm.fire && !bm.hit && state === 'playing') {
+        if (paddle.x < bm.x + bm.w / 2 && paddle.x + paddle.w > bm.x - bm.w / 2) {
+          bm.hit = true; burst(paddle.x + paddle.w / 2, paddle.y, '#ffd84a', 22); shake = Math.min(12, shake + 6);
+          setHint('<span style="color:#ffd84a;font-weight:900">RAIO!</span>');
+          deathCause = 'raio'; loseBall(); return;
+        }
+      }
+    }
+    const had = b.beams.length;
+    b.beams = b.beams.filter(bm => bm.t < bm.tel + bm.fire);
+    if (had && !b.beams.length) {
+      b.exposedUntil = now + 1500;
+      floatText(b.x + b.w / 2, b.y + b.h + 20, 'SUPERAQUECIDO! NÚCLEO EXPOSTO', '#ffe66d', 13);
+    }
+  },
+  void(b, dt) {
+    const f = chronoFactor();
+    b.gp -= dt * f;
+    if (b.gp <= 0) {
+      b.pulling = !b.pulling;
+      b.gp = b.pulling ? [2.0, 2.3, 2.6][b.stage - 1] : [3.6, 3.2, 2.8][b.stage - 1];
+      if (b.pulling) { floatText(b.x + b.w / 2, b.y + b.h + 22, 'GRAVIDADE!', '#d9b8ff', 14); sfx('phase'); }
+    }
+    if (b.pulling && state === 'playing') {
+      const c = bossCore(), k = [520, 640, 780][b.stage - 1];
+      for (const ball of balls) {
+        if (ball.attached) continue;
+        const dx = c.x - ball.x, dy = c.y - ball.y, d = Math.hypot(dx, dy);
+        if (d < 240 && d > 30) { const a = k * (1 - d / 240); ball.vx += dx / d * a * dt; ball.vy += dy / d * a * dt; }
+      }
+    }
+    if (b.stage >= 2) {
+      if (b.blinkTo == null) {
+        b.blinkT -= dt * f;
+        if (b.blinkT <= 0) {
+          const px = paddle.x + paddle.w / 2;
+          let tx = rand(8, W - 8 - b.w);
+          for (let i = 0; i < 6 && Math.abs(tx + b.w / 2 - b.x - b.w / 2) < 90; i++) tx = rand(8, W - 8 - b.w);
+          b.blinkTo = tx; b.blinkWarn = .85;
+        }
+      } else {
+        b.blinkWarn -= dt;
+        if (b.blinkWarn <= 0) {
+          burst(b.x + b.w / 2, b.y + b.h / 2, '#b06bff', 18);
+          b.x = b.blinkTo; b.blinkTo = null; b.blinkT = rand(5, 7);
+          burst(b.x + b.w / 2, b.y + b.h / 2, '#e8d4ff', 22); sfx('phase'); shake = Math.min(8, shake + 3);
+        }
+      }
+    }
+  }
+};
+
+/* ---- bossart.js ---- */
+/* ========== ARTE DOS CHEFES ==========
+   Cada chefe ilustra o seu setor: Raider (ÓRBITA, satélite), Forjador (MAGMA), Leviatã (ABISMO),
+   Guardião (CRISTALINO), Sentinela (SOLAR), Singularidade (VAZIO).
+   O desenho é só visual: a hitbox continua sendo o retângulo x,y,w,h do chefe. */
+const BOSS_PAL = {
+  raider: { hi: '#ff9db8', mid: '#e03a5c', lo: '#4a0820', dark: '#801030', acc: '#ffc0d4' },
+  forge:  { hi: '#ffd27a', mid: '#ff7a2c', lo: '#3a0e04', dark: '#24100a', acc: '#ffe0a0' },
+  abyss:  { hi: '#9ffcec', mid: '#14b8a0', lo: '#04302e', dark: '#06201f', acc: '#bffff4' },
+  warden: { hi: '#c4eaff', mid: '#4aa6f0', lo: '#0a3060', dark: '#0a2448', acc: '#e0f4ff' },
+  sun:    { hi: '#fff6c0', mid: '#f0b81c', lo: '#6a3a02', dark: '#3a2402', acc: '#fff6c8' },
+  void:   { hi: '#d9b8ff', mid: '#7a3ad8', lo: '#14062e', dark: '#08040f', acc: '#e8d4ff' }
+};
+function bgrad(b, x, y, h, p, a = 1) {
+  if (b.flash > 0) return '#fff';
+  const g = ctx.createLinearGradient(x, y, x, y + h);
+  g.addColorStop(0, p.hi); g.addColorStop(.45, p.mid); g.addColorStop(1, p.lo);
+  return g;
+}
+function poly(pts) { ctx.beginPath(); pts.forEach((q, i) => i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1])); ctx.closePath(); }
+function tri(a, b, c) { poly([a, b, c]); }
+
+const BOSS_ART = {
+  /* RAIDER · ÓRBITA — satélite de ataque: painéis solares, antena, propulsores */
+  raider(b, p, t) {
+    const bx = b.x, by = b.y, bw = b.w, bh = b.h, cx = bx + bw / 2, cy = by + bh / 2;
+    for (const fx of [bx + bw * .28, bx + bw * .72]) {                       // chamas dos propulsores
+      const fl = 11 + Math.sin(t * 30 + fx) * 4 + b.stage * 3;
+      const g = ctx.createLinearGradient(0, by + bh, 0, by + bh + fl);
+      g.addColorStop(0, '#fff0b0'); g.addColorStop(.4, '#ff8a3c'); g.addColorStop(1, '#ff3d6a00');
+      ctx.fillStyle = g; tri([fx - 6, by + bh - 3], [fx + 6, by + bh - 3], [fx, by + bh + fl]); ctx.fill();
+    }
+    for (const s of [-1, 1]) {                                                // painéis solares
+      ctx.save(); ctx.translate(s < 0 ? bx : bx + bw, cy - 2); ctx.scale(s, 1);
+      ctx.shadowBlur = 0;
+      poly([[2, -9], [40, -17], [40, 13], [2, 7]]);
+      const g = ctx.createLinearGradient(0, 0, 40, 0); g.addColorStop(0, '#1b2b66'); g.addColorStop(1, '#0c1538');
+      ctx.fillStyle = b.flash > 0 ? '#fff' : g; ctx.fill();
+      ctx.strokeStyle = p.acc; ctx.lineWidth = 1.4; ctx.stroke();
+      ctx.strokeStyle = '#7ea6ff66'; ctx.lineWidth = 1;
+      for (let i = 1; i < 4; i++) { ctx.beginPath(); ctx.moveTo(2 + i * 9.5, -9 - i * 2); ctx.lineTo(2 + i * 9.5, 7 + i * 1.5); ctx.stroke(); }
+      ctx.beginPath(); ctx.moveTo(4, -1); ctx.lineTo(40, -2); ctx.stroke();
+      ctx.restore();
+    }
+    ctx.beginPath();                                                          // casco
+    ctx.moveTo(bx + 12, by + 2); ctx.lineTo(bx + bw - 12, by + 2);
+    ctx.quadraticCurveTo(bx + bw - 2, by + 2, bx + bw - 4, by + 12);
+    ctx.lineTo(bx + bw - 8, by + bh - 4); ctx.quadraticCurveTo(cx, by + bh + 4, bx + 8, by + bh - 4);
+    ctx.lineTo(bx + 4, by + 12); ctx.quadraticCurveTo(bx + 2, by + 2, bx + 12, by + 2); ctx.closePath();
+    ctx.fillStyle = bgrad(b, bx, by, bh, p); ctx.fill();
+    ctx.shadowBlur = 0; ctx.strokeStyle = p.acc; ctx.lineWidth = 2; ctx.stroke();
+    ctx.strokeStyle = '#ffffff30'; ctx.lineWidth = 1;                         // painéis do casco
+    ctx.beginPath(); ctx.moveTo(bx + 10, by + 10); ctx.lineTo(bx + bw - 10, by + 10); ctx.moveTo(bx + 18, by + bh - 10); ctx.lineTo(bx + bw - 18, by + bh - 10); ctx.stroke();
+    ctx.fillStyle = '#2a0810';                                                // dentes
+    for (let i = 0; i < 5; i++) { const tx = bx + 18 + i * ((bw - 36) / 4); tri([tx - 4, by + bh - 6], [tx, by + bh + 3], [tx + 4, by + bh - 6]); ctx.fill(); }
+    ctx.strokeStyle = p.acc; ctx.lineWidth = 1.6;                             // antena + parabólica
+    ctx.beginPath(); ctx.moveTo(cx, by + 2); ctx.lineTo(cx, by - 13); ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx, by - 11, 8, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
+    ctx.fillStyle = Math.sin(t * 8) > 0 ? '#ff2d55' : '#5a0a1a'; ctx.beginPath(); ctx.arc(cx, by - 14, 2.2, 0, Math.PI * 2); ctx.fill();
+    for (const lx of [bx + 8, bx + bw - 8]) { ctx.fillStyle = Math.sin(t * 6 + lx) > 0 ? '#7ef6ff' : '#17323a'; ctx.beginPath(); ctx.arc(lx, by + 9, 2, 0, Math.PI * 2); ctx.fill(); }
+  },
+
+  /* FORJADOR · MAGMA — rocha vulcânica com veios de lava, chifres e orbes fundidos */
+  forge(b, p, t) {
+    const bx = b.x, by = b.y, bw = b.w, bh = b.h, cx = bx + bw / 2, cy = by + bh / 2;
+    const heat = ctx.createRadialGradient(cx, cy, 4, cx, cy, bw * .6);
+    heat.addColorStop(0, 'rgba(255,140,40,.35)'); heat.addColorStop(1, 'rgba(255,140,40,0)');
+    ctx.shadowBlur = 0; ctx.fillStyle = heat; ctx.fillRect(bx - 30, by - 30, bw + 60, bh + 80);
+    ctx.shadowBlur = 24 + b.stage * 5; ctx.shadowColor = '#ff7a2c';
+    ctx.fillStyle = b.flash > 0 ? '#fff' : '#1c0a06';                         // chifres
+    for (const [fx, h] of [[.2, 15], [.5, 22], [.8, 15]]) tri([bx + bw * fx - 11, by + 4], [bx + bw * fx, by - h], [bx + bw * fx + 11, by + 4]), ctx.fill();
+    poly([[bx + 8, by + 10], [bx + 18, by], [bx + bw - 18, by], [bx + bw - 8, by + 10], [bx + bw, by + bh - 6], [bx + bw - 14, by + bh + 3], [bx + 14, by + bh + 3], [bx, by + bh - 6]]);
+    const g = ctx.createLinearGradient(0, by, 0, by + bh); g.addColorStop(0, '#4a2418'); g.addColorStop(.6, '#241008'); g.addColorStop(1, '#120604');
+    ctx.fillStyle = b.flash > 0 ? '#fff' : g; ctx.fill();
+    ctx.shadowBlur = 0; ctx.strokeStyle = '#ff8a3c'; ctx.lineWidth = 2; ctx.stroke();
+    const glow = .65 + .35 * Math.sin(t * 3);                                 // veios de lava
+    ctx.strokeStyle = 'rgba(255,170,60,' + glow.toFixed(2) + ')'; ctx.lineWidth = 2.2; ctx.lineCap = 'round';
+    ctx.shadowBlur = 8; ctx.shadowColor = '#ff7a2c';
+    const veins = [[[.12, .3], [.28, .5], [.2, .8]], [[.88, .3], [.74, .55], [.84, .85]], [[.3, .18], [.4, .45], [.34, .8]], [[.7, .18], [.6, .45], [.66, .8]]];
+    for (const v of veins) { ctx.beginPath(); v.forEach((q, i) => { const x = bx + q[0] * bw, y = by + q[1] * bh; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }); ctx.stroke(); }
+    ctx.shadowBlur = 0; ctx.lineCap = 'butt';
+    ctx.fillStyle = '#ff9a3c';                                                // gotas de lava
+    for (let i = 0; i < 3; i++) { const k = (t * .9 + i * .37) % 1, x = bx + bw * (.25 + i * .25); ctx.globalAlpha = 1 - k; ctx.beginPath(); ctx.arc(x, by + bh + 2 + k * 16, 2.4 * (1 - k * .4), 0, Math.PI * 2); ctx.fill(); }
+    ctx.globalAlpha = 1;
+    for (const o of b.orbs || []) {                                           // orbes orbitais
+      const q = orbPos(b, o);
+      if (!o.alive) { ctx.strokeStyle = '#ff8a3c44'; ctx.lineWidth = 1.2; ctx.setLineDash([3, 4]); ctx.beginPath(); ctx.arc(q.x, q.y, o.r, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]); continue; }
+      ctx.strokeStyle = '#ff8a3c55'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(q.x, q.y); ctx.stroke();
+      const rg = ctx.createRadialGradient(q.x - 2, q.y - 2, 1, q.x, q.y, o.r + 2);
+      rg.addColorStop(0, '#fffbe0'); rg.addColorStop(.35, '#ffc050'); rg.addColorStop(1, o.hp <= 1 ? '#a02808' : '#e05a14');
+      ctx.shadowBlur = 16; ctx.shadowColor = '#ff7a2c';
+      ctx.fillStyle = o.flash > 0 ? '#fff' : rg; ctx.beginPath(); ctx.arc(q.x, q.y, o.r + 1, 0, Math.PI * 2); ctx.fill();
+      ctx.shadowBlur = 0; ctx.strokeStyle = '#2a0c04'; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.arc(q.x, q.y, o.r + 1, 0, Math.PI * 2); ctx.stroke();
+      if (o.hp <= 1) { ctx.strokeStyle = '#2a0c04'; ctx.beginPath(); ctx.moveTo(q.x - 4, q.y - 4); ctx.lineTo(q.x + 1, q.y); ctx.lineTo(q.x - 1, q.y + 5); ctx.stroke(); }
+    }
+  },
+
+  /* LEVIATÃ · ABISMO — água-viva abissal: cúpula translúcida, tentáculos e fotóforos */
+  abyss(b, p, t) {
+    const bx = b.x, by = b.y, bw = b.w, bh = b.h, cx = bx + bw / 2, cy = by + bh / 2;
+    ctx.shadowBlur = 0; ctx.lineCap = 'round';
+    for (let i = 0; i < 8; i++) {                                             // tentáculos
+      const x0 = bx + 10 + i * (bw - 20) / 7, len = 28 + (i % 3) * 8 + b.stage * 3;
+      ctx.strokeStyle = i % 2 ? p.mid + 'bb' : p.hi + '88'; ctx.lineWidth = 3.2 - (i % 3) * .6;
+      ctx.beginPath(); ctx.moveTo(x0, by + bh - 6);
+      for (let k = 1; k <= 6; k++) ctx.lineTo(x0 + Math.sin(t * 2.6 + i * 1.3 + k * .8) * (3 + k * 1.4), by + bh - 6 + k * len / 6);
+      ctx.stroke();
+      ctx.fillStyle = p.acc; ctx.shadowBlur = 8; ctx.shadowColor = p.mid;
+      ctx.beginPath(); ctx.arc(x0 + Math.sin(t * 2.6 + i * 1.3 + 4.8) * 11, by + bh - 6 + len, 2, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0;
+    }
+    ctx.lineCap = 'butt';
+    ctx.shadowBlur = 22 + b.stage * 4; ctx.shadowColor = p.mid;
+    const pulse = Math.sin(t * 2.2) * 2;                                      // cúpula
+    ctx.beginPath(); ctx.moveTo(bx, by + bh * .7);
+    ctx.quadraticCurveTo(bx - 4, by - 14 - pulse, cx, by - 14 - pulse);
+    ctx.quadraticCurveTo(bx + bw + 4, by - 14 - pulse, bx + bw, by + bh * .7);
+    for (let i = 7; i >= 0; i--) { const x = bx + i * bw / 7; ctx.quadraticCurveTo(x + bw / 14, by + bh + 2, x, by + bh * .7 + 2); }
+    ctx.closePath();
+    const g = ctx.createLinearGradient(0, by - 14, 0, by + bh);
+    g.addColorStop(0, p.hi + 'dd'); g.addColorStop(.5, p.mid + 'bb'); g.addColorStop(1, p.lo + 'ee');
+    ctx.fillStyle = b.flash > 0 ? '#fff' : g; ctx.fill();
+    ctx.shadowBlur = 0; ctx.strokeStyle = p.acc; ctx.lineWidth = 1.8; ctx.stroke();
+    ctx.strokeStyle = '#ffffff33'; ctx.lineWidth = 1;
+    for (let i = 1; i < 6; i++) { ctx.beginPath(); ctx.moveTo(cx, by - 12); ctx.quadraticCurveTo(bx + i * bw / 6 + (i < 3 ? -8 : 8), by + 8, bx + i * bw / 6, by + bh * .7); ctx.stroke(); }
+    for (let i = 0; i < 9; i++) {                                             // fotóforos
+      const x = bx + bw * (.1 + i * .1), y = by + 4 + Math.sin(i * 2.1) * 8 + 10;
+      ctx.fillStyle = p.acc; ctx.globalAlpha = .35 + .5 * Math.abs(Math.sin(t * 2 + i)); ctx.beginPath(); ctx.arc(x, y, 1.8, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    for (let s = 0; s < 3; s++) {                                             // encaixes do núcleo
+      const x = cx + [-.3, 0, .3][s] * bw, nx = b.nextSock === s && b.sock !== s && b.hopT < .9;
+      ctx.strokeStyle = p.acc; ctx.lineWidth = nx ? 2.4 : 1.2; ctx.globalAlpha = nx ? .5 + .5 * Math.abs(Math.sin(t * 22)) : .28;
+      ctx.beginPath(); ctx.arc(x, cy, b.coreR + 5, 0, Math.PI * 2); ctx.stroke();
+      if (nx) { ctx.beginPath(); ctx.arc(x, cy, b.coreR + 11 - (b.hopT / .9) * 6, 0, Math.PI * 2); ctx.stroke(); }
+    }
+    ctx.globalAlpha = 1;
+  },
+
+  /* GUARDIÃO · CRISTALINO — espinhos de cristal facetados, fragmentos flutuantes e anel */
+  warden(b, p, t) {
+    const bx = b.x, by = b.y, bw = b.w, bh = b.h, cx = bx + bw / 2, cy = by + bh / 2;
+    for (const s of [-1, 1]) {                                                // cristais flutuantes
+      const fx = s < 0 ? bx - 16 : bx + bw + 16, fy = cy + Math.sin(t * 2 + s) * 6;
+      ctx.shadowBlur = 16; ctx.shadowColor = p.mid;
+      poly([[fx, fy - 12], [fx + 7, fy], [fx, fy + 12], [fx - 7, fy]]); ctx.fillStyle = b.flash > 0 ? '#fff' : p.mid + 'cc'; ctx.fill();
+      ctx.shadowBlur = 0; poly([[fx, fy - 12], [fx + 7, fy], [fx, fy]]); ctx.fillStyle = b.flash > 0 ? '#fff' : p.hi; ctx.fill();
+      ctx.strokeStyle = p.acc; ctx.lineWidth = 1.2; poly([[fx, fy - 12], [fx + 7, fy], [fx, fy + 12], [fx - 7, fy]]); ctx.stroke();
+    }
+    ctx.shadowBlur = 26 + b.stage * 4; ctx.shadowColor = p.mid;
+    ctx.fillStyle = b.flash > 0 ? '#fff' : p.dark;                            // base
+    poly([[bx + 2, cy - 2], [bx + 14, by + bh + 2], [bx + bw - 14, by + bh + 2], [bx + bw - 2, cy - 2]]); ctx.fill();
+    const spires = [[-.42, 22, 15], [-.26, 34, 19], [0, 50, 25], [.26, 34, 19], [.42, 22, 15]];
+    for (const [fx, h, hw] of spires) {                                       // espinhos facetados (lado claro / lado escuro)
+      const x = cx + fx * bw, top = cy - h - (fx === 0 ? 0 : 0) + 6, base = cy + bh * .32;
+      ctx.shadowBlur = 14; ctx.shadowColor = p.mid;
+      poly([[x - hw / 2, base], [x - hw / 2 + 1, top + 10], [x, top], [x, base]]); ctx.fillStyle = b.flash > 0 ? '#fff' : p.hi; ctx.fill();
+      ctx.shadowBlur = 0;
+      poly([[x, base], [x, top], [x + hw / 2 - 1, top + 10], [x + hw / 2, base]]); ctx.fillStyle = b.flash > 0 ? '#fff' : p.mid; ctx.fill();
+      ctx.strokeStyle = p.acc; ctx.lineWidth = 1.4; poly([[x - hw / 2, base], [x - hw / 2 + 1, top + 10], [x, top], [x + hw / 2 - 1, top + 10], [x + hw / 2, base]]); ctx.stroke();
+    }
+    ctx.save(); ctx.beginPath(); ctx.rect(bx - 6, by - 20, bw + 12, bh + 30); ctx.clip();   // brilho prismático
+    const sh = ((t * .5) % 1.6 - .3) * (bw + 40);
+    ctx.fillStyle = 'rgba(255,255,255,.22)'; poly([[bx + sh, by - 20], [bx + sh + 14, by - 20], [bx + sh - 10, by + bh + 10], [bx + sh - 24, by + bh + 10]]); ctx.fill();
+    ctx.restore();
+    ctx.shadowBlur = 0; ctx.strokeStyle = '#ffffff44'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.ellipse(cx, cy, Math.max(bw, bh) * .45, Math.max(bw, bh) * .45 * .35, 0, 0, Math.PI * 2); ctx.stroke();
+  },
+
+  /* SENTINELA · SOLAR — disco solar coroado de raios; superaquece depois de disparar */
+  sun(b, p, t) {
+    const bx = b.x, by = b.y, bw = b.w, bh = b.h, cx = bx + bw / 2, cy = by + bh / 2;
+    const hot = boss && b === boss && bossExposed(), rx = bw * .38, ry = bh * .62;
+    const cor = ctx.createRadialGradient(cx, cy, 6, cx, cy, bw * .6);
+    cor.addColorStop(0, hot ? 'rgba(255,90,40,.5)' : 'rgba(255,216,74,.3)'); cor.addColorStop(1, 'rgba(255,216,74,0)');
+    ctx.shadowBlur = 0; ctx.fillStyle = cor; ctx.fillRect(bx - 40, by - 40, bw + 80, bh + 80);
+    const n = 18, len = 9 + b.stage * 3 + (hot ? 6 : 0);
+    ctx.shadowBlur = 20 + b.stage * 5; ctx.shadowColor = hot ? '#ff5a28' : p.mid;
+    for (let i = 0; i < n; i++) {                                             // raios
+      const a = t * .45 + i * Math.PI * 2 / n, ex = Math.cos(a), ey = Math.sin(a), l = len + (i % 2) * 7;
+      const x0 = cx + ex * rx, y0 = cy + ey * ry, x1 = cx + ex * (rx + l), y1 = cy + ey * (ry + l * .8);
+      tri([x0 - ey * 4.5, y0 + ex * 3.4], [x1, y1], [x0 + ey * 4.5, y0 - ex * 3.4]);
+      ctx.fillStyle = b.flash > 0 ? '#fff' : (i % 2 ? p.mid : '#ffd84a'); ctx.fill();
+    }
+    ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);        // disco
+    const g = ctx.createRadialGradient(cx - rx * .25, cy - ry * .3, 3, cx, cy, rx);
+    if (hot) { g.addColorStop(0, '#ffffff'); g.addColorStop(.5, '#ffd0a0'); g.addColorStop(1, '#ff4a28'); }
+    else { g.addColorStop(0, p.hi); g.addColorStop(.55, p.mid); g.addColorStop(1, p.lo); }
+    ctx.fillStyle = b.flash > 0 ? '#fff' : g; ctx.fill();
+    ctx.shadowBlur = 0; ctx.strokeStyle = hot ? '#ffe0c0' : p.acc; ctx.lineWidth = 2; ctx.stroke();
+    ctx.strokeStyle = '#00000022'; ctx.lineWidth = 1;                         // faixas de plasma
+    for (let i = -1; i <= 1; i += 2) { ctx.beginPath(); ctx.ellipse(cx, cy + i * ry * .45, rx * .8, ry * .18, 0, 0, Math.PI); ctx.stroke(); }
+    const ch = b.beams && b.beams.length ? Math.max(...b.beams.map(m => Math.min(1, m.t / m.tel))) : 0;   // lente carregando
+    if (ch > 0 && ch < 1) { const lg = ctx.createRadialGradient(cx, cy, 0, cx, cy, 10 + ch * 26); lg.addColorStop(0, 'rgba(255,255,255,' + (.4 + ch * .5).toFixed(2) + ')'); lg.addColorStop(1, 'rgba(255,216,74,0)'); ctx.fillStyle = lg; ctx.beginPath(); ctx.arc(cx, cy, 10 + ch * 26, 0, Math.PI * 2); ctx.fill(); }
+  },
+
+  /* SINGULARIDADE · VAZIO — buraco negro com disco de acreção e detritos */
+  void(b, p, t) {
+    const bx = b.x, by = b.y, bw = b.w, bh = b.h, cx = bx + bw / 2, cy = by + bh / 2;
+    if (b.pulling) {                                                          // ondas de gravidade
+      ctx.shadowBlur = 0; ctx.lineWidth = 1.6;
+      for (let k = 0; k < 3; k++) { const f = (t * 1.1 + k / 3) % 1; ctx.strokeStyle = 'rgba(232,212,255,' + (.1 + .4 * f).toFixed(2) + ')'; ctx.beginPath(); ctx.arc(cx, cy, 20 + (1 - f) * 110, 0, Math.PI * 2); ctx.stroke(); }
+    }
+    if (b.blinkTo != null) {                                                  // aviso de teleporte
+      const gx = b.blinkTo + bw / 2, a = .3 + .5 * Math.abs(Math.sin(t * 20));
+      ctx.shadowBlur = 0; ctx.globalAlpha = a; ctx.strokeStyle = p.acc; ctx.lineWidth = 1.6; ctx.setLineDash([5, 4]);
+      ctx.beginPath(); ctx.ellipse(gx, cy, bw * .5, bh * .5, 0, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
+    }
+    ctx.save(); ctx.translate(cx, cy); ctx.rotate(-.1);
+    ctx.shadowBlur = 24 + b.stage * 5; ctx.shadowColor = p.mid;
+    for (let i = 2; i >= 0; i--) {                                            // disco de acreção
+      ctx.strokeStyle = [p.acc, p.hi, p.mid][i]; ctx.lineWidth = 3 - i * .7; ctx.globalAlpha = b.flash > 0 ? 1 : .9 - i * .15;
+      ctx.setLineDash([22 - i * 4, 9]); ctx.lineDashOffset = -t * (30 + i * 26);
+      ctx.beginPath(); ctx.ellipse(0, 0, bw * (.5 - i * .06), bh * (.42 - i * .07), 0, 0, Math.PI * 2); ctx.stroke();
+    }
+    ctx.setLineDash([]); ctx.globalAlpha = 1; ctx.restore();
+    const hr = bh * .56;                                                      // horizonte de eventos
+    const g = ctx.createRadialGradient(cx, cy, hr * .4, cx, cy, hr + 4);
+    g.addColorStop(0, '#000'); g.addColorStop(.8, '#0a0418'); g.addColorStop(1, p.mid);
+    ctx.shadowBlur = 20; ctx.shadowColor = p.mid;
+    ctx.fillStyle = b.flash > 0 ? '#fff' : g; ctx.beginPath(); ctx.arc(cx, cy, hr, 0, Math.PI * 2); ctx.fill();
+    ctx.shadowBlur = 0; ctx.strokeStyle = p.acc; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.arc(cx, cy, hr, 0, Math.PI * 2); ctx.stroke();
+    for (let i = 0; i < 7; i++) {                                             // detritos orbitando
+      const a = t * (.7 + (i % 3) * .35) + i * 1.9, r = bw * (.34 + (i % 4) * .045);
+      ctx.fillStyle = i % 2 ? p.acc : p.mid; ctx.fillRect(cx + Math.cos(a) * r - 1.5, cy + Math.sin(a) * r * .36 - 1.5, 3, 3);
+    }
+  }
+};
+
+/* rachaduras: aparecem conforme o chefe perde vida (dano visível) */
+function drawBossCracks(b, p) {
+  if (b.stage < 2) return;
+  const n = b.stage === 2 ? 4 : 8;
+  ctx.save(); ctx.lineJoin = 'round';
+  for (let i = 0; i < n; i++) {
+    const pts = b.cracks[i];
+    ctx.beginPath(); pts.forEach((q, k) => { const x = b.x + q[0] * b.w, y = b.y + q[1] * b.h; k ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
+    ctx.strokeStyle = 'rgba(0,0,0,.55)'; ctx.lineWidth = 1.8; ctx.stroke();
+    ctx.strokeStyle = p.acc; ctx.globalAlpha = .5 + .4 * Math.sin(animT * 5 + i); ctx.lineWidth = .8; ctx.stroke(); ctx.globalAlpha = 1;
+  }
+  ctx.restore();
+}
+
+/* núcleo dourado (posição vem de bossCore: o Leviatã muda de encaixe) */
+function drawBossCore(b) {
+  const c = bossCore(b);
+  if (!c.active) return;
+  const pulse = 1 + Math.sin(b.phase * 3) * .04, prot = coreProtected(b);
+  ctx.save();
+  ctx.fillStyle = '#120818'; ctx.beginPath(); ctx.arc(c.x, c.y, b.coreR + 6, 0, Math.PI * 2); ctx.fill();
+  ctx.shadowBlur = prot ? 6 : 22; ctx.shadowColor = '#ffe66d';
+  const g = ctx.createRadialGradient(c.x - 1.5, c.y - 1.5, 0, c.x, c.y, b.coreR + 1);
+  g.addColorStop(0, '#fff'); g.addColorStop(.35, '#ffe66d'); g.addColorStop(1, '#a87800');
+  ctx.fillStyle = b.flash > 0 ? '#fff' : g; ctx.globalAlpha = prot ? .55 : 1;
+  ctx.beginPath(); ctx.arc(c.x, c.y, b.coreR * pulse, 0, Math.PI * 2); ctx.fill();
+  ctx.globalAlpha = 1; ctx.shadowBlur = 0; ctx.strokeStyle = '#fff6b0'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.arc(c.x, c.y, b.coreR + 3, 0, Math.PI * 2); ctx.stroke();
+  if (prot) {                                                                 // armadura (Forjador): quebre os orbes
+    ctx.strokeStyle = '#ff9a3c'; ctx.lineWidth = 2.2; ctx.setLineDash([6, 4]); ctx.lineDashOffset = -animT * 20;
+    ctx.beginPath(); ctx.arc(c.x, c.y, b.coreR + 8, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
+  }
+  ctx.restore();
+}
+
+/* raios da Sentinela: telegrafa (linha + coluna tênue), dispara (coluna branca) */
+function drawBossBeams(b) {
+  if (!b.beams || !b.beams.length) return;
+  const top = 88, bot = paddle.y + paddle.h + 6;
+  ctx.save();
+  for (const m of b.beams) {
+    const x0 = m.x - m.w / 2;
+    if (m.t < m.tel) {
+      const k = m.t / m.tel;
+      ctx.globalAlpha = .1 + .25 * k; ctx.fillStyle = '#ffd84a'; ctx.fillRect(x0, top, m.w, bot - top);
+      ctx.globalAlpha = .4 + .5 * Math.abs(Math.sin(m.t * (10 + k * 24)));
+      ctx.strokeStyle = '#fff3b0'; ctx.lineWidth = 1.4; ctx.setLineDash([8, 6]); ctx.lineDashOffset = -animT * 60;
+      ctx.strokeRect(x0, top, m.w, bot - top); ctx.setLineDash([]);
+      ctx.globalAlpha = .6 + .4 * k; drawIcon(ctx, 'bang', m.x, bot - 18, 16, '#ffe66d'); ctx.globalAlpha = 1;
+    } else {
+      const k = (m.t - m.tel) / m.fire, a = 1 - k * .6;
+      ctx.shadowBlur = 28; ctx.shadowColor = '#ffd84a'; ctx.globalAlpha = a;
+      const g = ctx.createLinearGradient(x0, 0, x0 + m.w, 0);
+      g.addColorStop(0, 'rgba(255,200,60,0)'); g.addColorStop(.25, '#ffd84a'); g.addColorStop(.5, '#fff'); g.addColorStop(.75, '#ffd84a'); g.addColorStop(1, 'rgba(255,200,60,0)');
+      ctx.fillStyle = g; ctx.fillRect(x0 - 4, top, m.w + 8, bot - top); ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+    }
+  }
+  ctx.restore();
+}
+
+/* barra de vida segmentada por fase + placa de nome */
+function drawBossBar(b) {
+  const d = b.def, barX = 12, barY = 90, barW = W - 24, barH = 9, r = Math.max(0, b.hp / b.maxHp);
+  ctx.save();
+  ctx.fillStyle = '#0e1528'; roundedRect(barX, barY, barW, barH, 5); ctx.fill();
+  const g = ctx.createLinearGradient(barX, 0, barX + barW, 0); g.addColorStop(0, d.c); g.addColorStop(1, d.c2);
+  ctx.fillStyle = g; ctx.shadowBlur = 8; ctx.shadowColor = d.c;
+  roundedRect(barX, barY, Math.max(5, barW * r), barH, 5); ctx.fill(); ctx.shadowBlur = 0;
+  ctx.strokeStyle = '#0e1528cc'; ctx.lineWidth = 2;                           // marcas de fase (66% / 33%)
+  for (const m of [.33, .66]) { ctx.beginPath(); ctx.moveTo(barX + barW * m, barY - 1); ctx.lineTo(barX + barW * m, barY + barH + 1); ctx.stroke(); }
+  ctx.strokeStyle = '#ffffff25'; ctx.lineWidth = 1; roundedRect(barX + .5, barY + .5, barW - 1, barH - 1, 4.5); ctx.stroke();
+  ctx.font = '900 10px system-ui'; ctx.textBaseline = 'alphabetic'; ctx.textAlign = 'left';
+  ctx.fillStyle = d.c2; ctx.fillText(d.name + '  ·  FASE ' + b.stage, barX + 2, 111);
+  ctx.textAlign = 'right';
+  const tag = b.shield && b.shield.on ? 'ESCUDO' : bossExposed() ? 'EXPOSTO' : coreProtected(b) ? 'NÚCLEO BLINDADO' : b.pulling ? 'GRAVIDADE' : b.beams && b.beams.length ? 'RAIO!' : '';
+  ctx.fillStyle = tag ? '#ffe66d' : '#9fb0d8'; ctx.fillText((tag ? tag + '  ·  ' : '') + b.hp + '/' + b.maxHp, barX + barW - 2, 111);
+  ctx.restore();
+}
+
+function drawBossArt(b) {
+  const p = BOSS_PAL[b.kind];
+  ctx.save();
+  BOSS_ART[b.kind](b, p, animT);
+  ctx.restore();
+  drawBossCracks(b, p);
+}
+function drawBossDeath() {
+  const d = bossDeath, b = d.b, p = clamp((animT - d.t0) / 1.15, 0, 1);
+  ctx.save();
+  const j = (1 - p) * 5; ctx.translate(rand(-j, j), rand(-j, j));
+  b.flash = Math.sin(animT * 50) > 0 ? .05 : 0; b.phase += .016;
+  ctx.globalAlpha = 1 - p * p;
+  drawBossArt(b);
+  ctx.globalAlpha = 1;
+  ctx.restore();
+  ctx.save();
+  const cx = b.x + b.w / 2, cy = b.y + b.h / 2;
+  ctx.globalAlpha = (1 - p) * .9; ctx.strokeStyle = '#fff'; ctx.lineWidth = 4 * (1 - p) + 1;
+  ctx.shadowBlur = 24; ctx.shadowColor = b.def.c;
+  ctx.beginPath(); ctx.arc(cx, cy, 20 + p * 190, 0, Math.PI * 2); ctx.stroke();
+  ctx.strokeStyle = b.def.c; ctx.beginPath(); ctx.arc(cx, cy, 10 + p * 120, 0, Math.PI * 2); ctx.stroke();
+  ctx.restore();
+}
+
+/* ---- boss.js ---- */
+/* ========== BOSS (núcleo comum + mecânicas por chefe: ver bossdefs.js) ========== */
+let bossDeath = null;
+function countBossBombs() { return drops.filter(d => d.type === 'bomb' && d.fromBoss && !d.dead).length; }
+function bossEntering() { return !!boss && (animT - boss.born) < 1.1; }
 function spawnBoss() {
-  const bw = Math.min(150, W * .38);
   const sector = Math.max(1, Math.floor(level / 4));
   const pressure = eventMods.bossPressure || 0;
-  // Setores ímpares = Raider (bombas). Pares = Warden (fragmentos lentos, ritmo diferente)
-  const kind = sector % 2 === 0 ? 'warden' : 'raider';
-  const hp = 30 + (sector - 1) * 8 + pressure * 4 + (kind === 'warden' ? 4 : 0);
+  const kind = bossKindForSector(sector), def = BOSS_DEFS[kind];
+  const bw = Math.min(150, W * .38) * def.wMul;
+  const hp = 30 + (sector - 1) * 8 + pressure * 4 + def.hpBonus;
+  const cracks = [];
+  for (let i = 0; i < 8; i++) {
+    let u = rand(.08, .92), v = rand(.1, .9); const pts = [[u, v]];
+    for (let k = 0; k < 3; k++) { u = clamp(u + rand(-.14, .14), .02, .98); v = clamp(v + rand(-.3, .3), .02, .98); pts.push([u, v]); }
+    cracks.push(pts);
+  }
   boss = {
     x: W / 2 - bw / 2, y: Math.max(125, Math.min(H * .22, paddle.y - 180)),
     w: bw, h: 46, hp, maxHp: hp,
     dir: Math.random() < .5 ? -1 : 1, flash: 0, phase: 0,
-    attackTimer: kind === 'warden' ? 2.1 : (sector === 1 ? 1.9 : 1.7),
+    attackTimer: def.atk0 + (sector === 1 ? .1 : 0),
     lastHitAt: gameNow(), regenTimer: 0,
     damageReadyAt: 0, coreR: 10, stage: 1, dashCooldown: 3.0, baseY: 0,
     shield: { on: false, t: 3.5, warn: false, hit: 0 }, exposedUntil: 0, blockReadyAt: 0, aoeReadyAt: 0, lastDropAt: 0, shieldTold: false,
-    sector, patternIndex: 0, kind
+    sector, patternIndex: 0, kind, def, born: animT, critNoDrop: 0, protTold: 0, cracks
   };
   boss.baseY = boss.y;
+  if (BOSS_INIT[kind]) BOSS_INIT[kind](boss);
+  bossDeath = null;
 }
 function bossStageFromHp() {
   if (!boss) return 1;
@@ -1969,127 +2407,79 @@ function bossStageFromHp() {
   if (r <= 0.66) return 2;
   return 1;
 }
+/* o que cada chefe reinicia ao mudar de fase */
+const BOSS_STAGE = {
+  forge(b) { for (const o of b.orbs) { o.alive = true; o.hp = 2; o.flash = .3; } },
+  abyss(b) { b.hopT = 1.6; },
+  sun(b) { b.beams = []; },
+  void(b) { b.gp = 2.2; b.pulling = false; b.blinkTo = null; b.blinkT = 3.5; }
+};
 function onBossStageChange(prev, next) {
   if (next <= prev) return;
+  const d = boss.def;
   sfx('phase'); shake = Math.min(12, shake + 5); vibrate([20, 30, 20]);
-  const isW = boss.kind === 'warden';
-  const labels = isW
-    ? ['', '', 'FASE 2 · PRISMA', 'FASE FINAL · REFRAÇÃO']
-    : ['', '', 'FASE 2 · ACELERAÇÃO', 'FASE FINAL · FURIA'];
   announce = {
-    title: labels[next] || ('FASE ' + next),
-    sub: isW ? (next === 3 ? 'Fragmentos em ritmo rápido — faixas seguras' : 'Fragmentos lentos, leia o padrão')
-             : (next === 3 ? 'Padrões mais rápidos — ainda há espaço' : 'Mais pressão, com faixas seguras'),
-    life: 2, max: 2, color: next === 3 ? '#ff5e7a' : (isW ? '#7ec8ff' : '#ffb454')
+    title: d.stageNames[next - 2] || ('FASE ' + next), sub: d.stageSubs[next - 2] || '',
+    life: 2, max: 2, color: next === 3 ? '#ff5e7a' : d.c
   };
   setHint('<span class="power">' + announce.title + '!</span>');
-  burst(boss.x + boss.w / 2, boss.y + boss.h / 2, isW ? '#7ec8ff' : '#ff6b9a', 28);
-  boss.attackTimer = 1.2; boss.patternIndex = 0;
+  const cc = bossCore();
+  burst(boss.x + boss.w / 2, boss.y + boss.h / 2, d.c, 28);
+  boss.attackTimer = 1.4; boss.patternIndex = 0;
   boss.shield = { on: false, t: 2.4, warn: false, hit: 0 };
+  if (BOSS_STAGE[boss.kind]) BOSS_STAGE[boss.kind](boss);
+  // recompensa de fase: 1 power-up útil sai do núcleo (ajuda sem trivializar)
+  if (boss.hp > 0) drops.push({ x: cc.x, y: cc.y + boss.h / 2, vy: 105, type: bossPowerType(), r: 10, spin: 0, fromCritical: true });
 }
-function dropBossBomb(x, vyExtra = 0, asShard = false) {
+function dropBossBomb(x, vyExtra = 0, asShard = false, vx = 0, lava = false) {
   if (countBossBombs() >= maxBossBombs()) return false;
   const baseVy = asShard ? 110 + Math.min(level * 2, 30) : 155 + diff(level).bombSpeed;
   drops.push({
     x: clamp(x, 18, W - 18), y: boss.y + boss.h + 3,
-    vy: baseVy + vyExtra, type: 'bomb', r: asShard ? 10 : 11, spin: 0,
-    fromBoss: true, shard: asShard
+    vy: baseVy + vyExtra, vx, type: 'bomb', r: asShard ? 10 : 11, spin: 0,
+    fromBoss: true, shard: asShard, lava
   });
   return true;
 }
 function bossAttack() {
   if (!boss) return;
-  if (countBossBombs() >= maxBossBombs()) { boss.attackTimer = 0.55; return; }
-  const stage = boss.stage, sector = boss.sector || 1, cx = boss.x + boss.w / 2, px = paddle.x + paddle.w / 2;
-  const pressure = eventMods.bossPressure || 0;
+  const sun = boss.kind === 'sun';
+  if (!sun && countBossBombs() >= maxBossBombs()) { boss.attackTimer = 0.55; return; }
   boss.patternIndex = (boss.patternIndex || 0) + 1;
-  const p = boss.patternIndex % 4;
-  const leftLane = W * 0.22, midLane = W * 0.5, rightLane = W * 0.78;
-  const slots = [];
-  const isW = boss.kind === 'warden';
-
-  if (isW) {
-    // Warden: menos projéteis, mais legível, sempre deixa faixa livre
-    if (stage === 1) {
-      slots.push(p % 2 === 0 ? leftLane : rightLane);
-      boss.attackTimer = 2.0 - pressure * 0.06;
-    } else if (stage === 2) {
-      if (p % 2 === 0) { slots.push(leftLane); slots.push(rightLane); }
-      else slots.push(midLane);
-      boss.attackTimer = 1.65 - pressure * 0.05;
-    } else {
-      if (p === 0) { slots.push(leftLane); slots.push(midLane); }
-      else if (p === 1) { slots.push(midLane); slots.push(rightLane); }
-      else { slots.push(leftLane); slots.push(rightLane); }
-      boss.attackTimer = 1.35;
-    }
-    for (const x of slots) {
-      const nearPaddle = Math.abs(x - px) < paddle.w * 0.65;
-      const safeX = nearPaddle ? (x < W / 2 ? midLane : leftLane) : x;
-      dropBossBomb(safeX, 0, true);
-    }
-  } else {
-    if (stage === 1) {
-      if (p % 2 === 0) slots.push(leftLane + rand(-20, 20));
-      else slots.push(rightLane + rand(-20, 20));
-      boss.attackTimer = (sector === 1 ? 1.85 : 1.55) - pressure * 0.08;
-    } else if (stage === 2) {
-      if (p === 0) { slots.push(leftLane); slots.push(midLane); }
-      else if (p === 1) { slots.push(midLane); slots.push(rightLane); }
-      else if (p === 2) { slots.push(leftLane); slots.push(rightLane); }
-      else { slots.push(cx); slots.push(px > W / 2 ? leftLane : rightLane); }
-      boss.attackTimer = (sector === 1 ? 1.45 : 1.25) - pressure * 0.06;
-    } else {
-      if (sector === 1 && pressure === 0) {
-        if (p % 2 === 0) { slots.push(leftLane); slots.push(rightLane); }
-        else { slots.push(midLane); slots.push(px > W / 2 ? leftLane : rightLane); }
-        boss.attackTimer = 1.2;
-      } else {
-        if (p === 0) { slots.push(leftLane); slots.push(midLane); }
-        else if (p === 1) { slots.push(midLane); slots.push(rightLane); }
-        else if (p === 2) { slots.push(leftLane); slots.push(rightLane); }
-        else { slots.push(leftLane); slots.push(midLane); slots.push(rightLane); }
-        boss.attackTimer = sector >= 3 ? 1.0 : 1.1;
-      }
-    }
-    for (const x of slots) {
-      const nearPaddle = Math.abs(x - px) < paddle.w * 0.7;
-      const safeX = nearPaddle ? (x < W / 2 ? x - paddle.w * 0.9 : x + paddle.w * 0.9) : x;
-      dropBossBomb(safeX, 0, false);
-    }
-  }
+  BOSS_ATTACK[boss.kind](boss);
   boss.attackTimer *= diff(level).bossAtkMul;
-  if (countBossBombs() >= maxBossBombs() - 1) boss.attackTimer = Math.max(boss.attackTimer, 0.9);
+  if (!sun && countBossBombs() >= maxBossBombs() - 1) boss.attackTimer = Math.max(boss.attackTimer, 0.9);
 }
 function updateBoss(dt) {
   if (!boss) return;
+  const d = boss.def, entering = bossEntering();
   const prevStage = boss.stage;
   boss.stage = bossStageFromHp();
   if (boss.stage !== prevStage) onBossStageChange(prevStage, boss.stage);
   const sector = boss.sector || 1;
-  const isW = boss.kind === 'warden';
   const speedMul = (boss.stage === 1 ? 1 : boss.stage === 2 ? 1.12 : 1.28)
     * (sector === 1 ? 0.88 : sector === 2 ? 0.95 : 1)
-    * (isW ? 0.85 : 1)
-    * chronoFactor();
+    * d.speed * chronoFactor();
   const moveSpeed = (115 + level * 4) * speedMul;
   boss.x += boss.dir * moveSpeed * dt;
   if (boss.x <= 8) { boss.x = 8; boss.dir = 1; }
   else if (boss.x + boss.w >= W - 8) { boss.x = W - 8 - boss.w; boss.dir = -1; }
   boss.phase += dt;
-  const bob = Math.sin(boss.phase * (isW ? 1.2 : 1.6)) * (isW ? 7 : 9) + (boss.stage >= 2 ? Math.sin(boss.phase * 2.8) * 4 : 0);
+  const bob = Math.sin(boss.phase * d.bob[0]) * d.bob[1] + (boss.stage >= 2 ? Math.sin(boss.phase * 2.8) * 4 : 0);
   boss.y = Math.max(105, Math.min((boss.baseY || H * .2), paddle.y - 180)) + bob;
   boss.flash = Math.max(0, boss.flash - dt);
-  boss.attackTimer -= dt * chronoFactor();   // Cronos atrasa os ataques (antes acelerava por engano)
+  if (!entering) boss.attackTimer -= dt * chronoFactor();   // Cronos atrasa os ataques
   updateBossShield(dt);
-  if (boss.attackTimer <= 0) bossAttack();
-  if (boss.stage >= 3) {
+  if (BOSS_UPDATE[boss.kind] && !entering) { BOSS_UPDATE[boss.kind](boss, dt); if (state !== 'playing' || !boss) return; }
+  if (boss.attackTimer <= 0 && !entering) bossAttack();
+  if (boss.stage >= 3 && Math.random() < dt * 7) burst(boss.x + rand(0, boss.w), boss.y + rand(2, boss.h), d.c, 1);   // dano visível
+  if (boss.stage >= 3 && d.dash) {
     boss.dashCooldown -= dt;
     if (boss.dashCooldown <= 0) {
       const target = paddle.x + paddle.w / 2 - boss.w / 2;
       boss.dir = target > boss.x ? 1 : -1;
-      boss.dashCooldown = (isW ? rand(3.4, 4.4) : (sector === 1 ? rand(3.0, 4.0) : rand(2.6, 3.6)));
-      burst(boss.x + boss.w / 2, boss.y + boss.h / 2, isW ? '#7ec8ff' : '#ff6b9a', 10);
+      boss.dashCooldown = d.speed < 1 || boss.kind === 'warden' ? rand(3.4, 4.4) : (sector === 1 ? rand(3.0, 4.0) : rand(2.6, 3.6));
+      burst(boss.x + boss.w / 2, boss.y + boss.h / 2, d.c, 10);
     }
   }
   const regenDelay = sector === 1 ? 6500 : 6000;
@@ -2104,18 +2494,31 @@ function updateBoss(dt) {
     }
   } else boss.regenTimer = 0;
 }
+/* animação de morte: o corpo treme, pisca e se desfaz em explosões */
+function startBossDeath() {
+  const snap = Object.assign({}, boss, { flash: 0 });
+  snap.orbs = boss.orbs ? boss.orbs.map(o => Object.assign({}, o)) : null;
+  bossDeath = { b: snap, t0: animT, next: 0 };
+}
+function updateBossDeath(dt) {
+  const p = (animT - bossDeath.t0) / 1.15, b = bossDeath.b;
+  if (p >= 1) { bossDeath = null; return; }
+  if (p >= bossDeath.next) {
+    bossDeath.next += .09;
+    const x = b.x + rand(0, b.w), y = b.y + rand(-6, b.h + 6);
+    burst(x, y, Math.random() < .5 ? b.def.c : '#ffe66d', 10); sfx('hit');
+    explosions.push({ x, y, r: 26 + rand(0, 22), life: .5, max: .5, color: b.def.c });
+    shake = Math.min(12, shake + 1.6);
+  }
+}
 
 /* ========== CHEFE: NÚCLEO, CORPO ATRAVESSÁVEL E BLINDAGEM ==========
    - A bola ATRAVESSA o corpo na vertical (só as laterais são sólidas): dá para alcançar o núcleo.
    - Núcleo = dano crítico (2) e chance de soltar power-up útil contra chefe.
    - Blindagem alterna ativa/desativada: ativa = o corpo vira parede e nada causa dano.
      Estrela (★) atravessa a blindagem · Cronos derruba a blindagem · ao cair, o núcleo fica EXPOSTO (+1 dano crítico). */
-const SHIELD_CFG = {
-  raider: [null, { on: 1.8, off: 4.6 }, { on: 2.2, off: 3.8 }],
-  warden: [{ on: 1.4, off: 5.0 }, { on: 1.9, off: 4.2 }, { on: 2.4, off: 3.6 }]
-};
 function shieldCfg() {
-  const c = SHIELD_CFG[boss.kind][boss.stage - 1];
+  const arr = boss.def.shield, c = arr && arr[boss.stage - 1];
   if (!c) return null;
   const bonus = Math.min(.6, (boss.sector - 1) * .15);
   return { on: c.on + bonus, off: c.off };
@@ -2156,7 +2559,7 @@ function damageBoss(dmg, crit, x, y) {
   const now = gameNow(), prevStage = boss.stage;
   boss.hp = Math.max(0, boss.hp - dmg);
   boss.lastHitAt = now; boss.regenTimer = 0; boss.flash = .12;
-  const coreX = boss.x + boss.w / 2, coreY = boss.y + boss.h / 2;
+  const cc = bossCore(), coreX = cc.x, coreY = cc.y;
   const nextStage = bossStageFromHp();
   if (nextStage !== prevStage) { boss.stage = nextStage; onBossStageChange(prevStage, nextStage); }
   sfx(crit ? 'boss' : 'hit');
@@ -2167,12 +2570,13 @@ function damageBoss(dmg, crit, x, y) {
     shake = Math.min(10, shake + 2.5);
     floatText(coreX, coreY - 26, bossExposed() ? 'CRÍTICO ×3' : 'CRÍTICO', '#ffe66d', 14);
     const onField = drops.filter(d => d.fromCritical && !d.dead).length;
-    const chance = Math.min(.5, .28 + lv('scavenger') * .05 * rarityMult('scavenger') + (bossExposed() ? .12 : 0));
-    if (onField < 2 && now - (boss.lastDropAt || 0) > 3500 && Math.random() < chance) {
-      boss.lastDropAt = now;
+    // chance base + exposto + "pity": quanto mais críticos sem drop, maior a chance (6º garante)
+    const chance = Math.min(.65, .33 + lv('scavenger') * .05 * rarityMult('scavenger') + (bossExposed() ? .12 : 0) + boss.critNoDrop * .07);
+    if (onField < 2 && now - (boss.lastDropAt || 0) > 3000 && (boss.critNoDrop >= 6 || Math.random() < chance)) {
+      boss.lastDropAt = now; boss.critNoDrop = 0;
       drops.push({ x: coreX, y: coreY + boss.h / 2, vy: 105, type: bossPowerType(), r: 10, spin: 0, fromCritical: true });
       burst(coreX, coreY, '#62f4c5', 16);
-    }
+    } else boss.critNoDrop++;
   } else {
     addScore(15, x, y);
     shake = Math.min(8, shake + 1.2);
@@ -2186,6 +2590,7 @@ function damageBoss(dmg, crit, x, y) {
     announce = { title: 'CHEFE DERROTADO', sub: '+' + (600 + level * 55) + ' pts · recompensa a caminho', life: 1.6, max: 1.6, color: '#ffe66d' };
     eventMods.bossPressure = 0;
     if (lives < maxLives()) { lives++; floatText(bx, by - 34, '+1 VIDA', '#ff7a9a', 16); updateHud(); }
+    startBossDeath();
     boss = null;
     completeStage();
   }
@@ -2196,27 +2601,33 @@ function bossAoe(x, y, radius, dmg) {
   const cx = clamp(x, boss.x, boss.x + boss.w), cy = clamp(y, boss.y, boss.y + boss.h);
   if (Math.hypot(cx - x, cy - y) > radius) return;
   boss.aoeReadyAt = gameNow() + 400;
-  const coreD = Math.hypot(boss.x + boss.w / 2 - x, boss.y + boss.h / 2 - y);
+  const cc = bossCore(), coreD = Math.hypot(cc.x - x, cc.y - y);
   damageBoss(coreD <= radius * .5 ? dmg + 1 : dmg, false, cx, cy);
 }
 function hitBoss(b, px, py) {
-  if (!boss || boss.hp <= 0) return false;
-  const coreX = boss.x + boss.w / 2, coreY = boss.y + boss.h / 2;
+  if (!boss || boss.hp <= 0 || bossEntering()) return false;
+  if (boss.kind === 'forge' && orbCollide(b)) return true;
+  const c = bossCore(), mx = boss.x + boss.w / 2, my = boss.y + boss.h / 2;
   const coreR = boss.coreR + b.r;
-  const coreHit = (b.x - coreX) ** 2 + (b.y - coreY) ** 2 <= coreR * coreR;
+  const inCore = c.active && (b.x - c.x) ** 2 + (b.y - c.y) ** 2 <= coreR * coreR;
+  const prot = coreProtected();
+  const coreHit = inCore && !prot;
   const cx = clamp(b.x, boss.x, boss.x + boss.w), cy = clamp(b.y, boss.y, boss.y + boss.h);
-  if (!coreHit && (b.x - cx) ** 2 + (b.y - cy) ** 2 > b.r * b.r) return false;
+  if (!inCore && (b.x - cx) ** 2 + (b.y - cy) ** 2 > b.r * b.r) return false;
   const now = gameNow();
   const piercing = now < pierceUntil;
   const sideEntry = px + b.r <= boss.x || px - b.r >= boss.x + boss.w;
   // blindagem ativa: o corpo vira parede (estrela atravessa)
   if (bossShieldOn() && !piercing) {
-    if (sideEntry) { const left = b.x < coreX; b.vx = (left ? -1 : 1) * Math.abs(b.vx); b.x = left ? boss.x - b.r - .5 : boss.x + boss.w + b.r + .5; }
-    else if (b.y >= coreY) { b.vy = Math.abs(b.vy); b.y = boss.y + boss.h + b.r + .5; }
+    if (sideEntry) { const left = b.x < mx; b.vx = (left ? -1 : 1) * Math.abs(b.vx); b.x = left ? boss.x - b.r - .5 : boss.x + boss.w + b.r + .5; }
+    else if (b.y >= my) { b.vy = Math.abs(b.vy); b.y = boss.y + boss.h + b.r + .5; }
     else { b.vy = -Math.abs(b.vy); b.y = boss.y - b.r - .5; }
     if (now >= (boss.blockReadyAt || 0)) { boss.blockReadyAt = now + 120; boss.shield.hit = .22; sfx('wall'); burst(b.x, b.y, '#bfe9ff', 5); }
     normalizeBall(b, 310, 450);
     return true;
+  }
+  if (inCore && prot && now - boss.protTold > 1800) {
+    boss.protTold = now; floatText(c.x, c.y - 24, 'NÚCLEO BLINDADO · QUEBRE OS ORBES', '#ffb454', 11);
   }
   if (now >= boss.damageReadyAt) {
     let dmg = coreHit ? 3 : 1;
@@ -2228,7 +2639,7 @@ function hitBoss(b, px, py) {
   }
   // laterais são sólidas; na vertical a bola ATRAVESSA o corpo (alcança o núcleo)
   if (sideEntry && !piercing) {
-    const left = b.x < coreX;
+    const left = b.x < mx;
     b.vx = (left ? -1 : 1) * Math.abs(b.vx);
     b.x = left ? boss.x - b.r - .5 : boss.x + boss.w + b.r + .5;
     normalizeBall(b, 310, 450);
@@ -2617,6 +3028,7 @@ function update(dt) {
     if (boss) updateBoss(dt);
 
     for (const b of balls) {
+      if (state !== 'playing') break;
       if (b.attached) { b.x = paddle.x + paddle.w / 2; b.y = paddle.y - b.r - 2; continue; }
       const speed = Math.hypot(b.vx, b.vy);
       const maxStep = Math.max(2.2, b.r * 0.55);
@@ -2664,8 +3076,10 @@ function update(dt) {
     balls = balls.filter(b => !b.dead);
 
     for (const d of drops) {
+      if (state !== 'playing') break;
       const slow = (d.type === 'bomb' || d.fromBoss) ? chronoFactor() : 1;
       d.y += d.vy * dt * slow;
+      if (d.vx) { d.x += d.vx * dt * slow; if (d.x < 14 || d.x > W - 14) { d.vx = -d.vx; d.x = clamp(d.x, 14, W - 14); } }
       d.spin += dt * 4;
       const tol = d.type === 'bomb' ? 0 : d.r * .7;
       if (d.y + d.r >= paddle.y && d.y - d.r <= paddle.y + paddle.h && d.x >= paddle.x - tol && d.x <= paddle.x + paddle.w + tol) {
@@ -2694,6 +3108,7 @@ function update(dt) {
     if (dir) paddle.x = clamp(paddle.x + dir * paddle.speed * dt, 5, W - paddle.w - 5);
   }
 
+  if (bossDeath) updateBossDeath(dt);
   for (const p of particles) {
     p.x += p.vx * dt; p.y += p.vy * dt;
     p.vx *= Math.pow(.1, dt); p.vy += 90 * dt; p.life -= dt;
