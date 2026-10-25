@@ -124,6 +124,40 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none}
 @keyframes gain{0%,100%{border-color:#3d527a}30%{border-color:#65f6c5;box-shadow:0 0 22px #65f6c5aa;transform:scale(1.08)}}
 .stat:nth-child(2){pointer-events:auto}
 #settings .panel{max-height:94vh;overflow-y:auto;-webkit-overflow-scrolling:touch}#settings .setting-row{padding-top:7px;padding-bottom:7px}
+
+/* tela de fim de run */
+.overp{max-height:96vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.over-score{margin:2px 0 10px}.over-score small{display:block;font-size:10px;letter-spacing:2px;color:#8fa3d0;font-weight:800}
+.over-score b{display:block;font-size:34px;color:#fff;text-shadow:0 0 22px #35d9ff70;letter-spacing:-.5px}
+.over-score span{display:block;font-size:11px;color:#9fb0d8;font-weight:700;margin-top:2px}
+.over-score span.new{color:#ffd56a;text-shadow:0 0 12px #ffd56a80}
+.over-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0}
+.over-cell{padding:8px 4px;border-radius:12px;background:#0c1228;border:1px solid #2a3a62}
+.over-cell small{display:block;font-size:9px;letter-spacing:1.2px;color:#8fa3d0;font-weight:800}
+.over-cell b{display:block;font-size:17px;color:#9ef0c8;margin-top:2px}
+.over-sec{font-size:10px;letter-spacing:2px;color:#8fa3d0;font-weight:800;margin:12px 0 6px;text-align:left}
+.over-sec:empty{display:none}
+.over-route{display:flex;flex-wrap:wrap;gap:5px;justify-content:center}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:999px;border:1px solid currentColor;font-size:10px;font-weight:800;letter-spacing:.6px;background:#0c1228}
+.over-build{display:grid;grid-template-columns:1fr 1fr;gap:6px;text-align:left}
+.over-up{display:flex;align-items:center;gap:7px;padding:7px 9px;border-radius:11px;background:#0c1228;border:1px solid #2a3a62;font-size:11px;font-weight:700;color:#dfe8ff}
+.over-up i{font-style:normal;color:#8fa3d0;font-size:10px;margin-left:auto;white-space:nowrap}
+.over-syn{font-size:11px;color:#c9a4ff;margin-top:8px;font-weight:700}
+.over-tip{margin-top:12px;padding:10px 12px;border-radius:12px;background:#10213f;border:1px solid #35d9ff55;color:#bfeaff;font-size:12px;line-height:1.5;text-align:left}
+.over-tip:empty{display:none}
+.over-tip b{color:#5ceeff;letter-spacing:1px;font-size:10px;display:block;margin-bottom:2px}
+
+#rerollBtn{margin-top:12px;border-color:#ff7a9a99;color:#ffc2d0}
+#rerollBtn:disabled{opacity:.4}
+.panel.gl{max-height:90vh;overflow-y:auto;text-align:left;-webkit-overflow-scrolling:touch}
+.panel.gl .eyebrow,.panel.gl h1{text-align:center}
+.gl-sec{margin:16px 0 6px;font-size:10px;letter-spacing:2.4px;font-weight:900;color:#5ceeff}
+.gl-row{display:flex;gap:11px;align-items:flex-start;padding:8px 0;border-bottom:1px solid #2a3d6655}
+.gl-ic{flex:0 0 26px;display:grid;place-items:center;padding-top:2px}
+.gl-row b{font-size:13px;color:#eef3ff}.gl-row small{font-size:9px;letter-spacing:1.4px;color:#8fa3d0;margin-left:4px}
+.gl-row p{margin:2px 0 0;font-size:11.5px;color:#a8b8dc;line-height:1.45}
+.gl-dot{width:16px;height:16px;border-radius:5px;display:block}
+.panel.gl .primary{margin-top:16px}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#090d20">
@@ -156,6 +190,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none}
     <p>Monte uma build, cause reações em cadeia e enfrente chefes com identidade própria. Cada run muda — upgrades, sinergias e eventos de setor.</p>
     <div class="legend" id="legend"></div>
     <button class="primary" id="start">COMEÇAR JOGO</button>
+    <button class="secondary" id="glMenu">GLOSSÁRIO</button>
     <p class="tip">3 vidas · 2 tipos de chefe · fases especiais · tutorial na 1ª run<br>Upgrade a cada 3 fases · Arraste para mirar · Toque para lançar</p>
   </div>
 </div>
@@ -166,6 +201,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none}
     <h1 id="upTitle">ESCOLHA UM UPGRADE</h1>
     <p id="upSubtitle">Escolha uma melhoria para sua build. Ela permanece até o Game Over.</p>
     <div class="cards" id="cards"></div>
+    <button class="secondary" id="rerollBtn" style="display:none"></button>
     <p class="tip">Comum 65% · Incomum 25% · Raro 8% · Lendário 2%. Sinergias ativam sozinhas.</p>
   </div>
 </div>
@@ -195,6 +231,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none}
     <div class="setting-row"><div><label>Reduzir flashes</label><small>Sem piscadas rápidas e clarões</small></div><label class="toggle"><input type="checkbox" id="a11yFlash"><span></span></label></div>
     <div class="setting-row"><div><label>Perigos em destaque</label><small>Anel preto/branco em bombas e listras nos raios (daltonismo)</small></div><label class="toggle"><input type="checkbox" id="a11yContrast"><span></span></label></div>
     <button class="primary" id="resumeSettings">CONTINUAR</button>
+    <button class="secondary" id="glSettings">GLOSSÁRIO</button>
     <button class="secondary" id="restartSettings">NOVA PARTIDA</button>
     <p class="tip">Atalhos: P ou Esc abrem/fecham as configurações · <span id="verTag"></span></p>
   </div>
@@ -213,12 +250,26 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none}
 </div>
 
 <div class="overlay hidden" id="over">
-  <div class="panel">
+  <div class="panel overp">
     <div class="eyebrow">FIM DE JOGO</div>
     <h1>GAME OVER</h1>
-    <p id="finalscore">Pontuação: 0</p>
-    <p id="buildsummary"></p>
+    <div class="over-score"><small>PONTUAÇÃO</small><b id="finalscore">0</b><span id="overBest"></span></div>
+    <div class="over-grid" id="overStats"></div>
+    <div class="over-sec" id="overRoute"></div>
+    <div class="over-sec">BUILD · <span id="buildsummary"></span></div>
+    <div class="over-build" id="overBuild"></div>
+    <div class="over-syn" id="overSyn"></div>
+    <div class="over-tip" id="overTip"></div>
     <button class="primary" id="again">NOVA PARTIDA</button>
+  </div>
+</div>
+
+<div class="overlay hidden" id="glossary" style="z-index:30">
+  <div class="panel gl">
+    <div class="eyebrow">GUIA RÁPIDO</div>
+    <h1>GLOSSÁRIO</h1>
+    <div id="glBody"></div>
+    <button class="primary" id="glClose">FECHAR</button>
   </div>
 </div>
 
@@ -467,10 +518,10 @@ let topInset = 0, themeIdx = 0, sectorSeq = [0], themeCycle = [0];
 let theme = THEMES[0], sector = 1, mods = [], sectorIntro = false;
 let stage = { maxCombo: 0, perfects: 0, lostLife: false };
 let perfectStreak = 0, comboTier = 0, timeScale = 1, godMode = false, cheated = false, animT = 0;
-let runStats = { picks: {}, stages: 0 }, deathCause = 'bola', hudLivesKey = '', hudLivesPrev = 3;
-let sectorBanner = null, fervor = 0;
+let runStats = { picks: {}, stages: 0, bosses: [], perfects: 0, maxCombo: 0, rerolls: 0 }, deathCause = 'bola', hudLivesKey = '', hudLivesPrev = 3;
+let curSpecial = '', sectorBanner = null, fervor = 0, resumeCd = 0, lastSpecial = '', deathBossKind = '';
 let a11y = { shake: false, flash: false, contrast: false };
-const GAME_VERSION = '3.7';
+const GAME_VERSION = '3.8';
 let paddleFlash = 0, regenTimer = 0, tierFlash = 0, bgDirty = true, musicVol = 0.6, windPhase = 0;
 
 const paddle = { x: 0, y: 0, w: 104, h: 13, baseW: 104, speed: 420 };
@@ -539,10 +590,36 @@ function chronoFactor() {
 function lv(id) { return runUpgrades[id] || 0; }
 function rarityMult(id) { return rarityMultTable[runUpgradeRarity[id] || 'Common'] || 1; }
 function has(a, b) { return lv(a) > 0 && lv(b) > 0; }
-function vibrate(ms) {
-  if (!vibrationOn) return;
-  try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) {}
+/* ===== VIBRAÇÃO POR EVENTO =====
+   Android/Chrome: navigator.vibrate com padrão [liga, desliga, liga...]. iPhone (Safari não tem a API):
+   um "tique" háptico por segmento ligado, usando o truque do <input switch> (iOS 18+). Sem suporte, não faz nada. */
+const VIB = {
+  launch: 12, perfect: 8, power: 15, brick: 10, boom: 18, chain: [20, 40, 20], tier: [14, 20, 14], tier3: [16, 22, 16, 22, 30],
+  heart: [12, 30, 12, 30, 24], shield: [25, 40, 25], lose: [70, 50, 70], over: [120, 60, 120, 60, 220],
+  bossIn: [30, 60, 30], bossCrit: 26, bossHit: 8, bossPhase: [30, 40, 30, 40, 60], bossDie: [40, 50, 40, 50, 40, 50, 220],
+  bomb: [90, 40, 40], legend: [20, 30, 40, 30, 70], stars: [12, 40, 12, 40, 26], ui: 10, tick: 6
+};
+let hapticLabel = null;
+function iosTick() {
+  try {
+    if (!hapticLabel) {
+      hapticLabel = document.createElement('label');
+      hapticLabel.style.cssText = 'position:fixed;left:0;top:0;width:1px;height:1px;opacity:0;pointer-events:none';
+      const i = document.createElement('input'); i.type = 'checkbox'; i.setAttribute('switch', ''); hapticLabel.appendChild(i);
+      document.body.appendChild(hapticLabel);
+    }
+    hapticLabel.click();
+  } catch (e) {}
 }
+function vibrate(p) {
+  if (!vibrationOn) return;
+  try {
+    if (navigator.vibrate) { navigator.vibrate(p); return; }
+    const seg = Array.isArray(p) ? p : [p]; let t = 0;
+    seg.forEach((d, i) => { if (i % 2 === 0) { if (t === 0) iosTick(); else setTimeout(iosTick, t); } t += d; });
+  } catch (e) {}
+}
+function buzz(name) { vibrate(VIB[name] || 10); }
 
 /* ===== ordem dos setores: setor 1 = ÓRBITA; depois sorteio sem repetir até saírem todos =====
    Temas nunca vistos em runs anteriores têm peso 2 (incentiva descobrir). */
@@ -767,6 +844,28 @@ const Music = (() => {
     noise(t, .02, .16, 2500, 'highpass');                // estalo
   }
   const degNote = (sc, deg) => sc[((deg % 7) + 7) % 7] + 12 * Math.floor(deg / 7);
+  /* camada própria de cada chefe (entra com a intensidade ≥1, por cima da trilha do setor) */
+  const BOSS_LAYER = {
+    raider(t, s, ch, root, sd) { if (s % 2 === 0) tone(t, mtof(root + ch[(s / 2) % 3] + 24), sd * .9, 'square', .05, 3500, .003); if (s === 0) tone(t, mtof(root + ch[0] + 36), sd * 3, 'sine', .06, 5000, .002); },
+    forge(t, s, ch, root, sd) {
+      if (s % 8 === 0) { tone(t, mtof(root + ch[0] - 24), sd * 6, 'sine', .3, 400, .01); noise(t, .05, .14, 400, 'lowpass'); }
+      if (s === 6 || s === 14) { noise(t, .12, .16, 2200, 'bandpass'); tone(t, mtof(root + ch[2] + 12), sd * 2, 'square', .05, 2600, .002); }
+    },
+    abyss(t, s, ch, root, sd) {
+      if (s === 0) { const f = mtof(root + ch[0] + 12); tone(t, f, sd * 10, 'sine', .14, 1800, .05); tone(t + sd * 6, f, sd * 8, 'sine', .07, 1400, .05); }
+      if (s === 8) tone(t, mtof(root + ch[2] + 24), sd * 6, 'sine', .06, 3000, .02);
+    },
+    warden(t, s, ch, root, sd) { if (s % 4 === 2) tone(t, mtof(root + ch[(s / 4 | 0) % 3] + 24), sd * 8, 'triangle', .1, 6000, .002); if (s === 10) tone(t, mtof(root + ch[1] + 36), sd * 8, 'sine', .05, 8000, .002); },
+    sun(t, s, ch, root, sd) {
+      if (s === 0 || s === 6 || s === 10) for (const c of ch) tone(t, mtof(root + c + 12), sd * 2.2, 'sawtooth', .05, 2400, .004);
+      if (s === 12) noise(t, sd * 3, .07, 6500, 'highpass');
+    },
+    void(t, s, ch, root, sd) {
+      if (s === 0) { tone(t, mtof(root + ch[0] - 24), sd * 16, 'sawtooth', .16, 300, .15); tone(t, mtof(root + ch[0] - 23), sd * 16, 'sawtooth', .1, 300, .15); }
+      if (s % 7 === 3) noise(t, .03, .08, 4200, 'bandpass');
+      if (s === 8) tone(t, mtof(root + ch[0] + 6), sd * 3, 'square', .04, 1800, .004);
+    }
+  };
   function playStep(t) {
     const th = theme, sc = SCALES[th.scale] || SCALES.minor, root = th.root;
     const s = step % 16, I = Math.round(intensity);
@@ -795,6 +894,7 @@ const Music = (() => {
         tone(t, mtof(root + m + 12), stepDur * 2.4, 'sawtooth', .09, 3600);
       }
     }
+    if (I >= 1 && boss && BOSS_LAYER[boss.kind]) BOSS_LAYER[boss.kind](t, s, chord, root, stepDur);
     step++;
     intensity += (target - intensity) * .035;
   }
@@ -889,6 +989,7 @@ function skipReveal() {
   if (!revealTimers.length) return;
   revealTimers.forEach(clearTimeout); revealTimers = [];
   for (const el of ui.cards.children) { el.classList.add('reveal'); el.style.animationDelay = '0s'; el.classList.remove('locked'); }
+  $('rerollBtn').disabled = false;
 }
 window.__skipReveal = skipReveal;
 function sparksAt(el, color, n = 16) {
@@ -919,8 +1020,10 @@ function applyUpgrade(c, next, rarity, bossReward) {
   if (eventMods.rarityBoost && bossReward) eventMods.rarityBoost = false;
   runStats.picks[c.id] = (runStats.picks[c.id] || 0) + 1;
 }
-function showUpgrades(bossReward = false) {
-  if (skipNextUpgrade && !bossReward) {
+let upgradeOffer = { boss: false, rerolled: false };
+function showUpgrades(bossReward = false, rerolled = false) {
+  upgradeOffer = { boss: bossReward, rerolled };
+  if (skipNextUpgrade && !bossReward && !rerolled) {
     skipNextUpgrade = false;
     level++; updateHud(); buildLevel();
     return;
@@ -970,12 +1073,23 @@ function showUpgrades(bossReward = false) {
     // cerimônia: cada carta é revelada em sequência; as mais raras por último
     revealTimers.push(setTimeout(() => {
       card.classList.add('reveal');
-      if (rarity === 'Legendary') { sfx('legend'); if (!a11y.shake) ui.upgrade.classList.add('shakeDom'); setTimeout(() => ui.upgrade.classList.remove('shakeDom'), 400); sparksAt(card, accent, 24); }
+      if (rarity === 'Legendary') { sfx('legend'); buzz('legend'); if (!a11y.shake) ui.upgrade.classList.add('shakeDom'); setTimeout(() => ui.upgrade.classList.remove('shakeDom'), 400); sparksAt(card, accent, 24); }
       else if (rarity !== 'Common') { sfx('revealRare'); sparksAt(card, accent, 8); }
       else sfx('reveal');
     }, 350 + i * 480));
   });
-  revealTimers.push(setTimeout(() => { for (const el of ui.cards.children) el.classList.remove('locked'); revealTimers = []; }, 350 + rolled.length * 480 + 150));
+  const rb = $('rerollBtn'), canRe = !rerolled && lives >= 2;      // 1 troca por oferta · custa 1 vida · só com 2+ vidas
+  rb.style.display = canRe ? '' : 'none'; rb.disabled = true;
+  rb.innerHTML = iconSVG('heart', 14, '#ff7a9a', 'vertical-align:-2px;margin-right:6px') + 'TROCAR OFERTA · −1 vida';
+  revealTimers.push(setTimeout(() => { for (const el of ui.cards.children) el.classList.remove('locked'); rb.disabled = false; revealTimers = []; }, 350 + rolled.length * 480 + 150));
+}
+function doReroll() {
+  if (state !== 'upgrade' || pickedUpgrade || upgradeOffer.rerolled || lives < 2) return;
+  lives--; runStats.rerolls = (runStats.rerolls || 0) + 1;
+  sfx('lose'); buzz('lose'); updateHud();
+  floatText(W / 2, H * .3, '−1 ♥  OFERTA TROCADA', '#ff7a9a', 14);
+  revealTimers.forEach(clearTimeout); revealTimers = [];
+  showUpgrades(upgradeOffer.boss, true);
 }
 function showEvent() {
   state = 'event';
@@ -1026,6 +1140,7 @@ function closeSettings() {
   ui.settings.classList.add('hidden');
   state = preSettingsState === 'ready' ? 'ready' : (preSettingsState === 'playing' ? 'playing' : 'ready');
   if (state === 'ready') readyHint();
+  else if (state === 'playing' && !dbgOpen) { resumeCd = 1.8; moveLeft = moveRight = false; }
   sfx('ui');
 }
 
@@ -1095,6 +1210,88 @@ function proceedSummary() {
   $('summary').classList.add('hidden');
   c.done();
 }
+
+/* ========== FIM DE RUN: resumo rico + dica ========== */
+const BOSS_TIPS = {
+  raider: 'O Raider solta mísseis em faixas. Fique fora do alinhamento e acerte o núcleo dourado.',
+  forge: 'No Forjador o núcleo é blindado: quebre os 3 orbes (2 acertos cada) para expô-lo.',
+  abyss: 'No Leviatã o núcleo troca de encaixe. O próximo encaixe pisca antes da troca: mire o que estiver aceso.',
+  warden: 'O Guardião liga e desliga o escudo. Espere cair, ou use Estrela ou Cronos para furar.',
+  sun: 'A Sentinela avisa cada raio com uma coluna piscando. Saia da faixa e, depois do disparo, acerte o núcleo superaquecido.',
+  void: 'Na Singularidade a gravidade curva a bola. Ajuste a rebatida e atenção ao teleporte, que avisa antes.'
+};
+const CAUSE_TIPS = {
+  bola: 'Rebata perto do CENTRO da plataforma: dá ângulo e ainda conta como rebatida perfeita.',
+  bomba: 'Bombas só machucam se encostarem na plataforma. Deslize para o lado e deixe cair.',
+  fragmento: 'Fragmentos são lentos: leia o padrão e use as faixas livres.',
+  raio: 'Raios avisam antes de cair. Saia da coluna que estiver piscando.'
+};
+function deathTip(cause) {
+  if (deathBossKind && BOSS_TIPS[deathBossKind]) return BOSS_TIPS[deathBossKind];
+  return CAUSE_TIPS[cause] || CAUSE_TIPS[cause === 'bomba do chefe' ? 'bomba' : 'bola'];
+}
+function showGameOver(cause) {
+  const cell = (l, v) => '<div class="over-cell"><small>' + l + '</small><b>' + v + '</b></div>';
+  ui.final.textContent = score.toLocaleString('pt-BR');
+  const isNew = !cheated && score > 0 && score >= best;
+  const ob = $('overBest'); ob.className = isNew ? 'new' : ''; ob.textContent = cheated ? 'run com debug · recorde não salvo' : isNew ? '★ NOVO RECORDE ★' : 'Recorde: ' + best.toLocaleString('pt-BR');
+  $('overStats').innerHTML = cell('FASE', level) + cell('SETORES', Math.max(1, sector)) + cell('CHEFES', runStats.bosses.length)
+    + cell('COMBO MÁX', '×' + runStats.maxCombo) + cell('PERFEITAS', runStats.perfects) + cell('TROCAS', runStats.rerolls || 0);
+  const seq = sectorSeq.slice(0, Math.max(1, sector)).map(i => '<span class="chip" style="color:' + THEMES[i].accent + '">' + THEMES[i].name + '</span>');
+  const bs = runStats.bosses.map(k => '<span class="chip" style="color:' + BOSS_DEFS[k].c + '">' + iconSVG('core', 11, BOSS_DEFS[k].c) + BOSS_DEFS[k].name.split(' ')[0] + '</span>');
+  $('overRoute').innerHTML = 'ROTA<div class="over-route" style="margin-top:6px">' + seq.join('') + '</div>' + (bs.length ? '<div style="margin-top:10px">CHEFES DERROTADOS</div><div class="over-route" style="margin-top:6px">' + bs.join('') + '</div>' : '');
+  $('buildsummary').textContent = getBuildTitle();
+  const rc = { Common: '#c5d0e4', Uncommon: '#5dffb0', Rare: '#7db8ff', Legendary: '#ffd56a' };
+  const ups = catalog.filter(c => lv(c.id) > 0);
+  $('overBuild').innerHTML = ups.length ? ups.map(c => {
+    const r = runUpgradeRarity[c.id] || 'Common';
+    return '<div class="over-up">' + iconSVG(c.icon, 18, rc[r]) + '<span>' + c.name + '</span><i>Nv.' + lv(c.id) + '</i></div>';
+  }).join('') : '<div class="over-up" style="grid-column:1/3;justify-content:center;color:#8fa3d0">Nenhuma melhoria nesta run</div>';
+  const syn = activeSynergies();
+  $('overSyn').textContent = syn.length ? '✦ Sinergias: ' + syn.join(' · ') : '';
+  $('overTip').innerHTML = '<b>DICA</b>' + deathTip(cause);
+  const p = ui.over.querySelector('.panel'); if (p) p.scrollTop = 0;
+}
+
+/* ---- glossary.js ---- */
+/* ========== GLOSSÁRIO: power-ups, blocos, chefes e fases especiais (montado a partir dos dados do jogo) ========== */
+const GL_POWERS = [
+  ['wide', 'Plataforma Ampla', 'A plataforma fica maior por alguns segundos.'],
+  ['multi', 'Multibola', 'Divide a bola em várias.'],
+  ['pierce', 'Estrela', 'A bola atravessa blocos e também a blindagem dos chefes.'],
+  ['grenade', 'Granada', 'Seus acertos explodem e ferem os blocos em volta (e o chefe).'],
+  ['overcharge', 'Sobrecarga', 'Os próximos acertos causam dano extra.'],
+  ['chrono', 'Cronos', 'Desacelera bombas e o chefe, e derruba o escudo dele.'],
+  ['heart', 'Coração', '+1 vida. Cai de elites e cofres.'],
+  ['bomb', 'Bomba', 'Não deixe tocar na plataforma: custa uma vida.']
+];
+const GL_BLOCKS = [
+  ['#c9a4ff', 'Elite', 'Mais resistente. Sempre solta um power-up e pode soltar coração.'],
+  ['#7ef6ff', 'Cristal', 'Quebra com 1 acerto e estoura os vizinhos em cadeia.'],
+  ['#e8d48a', 'Cofre', 'Muito resistente; sempre solta power-up e tem chance alta de coração.'],
+  ['#ff8a32', 'Explosivo', 'Explode ao quebrar e danifica os blocos próximos.']
+];
+function glossaryHTML() {
+  const sec = t => '<div class="gl-sec">' + t + '</div>';
+  const row = (ic, name, txt) => '<div class="gl-row"><div class="gl-ic">' + ic + '</div><div><b>' + name + '</b><p>' + txt + '</p></div></div>';
+  let h = sec('POWER-UPS');
+  GL_POWERS.forEach(([id, n, d]) => { const col = id === 'bomb' ? '#ff426b' : (DROP_COL[id] || '#ffd166'); h += row(iconSVG(DROP_ICON[id] || id, 22, col), n, d); });
+  h += sec('BLOCOS');
+  GL_BLOCKS.forEach(([c, n, d]) => { h += row('<span class="gl-dot" style="background:' + c + ';box-shadow:0 0 10px ' + c + '88"></span>', n, d); });
+  h += sec('CHEFES · um por setor');
+  BOSS_ORDER.forEach((k, i) => { const df = BOSS_DEFS[k]; h += row(iconSVG('core', 22, df.c), '<span style="color:' + df.c2 + '">' + df.name + '</span> <small>' + THEMES[i].name + '</small>', BOSS_TIPS[k]); });
+  h += sec('FASES ESPECIAIS');
+  SPECIALS.forEach(k => { const si = SPECIAL_INFO[k]; h += row(iconSVG('sparkle', 22, si.c), '<span style="color:' + si.c + '">' + si.t + '</span>', si.s); });
+  return h;
+}
+function openGlossary() {
+  const g = $('glossary'); $('glBody').innerHTML = glossaryHTML(); g.classList.remove('hidden');
+  const p = g.querySelector('.panel'); if (p) p.scrollTop = 0; sfx('ui');
+}
+function closeGlossary() { $('glossary').classList.add('hidden'); sfx('ui'); }
+$('glClose').addEventListener('click', closeGlossary);
+$('glossary').addEventListener('click', e => { if (e.target === $('glossary')) closeGlossary(); });
+['glSettings', 'glMenu'].forEach(id => $(id).addEventListener('click', openGlossary));
 
 /* ---- fx.js ---- */
 /* ========== VISUAL: fundo por tema, cores, efeitos de combo ========== */
@@ -1644,6 +1841,15 @@ function draw() {
     drawBossBar(boss);
   }
   if (bossDeath) drawBossDeath();
+  if (resumeCd > 0) {
+    const n = Math.ceil(resumeCd / .6), k = 1 - (resumeCd / .6 - (n - 1));
+    ctx.save(); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = 'rgba(5,8,23,.35)'; ctx.fillRect(0, 0, W, H);
+    ctx.globalAlpha = clamp(1.3 - k * .9, 0, 1); ctx.font = '900 ' + Math.round(86 + (1 - k) * 28) + 'px system-ui';
+    ctx.shadowBlur = 28; ctx.shadowColor = theme.accent; ctx.fillStyle = '#fff'; ctx.fillText(String(n), W / 2, H * .42);
+    ctx.shadowBlur = 0; ctx.globalAlpha = .8; ctx.font = '800 11px system-ui'; ctx.fillStyle = theme.accent; ctx.fillText('P R E P A R E - S E', W / 2, H * .42 + 66);
+    ctx.restore();
+  }
 
   for (const e of explosions) {
     const p = 1 - e.life / e.max;
@@ -1758,7 +1964,7 @@ function setAim(px, py) {
 }
 function launch() {
   if (state !== 'ready') return;
-  state = 'playing'; unlockAudio(); sfx('launch'); vibrate(12); announce = null;
+  state = 'playing'; unlockAudio(); sfx('launch'); buzz('launch'); announce = null;
   stageStartTime = gameNow();
   for (const b of balls) if (b.attached) {
     b.attached = false;
@@ -1783,20 +1989,39 @@ function normalizeBall(b, min = 295 + Math.min(level * 4, 55), max = 420 + Math.
 }
 
 function onPerfect(b) {
-  perfectStreak++; stage.perfects++; paddleFlash = .3;
+  perfectStreak++; stage.perfects++; runStats.perfects++; paddleFlash = .3;
   const rx = [1, 1, 1.5, 2][lv('reflex')];
   const pts = Math.round(10 * Math.min(perfectStreak, 10) * rx);
   score += Math.round(pts * (hasMod('swift') ? 1.25 : 1)); saveBest(); updateHud();
   floatText(b.x, paddle.y - 32, perfectStreak > 1 ? 'PERFEITO ×' + perfectStreak : 'PERFEITO', '#7ef6ff', 12 + Math.min(perfectStreak, 6));
   explosions.push({ x: b.x, y: paddle.y, r: 24 + Math.min(perfectStreak, 8) * 3, life: .3, max: .3, color: '#7ef6ff' });
   burst(b.x, paddle.y, '#b8fbff', 6 + Math.min(perfectStreak, 8));
-  sfx('perfect'); vibrate(8);
+  sfx('perfect'); buzz('perfect');
   if (lv('reflex') >= 3) registerCombo(b.x, paddle.y - 46);
   if (lv('fervor')) { fervor = lv('fervor'); floatText(b.x, paddle.y - 52, 'FERVOR ×' + fervor, '#ffb454', 11); }
   if (perfectStreak === 5 || perfectStreak === 10) announce = { title: 'PRECISÃO ×' + perfectStreak, sub: 'Rebatidas perfeitas em sequência', life: 1.3, max: 1.3, color: '#7ef6ff' };
 }
 
 /* ---- level.js ---- */
+const SPECIALS = ['crystal_storm', 'elite_hunt', 'vault_room', 'corridor', 'fortress', 'minefield', 'power_rain'];
+const SPECIAL_INFO = {
+  crystal_storm: { t: 'TEMPESTADE DE CRISTAIS', s: 'Cristais em cadeia · cuidado com o combo', c: '#7ef6ff' },
+  elite_hunt: { t: 'CAÇADA AOS ELITES', s: 'Elites reforçados · recompensas melhores', c: '#c9a4ff' },
+  vault_room: { t: 'SALA DO COFRE', s: 'Cofres cheios de power-ups · abra todos', c: '#e8d48a' },
+  corridor: { t: 'CORREDOR', s: 'Passe pelo vão central · elite no fundo', c: '#7ef0ff' },
+  fortress: { t: 'FORTALEZA', s: 'Quanto mais fundo, mais resistente · elite na ponta', c: '#9ab4d8' },
+  minefield: { t: 'CAMPO MINADO', s: 'Blocos explosivos em cadeia · combo gigante', c: '#ff8a32' },
+  power_rain: { t: 'CHUVA DE PODER', s: 'Muito power-up… e muita bomba · fique atento', c: '#65f6c5' }
+};
+function pickSpecial() {
+  if (level < 5) { lastSpecial = ''; return null; }
+  const st = (level - 1) % 4 + 1;
+  if (!(level % 5 === 0 || (sector >= 2 && st >= 2 && Math.random() < .4))) return null;
+  let pool = SPECIALS.filter(s => s !== lastSpecial);
+  if (level < 9) pool = pool.filter(s => s !== 'elite_hunt');
+  const s = pool[Math.floor(Math.random() * pool.length)];
+  lastSpecial = s; return s;
+}
 function enterReady(kind) {
   state = 'ready';
   attachBalls();
@@ -1807,10 +2032,9 @@ function enterReady(kind) {
     const bd = boss ? boss.def : BOSS_DEFS.raider;
     sfx('bossIn');
     announce = { title: bd.title, sub: bd.sub + ' · 3 fases', life: 2.6, max: 2.6, color: bd.c };
-  } else if (kind === 'crystal_storm') {
-    announce = { title: 'TEMPESTADE DE CRISTAIS', sub: 'Cristais em cadeia · cuidado com o combo', life: 2.2, max: 2.2, color: '#7ef6ff' };
-  } else if (kind === 'elite_hunt') {
-    announce = { title: 'CAÇADA AOS ELITES', sub: 'Elites reforçados · recompensas melhores', life: 2.2, max: 2.2, color: '#c9a4ff' };
+  } else if (SPECIAL_INFO[kind]) {
+    const si = SPECIAL_INFO[kind];
+    announce = { title: si.t, sub: si.s, life: 2.4, max: 2.4, color: si.c };
   } else if (kind === 'shield') announce = { title: 'ÚLTIMA CHANCE', sub: 'Proteção salvou a bola', life: 1.8, max: 1.8, color: '#65f6c5' };
   else if (kind === 'life') announce = { title: 'VIDA PERDIDA', sub: lives + ' vida(s) restante(s)', life: 1.8, max: 1.8, color: '#ff8aa0' };
   else {
@@ -1849,7 +2073,7 @@ function buildLevel() {
   // sinergia Cronista + Magnético: plataforma um pouco maior sob cronos (base já conta magnet)
   paddle.w = paddle.baseW;
   paddle.x = clamp(paddle.x, 5, W - paddle.w - 5);
-  bricks = []; drops = []; particles = []; explosions = []; floatingTexts = [];
+  curSpecial = '';   bricks = []; drops = []; particles = []; explosions = []; floatingTexts = [];
   boss = null; bossDeath = null; shieldUses = 0; combo = 0; comboTimer = 0; electricCooldown = 0; comboTier = 0;
   stagePowerDropped = false; perfectStreak = 0; regenTimer = 0;
   stage = { maxCombo: 0, perfects: 0, lostLife: false }; fervor = 0;
@@ -1864,8 +2088,8 @@ function buildLevel() {
     spawnBoss();
     enterReady('boss');
   } else {
-    // Fase especial: a cada 5 fases (exceto chefe)
-    const special = (level >= 5 && level % 5 === 0) ? (level % 10 === 0 ? 'elite_hunt' : 'crystal_storm') : null;
+    // Fase especial: fases múltiplas de 5 e, a partir do setor 2, chance nas fases 2 e 3 de cada setor
+    const special = pickSpecial(); curSpecial = special || '';
     const cols = clamp(Math.floor((W - 24) / 43), 5, 11), gap = 5;
     const bw = Math.min(48, (W - 24 - (cols - 1) * gap) / cols), bh = 18;
     const topY = Math.max(112 + topInset, H * .18);
@@ -1873,21 +2097,35 @@ function buildLevel() {
     const maxRowsBySpace = Math.max(3, Math.floor((maxBottom - topY) / (bh + gap)));
     let rows = Math.min(D.rows, maxRowsBySpace);
     if (special === 'elite_hunt') rows = Math.min(rows, 5);
+    if (special === 'vault_room') rows = Math.min(rows, 4);
+    if (special === 'corridor') rows = Math.min(Math.max(rows, 5), maxRowsBySpace, 7);
+    if (special === 'fortress') rows = Math.min(Math.max(rows, 5), maxRowsBySpace, 6);
+    if (special === 'minefield' || special === 'power_rain') rows = Math.min(rows, 5);
+    const half = (cols - 1) / 2;
+    const mask = special === 'corridor' ? (r, c) => r === 0 || Math.abs(c - half) > 1
+      : special === 'fortress' ? (r, c) => Math.abs(c - half) <= half * (rows - r) / rows + .5
+      : null;
     const total = cols * bw + (cols - 1) * gap, sx = (W - total) / 2, sy = topY;
     let elitePlaced = 0, crystalPlaced = 0, vaultPlaced = 0;
     let maxElites = D.elites, maxCrystal = D.crystals, maxVault = D.vaults;
     if (special === 'crystal_storm') { maxCrystal = Math.min(cols * 2, 8); maxElites = 0; maxVault = 0; }
     if (special === 'elite_hunt') { maxElites = Math.min(3, 2 + Math.floor(level / 10)); maxCrystal = 1; maxVault = 0; }
+    if (special === 'vault_room') { maxVault = 6; maxElites = 0; maxCrystal = 0; }
+    if (special === 'corridor') { maxElites = 1; maxCrystal = 0; maxVault = 0; }
+    if (special === 'fortress') { maxElites = 1; maxCrystal = 0; maxVault = 0; }
+    if (special === 'minefield' || special === 'power_rain') { maxElites = 0; maxCrystal = 0; maxVault = 0; }
 
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
+        if (mask && !mask(r, c)) continue;
         if (!special && level > 2 && r === 0 && Math.random() < .08) continue;
         let hp = 1;
         if (r >= 1 && Math.random() < D.hp2) hp = 2;
         if (r >= 2 && Math.random() < D.hp3) hp = 3;
         if (r >= 3 && Math.random() < D.hp4) hp = 4;
         if (hasMod('armored') && !special && Math.random() < .2) hp++;
-        let explosive = !special && Math.random() < D.explosive;
+        if (special === 'fortress') hp = 1 + Math.floor(r * 3 / Math.max(1, rows - 1));
+        let explosive = (!special && Math.random() < D.explosive) || (special === 'minefield' && Math.random() < .4) || (special === 'corridor' && r >= 2 && Math.random() < .22);
         let kind = 'normal';
         let color = explosive ? '#ff8a32' : theme.bricks[(r + c + level - 1) % theme.bricks.length];
         const roll = Math.random();
@@ -1895,6 +2133,15 @@ function buildLevel() {
           if (crystalPlaced < maxCrystal && (r + c) % 2 === 0 && Math.random() < .5) {
             kind = 'crystal'; hp = 1; color = '#7ef6ff'; crystalPlaced++;
           }
+        } else if (special === 'vault_room') {
+          if (vaultPlaced < maxVault && r >= 1 && r <= rows - 2 && roll < .45) { kind = 'vault'; hp = 3; color = '#e8d48a'; vaultPlaced++; }
+          else hp = 1;
+        } else if (special === 'corridor') {
+          if (elitePlaced < maxElites && r === 0 && Math.abs(c - half) <= .5) { kind = 'elite'; hp = Math.max(3, hp + 2); color = '#c9a4ff'; elitePlaced++; }
+        } else if (special === 'fortress') {
+          if (elitePlaced < maxElites && r === rows - 1 && Math.abs(c - half) <= .5) { kind = 'elite'; hp = 4; color = '#c9a4ff'; elitePlaced++; }
+        } else if (special === 'minefield' || special === 'power_rain') {
+          hp = 1;
         } else if (special === 'elite_hunt') {
           if (elitePlaced < maxElites && r >= 1 && roll < 0.22) {
             kind = 'elite'; hp = Math.max(3, hp + 2); color = '#c9a4ff'; elitePlaced++;
@@ -1930,7 +2177,7 @@ function newGame() {
   runUpgrades = {}; runUpgradeRarity = {};
   combo = 0; shieldUses = 0; electricCooldown = 0; moveLeft = moveRight = false;
   skipNextUpgrade = false; eventMods = { bossPressure: 0, rarityBoost: false };
-  runStats = { picks: {}, stages: 0 }; godMode = false; cheated = false; theme = THEMES[0]; themeIdx = 0; sectorSeq = [0]; themeCycle = [0]; sector = 1; mods = []; bgDirty = true; comboTier = 0; perfectStreak = 0;
+  runStats = { picks: {}, stages: 0, bosses: [], perfects: 0, maxCombo: 0, rerolls: 0 }; lastSpecial = ''; deathBossKind = ''; resumeCd = 0; godMode = false; cheated = false; theme = THEMES[0]; themeIdx = 0; sectorSeq = [0]; themeCycle = [0]; sector = 1; mods = []; bgDirty = true; comboTier = 0; perfectStreak = 0;
   try { tutorialOn = localStorage.getItem('breakpointTutored') !== '1'; } catch (e) { tutorialOn = true; }
   tutorialStep = 0;
   ui.menu.classList.add('hidden'); ui.over.classList.add('hidden'); ui.over.style.zIndex = '';
@@ -1981,25 +2228,17 @@ function loseBall() {
   paddle.w = paddle.baseW;
   const shieldLimit = lv('last') >= 3 ? 2 : (lv('last') > 0 ? 1 : 0);
   if (shieldUses < shieldLimit) {
-    shieldUses++; deathCause = 'bola'; sfx('shield'); vibrate(25); enterReady('shield'); return;
+    shieldUses++; deathCause = 'bola'; sfx('shield'); buzz('shield'); enterReady('shield'); return;
   }
   const cause = deathCause; deathCause = 'bola';
   if (!godMode) lives--;
-  stage.lostLife = true; perfectStreak = 0; sfx('lose'); vibrate(40);
+  stage.lostLife = true; perfectStreak = 0; sfx('lose'); buzz(lives <= 0 ? 'over' : 'lose');
   paddle.x = clamp(paddle.x, 5, W - paddle.w - 5);
   updateHud();
   if (lives <= 0) {
+    deathBossKind = boss ? boss.kind : '';
     state = 'over'; saveBest(); flushBest(); recordRun(cause);
-    const title = getBuildTitle();
-    ui.final.textContent = 'Pontuação: ' + score.toLocaleString('pt-BR') + ' • Fase: ' + level;
-    const parts = catalog.filter(c => lv(c.id) > 0).map(c => {
-      const r = runUpgradeRarity[c.id];
-      return c.name + ' Nv.' + lv(c.id) + (r && r !== 'Common' ? ' (' + rarityNames[r] + ')' : '');
-    });
-    const syn = activeSynergies();
-    ui.buildsummary.textContent = '★ ' + title + '\n'
-      + (parts.length ? 'Build: ' + parts.join(' · ') : 'Build: nenhuma melhoria')
-      + (syn.length ? '\nSinergias: ' + syn.join(' · ') : '');
+    showGameOver(cause);
     ui.over.style.zIndex = '20';
     ui.over.classList.remove('hidden');
     ui.upgrade.classList.add('hidden');
@@ -2658,7 +2897,7 @@ const BOSS_STAGE = {
 function onBossStageChange(prev, next) {
   if (next <= prev) return;
   const d = boss.def;
-  sfx('phase'); shake = Math.min(12, shake + 5); vibrate([20, 30, 20]);
+  sfx('phase'); shake = Math.min(12, shake + 5); buzz('bossPhase');
   announce = {
     title: d.stageNames[next - 2] || ('FASE ' + next), sub: d.stageSubs[next - 2] || '',
     life: 2, max: 2, color: next === 3 ? '#ff5e7a' : d.c
@@ -2804,7 +3043,7 @@ function damageBoss(dmg, crit, x, y) {
   const nextStage = bossStageFromHp();
   if (nextStage !== prevStage) { boss.stage = nextStage; onBossStageChange(prevStage, nextStage); }
   sfx(crit ? 'boss' : 'hit');
-  vibrate(crit ? 22 : 8);
+  buzz(crit ? 'bossCrit' : 'bossHit');
   burst(x, y, crit ? '#ffe66d' : boss.hp % 3 ? '#ff5e83' : '#ffd166', crit ? 16 : 8);
   if (crit) {
     addScore(75, coreX, coreY);
@@ -2827,10 +3066,11 @@ function damageBoss(dmg, crit, x, y) {
     addScore(600 + level * 55, bx, by);
     burst(bx, by, '#ffcf68', 80); burst(bx, by, '#ff5e83', 40);
     shake = Math.min(14, shake + 8);
-    sfx('bossDie'); vibrate([30, 40, 30, 40, 20]);
+    sfx('bossDie'); buzz('bossDie');
     announce = { title: 'CHEFE DERROTADO', sub: '+' + (600 + level * 55) + ' pts · recompensa a caminho', life: 1.6, max: 1.6, color: '#ffe66d' };
     eventMods.bossPressure = 0;
     if (lives < maxLives()) { lives++; floatText(bx, by - 34, '+1 VIDA', '#ff7a9a', 16); updateHud(); }
+    runStats.bosses.push(boss.kind);
     startBossDeath();
     boss = null;
     completeStage();
@@ -2991,7 +3231,7 @@ function grenadeBlast(x, y) {
   const extraDmg = lv('demolisher') >= 3 ? 1 : 0;
   explosions.push({ x, y, r: radius, life: .36, max: .36, color: '#ff6b3d' });
   burst(x, y, '#ff6b3d', 16); burst(x, y, '#ffd166', 8);
-  sfx('explode'); shake = Math.min(10, shake + 2.5); vibrate(18);
+  sfx('explode'); shake = Math.min(10, shake + 2.5); buzz('boom');
   areaDamage(x, y, radius, 1 + extraDmg, 10);
   bossAoe(x, y, radius, 1 + extraDmg);
 }
@@ -3006,9 +3246,10 @@ function maybeDrop(br, forcePower = false) {
     dropAt(c.x, c.y, randomPowerType()); stagePowerDropped = true; return;
   }
   const mercy = lives <= 1 ? 1.2 : 1, jack = hasMod('jackpot') ? 1.35 : 1;
-  const powerChance = Math.min(.3, (.11 + sc * .04) * (sc ? rm : 1) * mercy * jack);
+  const rain = curSpecial === 'power_rain';
+  const powerChance = rain ? .42 : Math.min(.3, (.11 + sc * .04) * (sc ? rm : 1) * mercy * jack);
   const bombBase = level < 5 ? .06 : .085;
-  const bombChance = Math.max(.02, (bombBase - sc * .025) * (sc ? (2 - rm * 0.5) : 1) * diff(level).bombMul * (hasMod('jackpot') ? 1.4 : 1));
+  const bombChance = Math.max(.02, (bombBase - sc * .025) * (sc ? (2 - rm * 0.5) : 1) * diff(level).bombMul * (hasMod('jackpot') ? 1.4 : 1)) * (rain ? 1.9 : 1);
   const roll = Math.random();
   if (roll < powerChance) { dropAt(c.x, c.y, randomPowerType()); stagePowerDropped = true; return; }
   if (roll < powerChance + bombChance) dropAt(c.x, c.y, 'bomb', 125);
@@ -3072,7 +3313,7 @@ function explodeAt(x, y, source) {
     }
   }
   sfx('explode');
-  vibrate(processed > 1 ? [20, 40, 20] : 30);
+  if (processed > 1) buzz('chain');
   setHint(processed > 1 ? '<span class="power">CADEIA ×' + processed + '!</span>' : '<span class="power">EXPLOSÃO!</span>');
   setTimeout(() => { if (state === 'playing' && !anyPowerActive()) restoreDefaultHint(); }, 900);
 }
@@ -3083,18 +3324,17 @@ function registerCombo(x, y) {
     const nt = tierOf(combo);
     if (nt > comboTier) onTierUp(nt, x, y);
     else sfx('combo');
-    stage.maxCombo = Math.max(stage.maxCombo, combo);
+    stage.maxCombo = Math.max(stage.maxCombo, combo); runStats.maxCombo = Math.max(runStats.maxCombo, combo);
     floatText(x, y - 12, 'COMBO ×' + combo, TIERS[comboTier].color, 13 + comboTier * 1.5);
     updateHud();
     ui.comboHud.classList.add('pop'); setTimeout(() => ui.comboHud.classList.remove('pop'), 110);
-    if (combo % 5 === 0) vibrate(18);
   }
 }
 function onTierUp(t, x, y) {
   comboTier = t; tierFlash = 1;
   const T = TIERS[t];
   announce = { title: 'COMBO ×' + T.min, sub: T.name + '!', life: 1.5, max: 1.5, color: T.color };
-  shake = Math.min(12, shake + 2 + t); sfx('tierup'); vibrate([14, 20, 14]);
+  shake = Math.min(12, shake + 2 + t); sfx('tierup'); buzz(comboTier >= 3 ? 'tier3' : 'tier');
   burst(W / 2, H * .45, T.color, 14 + t * 6);
   explosions.push({ x: W / 2, y: H * .45, r: 90 + t * 30, life: .5, max: .5, color: T.color });
   addScore(25 * t * t, x, y);
@@ -3120,7 +3360,7 @@ function hitBrick(b, br) {
   registerCombo(cx, cy);
   burst(b.x, b.y, br.color, br.hp > 0 ? 3 : 8);
   sfx(br.hp > 0 ? 'hit' : 'break');
-  if (br.hp <= 0) vibrate(10);
+  if (br.hp <= 0) buzz('brick');
   if (gameNow() < grenadeUntil) grenadeBlast(cx, cy);
   const overlapL = (b.x + b.r) - br.x, overlapR = (br.x + br.w) - (b.x - b.r);
   const overlapT = (b.y + b.r) - br.y, overlapB = (br.y + br.h) - (b.y - b.r);
@@ -3147,12 +3387,12 @@ function hitBrickPiercing(b, br) {
   sfx(br.hp > 0 ? 'hit' : 'break');
   if (has('star', 'conductor') && Math.random() < 0.2) electricStrike(cx, cy);
   if (gameNow() < grenadeUntil) grenadeBlast(cx, cy);
-  if (br.hp <= 0) { vibrate(10); killBrick(br, 0, { ball: true }); }
+  if (br.hp <= 0) { buzz('brick'); killBrick(br, 0, { ball: true }); }
 }
 
 /* ---- powerups.js ---- */
 function catchDrop(d) {
-  sfx('power'); vibrate(15);
+  sfx('power'); buzz(d.type === 'heart' ? 'heart' : 'power');
   if (d.type === 'wide') {
     wideUntil = gameNow() + 10000;
     paddle.w = paddle.baseW * 1.55;
@@ -3237,6 +3477,13 @@ function catchDrop(d) {
 /* ---- update.js ---- */
 function update(dt) {
   if (state === 'settings' || state === 'event' || state === 'upgrade') return;
+  if (resumeCd > 0) {                               // contagem 3-2-1 ao retomar: o jogo (e o relógio dele) fica congelado
+    const n0 = Math.ceil(resumeCd / .6); resumeCd -= dt; animT += dt;
+    const n1 = Math.ceil(Math.max(0, resumeCd) / .6);
+    if (n1 !== n0 && n1 > 0) { sfx('tick'); buzz('tick'); }
+    if (resumeCd <= 0) { resumeCd = 0; sfx('launch'); }
+    return;
+  }
   gClock += dt * 1000;
   if (electricCooldown > 0) electricCooldown -= dt;
   animT += dt; windPhase += dt * .9; paddleFlash = Math.max(0, paddleFlash - dt); tierFlash = Math.max(0, tierFlash - dt * 1.4);
@@ -3328,7 +3575,7 @@ function update(dt) {
       if (d.y + d.r >= paddle.y && d.y - d.r <= paddle.y + paddle.h && d.x >= paddle.x - tol && d.x <= paddle.x + paddle.w + tol) {
         d.dead = true;
         if (d.type === 'bomb') {
-          const bi = BOMB_INFO[d.sty] || BOMB_INFO.none;
+          const bi = BOMB_INFO[d.sty] || BOMB_INFO.none; buzz('bomb');
           burst(d.x, d.y, bi.c, 22);
           shake = Math.min(10, shake + 6);
           setHint('<span style="color:' + bi.c + ';font-weight:900">' + bi.t + '</span>');
@@ -3382,6 +3629,7 @@ function pointFromEvent(e) {
 
 canvas.addEventListener('pointerdown', e => {
   if (state === 'menu' || state === 'over' || state === 'upgrade' || state === 'transition' || state === 'settings' || state === 'event' || state === 'summary') return;
+  if (resumeCd > 0 && state === 'playing') { const p0 = pointFromEvent(e); paddle.x = clamp(p0.x - paddle.w / 2, 5, W - paddle.w - 5); pointerDown = true; return; }
   pointerDown = true; unlockAudio();
   const p = pointFromEvent(e);
   if (state === 'ready') { aimStartX = p.x; aimStartY = p.y; aimDragged = false; setAim(p.x, p.y); }
@@ -3427,6 +3675,7 @@ ui.vibToggle.addEventListener('change', () => {
   vibrationOn = ui.vibToggle.checked; saveSettings();
   if (vibrationOn) vibrate(20);
 });
+$('rerollBtn').addEventListener('click', e => { e.stopPropagation(); doReroll(); });
 $('sumContinue').addEventListener('click', e => { e.stopPropagation(); skipSummary(); });
 $('summary').addEventListener('click', skipSummary);
 ui.upgrade.addEventListener('click', e => { if (!e.target.closest('.card')) skipReveal(); });
@@ -3442,6 +3691,7 @@ window.addEventListener('keyup', e => {
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) { flushBest(); if (state === 'playing') openSettings(); }
 });
+window.addEventListener('blur', () => { if (state === 'playing' && !dbgOpen) openSettings(); });
 window.addEventListener('pagehide', flushBest);
 window.addEventListener('keydown', e => {
   if (KL.includes(e.key)) { moveLeft = true; moveRight = false; e.preventDefault(); }
