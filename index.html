@@ -123,7 +123,16 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none}
 .stat.gain{animation:gain .65s}
 @keyframes gain{0%,100%{border-color:#3d527a}30%{border-color:#65f6c5;box-shadow:0 0 22px #65f6c5aa;transform:scale(1.08)}}
 .stat:nth-child(2){pointer-events:auto}
+#settings .panel{max-height:94vh;overflow-y:auto;-webkit-overflow-scrolling:touch}#settings .setting-row{padding-top:7px;padding-bottom:7px}
 </style>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#090d20">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Breakpoint">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
 </head>
 <body>
 <canvas id="game"></canvas>
@@ -184,9 +193,12 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none}
     <div class="setting-row"><div><label>Efeitos</label><small id="volLabel">80%</small></div><input type="range" id="volSlider" min="0" max="100" value="80"></div>
     <div class="setting-row"><div><label>Música</label><small id="musLabel">60%</small></div><input type="range" id="musSlider" min="0" max="100" value="60"></div>
     <div class="setting-row"><div><label>Vibração</label><small>Feedback tátil (se o aparelho permitir)</small></div><label class="toggle"><input type="checkbox" id="vibToggle" checked><span></span></label></div>
+    <div class="setting-row"><div><label>Reduzir tremor</label><small>Sem balanço de tela e de cartas</small></div><label class="toggle"><input type="checkbox" id="a11yShake"><span></span></label></div>
+    <div class="setting-row"><div><label>Reduzir flashes</label><small>Sem piscadas rápidas e clarões</small></div><label class="toggle"><input type="checkbox" id="a11yFlash"><span></span></label></div>
+    <div class="setting-row"><div><label>Perigos em destaque</label><small>Anel preto/branco em bombas e listras nos raios (daltonismo)</small></div><label class="toggle"><input type="checkbox" id="a11yContrast"><span></span></label></div>
     <button class="primary" id="resumeSettings">CONTINUAR</button>
     <button class="secondary" id="restartSettings">NOVA PARTIDA</button>
-    <p class="tip">Atalhos: P ou Esc abrem/fecham as configurações</p>
+    <p class="tip">Atalhos: P ou Esc abrem/fecham as configurações · <span id="verTag"></span></p>
   </div>
 </div>
 
@@ -270,6 +282,10 @@ const ICON_PATHS = {
   bang: 'M10.4 2.5h3.2l-.6 12.2h-2zM12 17.2a1.9 1.9 0 1 1 0 3.8 1.9 1.9 0 0 1 0-3.8z',
   vital: _heart,
   reflex: _ring(12, 12, 10.4, 8.4) + _ring(12, 12, 5.6, 3.6) + _circ(12, 12, 1.2),
+  fervor: 'M12 1.8c.9 4.2 6 6.2 6 11.6a6 6 0 0 1-12 0c0-2.4 1.1-3.8 2.4-5 .1 2.1 1 3.2 2.1 3.6-.7-4.6.2-7.2 1.5-10.2z',
+  pace: 'M5.5 2h13v4.2l-5 5.8 5 5.8V22h-13v-4.2l5-5.8-5-5.8z',
+  pull: _ring(12, 12, 10.4, 8.4) + _poly(12, 12, 5.2, 3, Math.PI / 2) + _circ(12, 17.6, 1.4),
+  lens: _ring(12, 12, 10.4, 7.2) + _ring(12, 12, 5, 3.2) + _circ(12, 12, 1.4),
   note: 'M9 3.5l11-2v14.2a3.4 3.4 0 1 1-2-3.1V6.4l-7 1.3v10.8a3.4 3.4 0 1 1-2-3.1z'
 };
 const ICON_P2D = {};
@@ -341,7 +357,19 @@ const catalog = [
     effect: 'Mais vidas máximas. Elites e cofres podem soltar corações.' },
   { id: 'reflex', name: 'Reflexo Cristalino', rarities: ['Common', 'Uncommon', 'Rare'], icon: 'target',
     desc: ['Zona de rebatida perfeita +35%.', 'Zona perfeita +70% e perfeitas valem +50% pts.', 'Zona perfeita +110%, perfeitas valem o dobro e dão +1 combo.'],
-    effect: 'Rebatidas perfeitas mais fáceis e mais valiosas. Sinergia com Caçador de Combos.' }
+    effect: 'Rebatidas perfeitas mais fáceis e mais valiosas. Sinergia com Caçador de Combos.' },
+  { id: 'fervor', name: 'Fervor Perfeito', rarities: ['Common', 'Uncommon', 'Rare'], icon: 'fervor',
+    desc: ['Rebatida perfeita: o próximo bloco atingido leva +1 de dano.', 'Rebatida perfeita: os próximos 2 blocos atingidos levam +1 de dano.', 'Rebatida perfeita: os próximos 3 blocos atingidos levam +1 de dano.'],
+    effect: 'Premia a precisão com dano extra. Sinergia com Reflexo Cristalino.' },
+  { id: 'pace', name: 'Ritmo Constante', rarities: ['Common', 'Uncommon', 'Rare'], icon: 'pace',
+    desc: ['O combo dura +0,35s a mais.', 'O combo dura +0,7s a mais.', 'O combo dura +1,1s a mais.'],
+    effect: 'Combos mais fáceis de manter. Sinergia com Caçador de Combos.' },
+  { id: 'pull', name: 'Atrator de Poder', rarities: ['Uncommon', 'Rare', 'Legendary'], icon: 'pull',
+    desc: ['Power-ups e corações são levemente puxados para a plataforma.', 'Atração mais forte e de mais longe.', 'Atração forte: poucos power-ups escapam.'],
+    effect: 'Não atrai bombas. Sinergia com Reciclador.' },
+  { id: 'lens', name: 'Lente do Núcleo', rarities: ['Uncommon', 'Rare', 'Legendary'], icon: 'lens',
+    desc: ['Núcleo do chefe com área de acerto +2.', 'Área de acerto do núcleo +4.', 'Área de acerto do núcleo +6 e crítico solta power-up mais fácil.'],
+    effect: 'Ajuda a acertar o núcleo dos chefes.' }
 ];
 const rarityNames = { Common: 'COMUM', Uncommon: 'INCOMUM', Rare: 'RARO', Legendary: 'LENDÁRIO' };
 
@@ -372,7 +400,9 @@ const MODS = {
   regen:   { name: 'BLOCOS VIVOS', desc: 'Blocos feridos se curam com o tempo', icon: 'heart', color: '#ff6c98' },
   wind:    { name: 'VENTO ESTELAR', desc: 'Correntes laterais curvam a bola', icon: 'wide', color: '#8fd6ff' },
   jackpot: { name: 'FARTURA', desc: 'Mais power-ups… e mais bombas', icon: 'sparkle', color: '#ffe27a' },
-  fog:     { name: 'PENUMBRA', desc: 'Blocos longe da bola ficam escuros', icon: 'gem', color: '#b794ff' }
+  fog:     { name: 'PENUMBRA', desc: 'Blocos longe da bola ficam escuros', icon: 'gem', color: '#b794ff' },
+  armored: { name: 'BLINDADOS', desc: '1 em cada 5 blocos ganha +1 de vida · pontos +20%', icon: 'shield', color: '#9ab4d8' },
+  frenzy:  { name: 'FRENESI', desc: 'O combo expira mais rápido · pontos +30%', icon: 'combo', color: '#ff7a8a' }
 };
 const MOD_IDS = Object.keys(MODS);
 
@@ -415,7 +445,7 @@ const ui = {
   hint: $('hint'), final: $('finalscore'), cards: $('cards'),
   upTitle: $('upTitle'), upSubtitle: $('upSubtitle'), buildsummary: $('buildsummary'),
   comboHud: $('comboHud'), comboValue: $('comboValue'), comboName: $('comboName'),
-  settingsBtn: $('settingsBtn'), volSlider: $('volSlider'), volLabel: $('volLabel'), musSlider: $('musSlider'), musLabel: $('musLabel'), vibToggle: $('vibToggle')
+  settingsBtn: $('settingsBtn'), volSlider: $('volSlider'), volLabel: $('volLabel'), musSlider: $('musSlider'), musLabel: $('musLabel'), vibToggle: $('vibToggle'), a11yShake: $('a11yShake'), a11yFlash: $('a11yFlash'), a11yContrast: $('a11yContrast')
 };
 
 let W = 0, H = 0, dpr = 1, last = 0, state = 'menu';
@@ -440,6 +470,9 @@ let theme = THEMES[0], sector = 1, mods = [], sectorIntro = false;
 let stage = { maxCombo: 0, perfects: 0, lostLife: false };
 let perfectStreak = 0, comboTier = 0, timeScale = 1, godMode = false, cheated = false, animT = 0;
 let runStats = { picks: {}, stages: 0 }, deathCause = 'bola', hudLivesKey = '', hudLivesPrev = 3;
+let sectorBanner = null, fervor = 0;
+let a11y = { shake: false, flash: false, contrast: false };
+const GAME_VERSION = '3.5';
 let paddleFlash = 0, regenTimer = 0, tierFlash = 0, bgDirty = true, musicVol = 0.6, windPhase = 0;
 
 const paddle = { x: 0, y: 0, w: 104, h: 13, baseW: 104, speed: 420 };
@@ -542,7 +575,10 @@ function loadSettings() {
     if (mv != null) musicVol = clamp(Number(mv) / 100, 0, 1);
     const vib = localStorage.getItem('breakpointVib');
     if (vib != null) vibrationOn = vib !== '0';
+    const a = JSON.parse(localStorage.getItem('breakpointA11y') || 'null');
+    if (a && typeof a === 'object') a11y = Object.assign(a11y, { shake: !!a.shake, flash: !!a.flash, contrast: !!a.contrast });
   } catch (e) {}
+  syncA11yUI();
   ui.volSlider.value = String(Math.round(masterVol * 100));
   ui.volLabel.textContent = Math.round(masterVol * 100) + '%';
   ui.musSlider.value = String(Math.round(musicVol * 100));
@@ -554,6 +590,7 @@ function saveSettings() {
     localStorage.setItem('breakpointVol', String(Math.round(masterVol * 100)));
     localStorage.setItem('breakpointMus', String(Math.round(musicVol * 100)));
     localStorage.setItem('breakpointVib', vibrationOn ? '1' : '0');
+    localStorage.setItem('breakpointA11y', JSON.stringify(a11y));
   } catch (e) {}
 }
 function getBest() {
@@ -585,6 +622,7 @@ function recordRun(cause) {
   for (const [k, v] of Object.entries(runStats.picks)) st.picks[k] = (st.picks[k] || 0) + v;
   try { localStorage.setItem('breakpointStats', JSON.stringify(st)); } catch (e) {}
 }
+function syncA11yUI() { ui.a11yShake.checked = a11y.shake; ui.a11yFlash.checked = a11y.flash; ui.a11yContrast.checked = a11y.contrast; }
 
 /* ---- audio.js ---- */
 let silentEl = null;
@@ -656,6 +694,36 @@ function sfx(name) {
     case 'reveal': beep(420, .09, 'sine', 0.2, 120); break;
     case 'revealRare': beep(520, .1, 'triangle', 0.24, 160); setTimeout(() => beep(780, .12, 'sine', 0.2), 70); break;
     case 'tick': beep(540 + (window._tickN = (window._tickN || 0) + 1) % 8 * 40, .05, 'sine', 0.2); break;
+    case 'sector': {
+      const th = THEMES[themeIdx], sc = SCALES[th.scale] || SCALES.minor, f0 = 440 * Math.pow(2, (th.root - 69) / 12);
+      const type = ['sine', 'sawtooth', 'sine', 'triangle', 'square', 'sawtooth'][themeIdx % 6];
+      const deg = themeIdx === 2 ? [4, 2, 0, -3] : themeIdx === 5 ? [0, 0, -5, -7] : [0, 2, 4, 6];
+      deg.forEach((d, i) => setTimeout(() => beep(f0 * Math.pow(2, (sc[((d % 7) + 7) % 7] + 12 * Math.floor(d / 7) + 12) / 12), .26, type, .22, themeIdx === 2 ? -30 : 0), i * 95));
+      beep(f0 / 2, .6, themeIdx === 1 || themeIdx === 5 ? 'sawtooth' : 'sine', .22, -20);
+      break;
+    }
+    /* ----- sons próprios dos chefes ----- */
+    case 'bossIn': {
+      const k = boss ? boss.kind : 'raider';
+      if (k === 'raider') { beep(300, .5, 'sawtooth', .26, 500); beep(150, .6, 'square', .2, 100); }
+      else if (k === 'forge') { beep(70, .7, 'sawtooth', .38, -20); beep(110, .5, 'square', .26, -40); setTimeout(() => beep(60, .5, 'sawtooth', .34), 220); }
+      else if (k === 'abyss') { beep(520, .9, 'sine', .26, -380); setTimeout(() => beep(390, .9, 'sine', .22, -280), 260); }
+      else if (k === 'warden') { [880, 1175, 1568, 2093].forEach((f, i) => setTimeout(() => beep(f, .5, 'triangle', .2), i * 90)); beep(220, .7, 'sine', .2); }
+      else if (k === 'sun') { beep(200, .9, 'sawtooth', .22, 900); setTimeout(() => beep(1100, .5, 'square', .22, -200), 700); }
+      else { beep(90, 1, 'sawtooth', .3, -30); beep(94, 1, 'sawtooth', .26, -30); setTimeout(() => beep(60, .7, 'sine', .32, -10), 400); }
+      break;
+    }
+    case 'atk_raider': beep(740, .1, 'square', .2, -420); break;
+    case 'atk_forge': beep(95, .22, 'sawtooth', .34, -45); beep(190, .12, 'square', .16, -90); break;
+    case 'atk_abyss': beep(880, .32, 'sine', .22, -520); break;
+    case 'atk_warden': beep(1568, .16, 'triangle', .18); beep(1175, .2, 'triangle', .14, -60); break;
+    case 'atk_sun': beep(300, .9, 'sawtooth', .2, 1100); break;
+    case 'beam': beep(120, .4, 'sawtooth', .36, -60); beep(1500, .25, 'square', .14, -900); break;
+    case 'atk_void': beep(130, .3, 'sawtooth', .24, 90); beep(137, .3, 'sawtooth', .2, 90); break;
+    case 'orbBreak': beep(900, .1, 'triangle', .3, -500); beep(300, .18, 'sawtooth', .26, -150); break;
+    case 'hop': beep(1000, .08, 'sine', .22, 400); beep(700, .1, 'sine', .18, -300); break;
+    case 'blink': beep(1400, .12, 'sine', .2, -1100); setTimeout(() => beep(300, .16, 'sine', .22, 700), 130); break;
+    case 'bossDie': beep(120, .8, 'sawtooth', .4, -90); beep(70, .9, 'square', .3, -30); [880, 660, 440].forEach((f, i) => setTimeout(() => beep(f, .3, 'triangle', .22), 250 + i * 110)); break;
     case 'clear': beep(600, .1, 'sine', 0.26, 200); break;
   }
 }
@@ -712,7 +780,7 @@ const Music = (() => {
     if (s % 4 === 0 && I < 3) tone(t, mtof(root + chord[(s / 4) % 3] + 12), stepDur * 3, 'triangle', .13, 2600, .004);
     if (I >= 1 && (I === 1 ? s % 4 === 0 : s % 2 === 0)) {
       const oct = (s % 8 === 6) ? 12 : 0;
-      tone(t, mtof(root + chord[0] - 12 + oct), stepDur * 1.8, 'sawtooth', .22, 1000);
+      tone(t, mtof(root + chord[0] - 12 + oct), stepDur * 1.8, bw(0), .22, boss && boss.kind === 'abyss' ? 700 : 1000);
     }
     if (I >= 2) {
       if (s % 4 === 0) kick(t);
@@ -720,7 +788,7 @@ const Music = (() => {
     }
     if (I >= 3 && (I >= 4 || s % 2 === 0)) {
       const pat = [0, 1, 2, 1, 2, 1, 0, 2][s % 8];
-      tone(t, mtof(root + chord[pat] + 12), stepDur * 1.1, 'square', .075, 3200);
+      tone(t, mtof(root + chord[pat] + 12), stepDur * 1.1, bw(1), .075, 3200);
     }
     if (I >= 4) {
       if (s === 4 || s === 12) noise(t, .1, .15, 1800, 'bandpass');
@@ -732,6 +800,8 @@ const Music = (() => {
     step++;
     intensity += (target - intensity) * .035;
   }
+  const BOSS_WAVE = { raider: ['sawtooth', 'square'], forge: ['sawtooth', 'sawtooth'], abyss: ['sine', 'triangle'], warden: ['triangle', 'triangle'], sun: ['square', 'square'], void: ['sawtooth', 'sawtooth'] };
+  const bw = i => (boss && BOSS_WAVE[boss.kind] ? BOSS_WAVE[boss.kind][i] : (i ? 'square' : 'sawtooth'));
   function bpm() { return Math.min(152, 106 + (sector - 1) * 4 + Math.round(intensity) * 5 + (boss ? 6 : 0)); }
   function tick() {
     if (!audioCtx || !master) return;
@@ -902,7 +972,7 @@ function showUpgrades(bossReward = false) {
     // cerimônia: cada carta é revelada em sequência; as mais raras por último
     revealTimers.push(setTimeout(() => {
       card.classList.add('reveal');
-      if (rarity === 'Legendary') { sfx('legend'); ui.upgrade.classList.add('shakeDom'); setTimeout(() => ui.upgrade.classList.remove('shakeDom'), 400); sparksAt(card, accent, 24); }
+      if (rarity === 'Legendary') { sfx('legend'); if (!a11y.shake) ui.upgrade.classList.add('shakeDom'); setTimeout(() => ui.upgrade.classList.remove('shakeDom'), 400); sparksAt(card, accent, 24); }
       else if (rarity !== 'Common') { sfx('revealRare'); sparksAt(card, accent, 8); }
       else sfx('reveal');
     }, 350 + i * 480));
@@ -950,7 +1020,7 @@ function openSettings() {
   ui.musLabel.textContent = Math.round(musicVol * 100) + '%';
   ui.volSlider.value = String(Math.round(masterVol * 100));
   ui.volLabel.textContent = Math.round(masterVol * 100) + '%';
-  ui.vibToggle.checked = vibrationOn;
+  ui.vibToggle.checked = vibrationOn; syncA11yUI();
   unlockAudio(); sfx('ui');
 }
 function closeSettings() {
@@ -1117,7 +1187,7 @@ function drawTierOverlay() {
       ctx.strokeRect(2, 2, W - 4, H - 4);
     }
   }
-  if (tierFlash > 0) { ctx.globalAlpha = tierFlash * .22; ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H); }
+  if (tierFlash > 0 && !a11y.flash) { ctx.globalAlpha = tierFlash * .22; ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H); }
   ctx.globalAlpha = 1;
 }
 const DROP_COL = { wide: '#62f4a6', pierce: '#ffe66d', grenade: '#ffb020', overcharge: '#b794ff', chrono: '#8fd6ff', multi: '#ffd166', heart: '#ff5e83', bomb: '#ff2d55' };
@@ -1139,6 +1209,10 @@ function drawDrop(d) {
     ctx.closePath(); ctx.fillStyle = col; ctx.fill();
     ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
     ctx.shadowBlur = 0; drawIcon(ctx, d.shard ? 'shard' : 'bang', 0, 0, d.r * 1.25, '#fff');
+    if (a11y.contrast) {   // perigo em alto contraste: anel tracejado preto/branco pulsante, formato inconfundível
+      ctx.lineWidth = 3; ctx.strokeStyle = '#000'; ctx.beginPath(); ctx.arc(0, 0, d.r + 6 + Math.sin(animT * 6) * 1.5, 0, Math.PI * 2); ctx.stroke();
+      ctx.lineWidth = 2; ctx.strokeStyle = '#fff'; ctx.setLineDash([5, 5]); ctx.lineDashOffset = -animT * 20; ctx.stroke(); ctx.setLineDash([]);
+    }
   } else {
     ctx.rotate(Math.sin(d.spin) * .12);
     roundedRect(-d.r * pulse, -d.r * pulse, d.r * 2 * pulse, d.r * 2 * pulse, 6);
@@ -1155,7 +1229,7 @@ function drawBossShield() {
   const rx = boss.w * .62 + 16, ry = boss.h * .95 + 12;
   ctx.save();
   if (sh.on) {
-    const flick = sh.warn ? .35 + .65 * Math.abs(Math.sin(animT * 28)) : 1;
+    const flick = sh.warn ? .35 + .65 * Math.abs(Math.sin(animT * (a11y.flash ? 3 : 28))) : 1;
     const glow = 1 + (sh.hit || 0) * 3;
     ctx.globalAlpha = flick;
     const g = ctx.createRadialGradient(cx, cy, 6, cx, cy, rx);
@@ -1185,6 +1259,46 @@ function drawBossExposed() {
   ctx.strokeStyle = '#ffe66d'; ctx.lineWidth = 2; ctx.shadowColor = '#ffe66d'; ctx.shadowBlur = 18;
   ctx.beginPath(); ctx.arc(cx, cy, boss.coreR + 8 + Math.sin(animT * 14) * 2.5, 0, Math.PI * 2); ctx.stroke();
   ctx.restore();
+}
+
+/* ===== BANNER DE NOVO SETOR: faixa que entra varrendo, nome do setor letra a letra, modificadores e faíscas ===== */
+function drawSectorBanner() {
+  const sb = sectorBanner, th = THEMES[sb.idx], t = animT - sb.t0;
+  if (t > sb.dur || state === 'playing' && t > 1.2) { sectorBanner = null; return; }
+  const inK = easeOutBack(clamp(t / .45, 0, 1)), outK = clamp((sb.dur - t) / .5, 0, 1), bandH = 118, cy = H * .53, y0 = cy - bandH / 2;
+  const acc = th.accent;
+  ctx.save();
+  ctx.globalAlpha = outK;
+  const x0 = -W * (1 - Math.min(1, inK)), g = ctx.createLinearGradient(0, y0, 0, y0 + bandH);
+  g.addColorStop(0, th.bg[1] + 'f2'); g.addColorStop(.5, th.bg[0] + 'f7'); g.addColorStop(1, th.bg[1] + 'f2');
+  ctx.fillStyle = g; ctx.fillRect(x0, y0, W, bandH);
+  ctx.fillStyle = acc; ctx.shadowBlur = 14; ctx.shadowColor = acc;               // filetes de luz
+  ctx.fillRect(x0, y0, W, 2); ctx.fillRect(x0, y0 + bandH - 2, W, 2); ctx.shadowBlur = 0;
+  const sw = ((t * 1.1) % 1.4 - .2) * W; ctx.globalAlpha = outK * .35;           // brilho que varre a faixa
+  const sg = ctx.createLinearGradient(sw - 60, 0, sw + 60, 0); sg.addColorStop(0, acc + '00'); sg.addColorStop(.5, acc + 'aa'); sg.addColorStop(1, acc + '00');
+  ctx.fillStyle = sg; ctx.fillRect(0, y0 + 2, W, bandH - 4);
+  ctx.globalAlpha = outK; ctx.textAlign = 'center';
+  ctx.fillStyle = acc; ctx.font = '800 11px system-ui';
+  ctx.fillText('S E T O R   ' + sb.n, W / 2, y0 + 28);
+  const name = th.name.split('').join(String.fromCharCode(8202)), shown = Math.min(name.length, Math.floor(Math.max(0, t - .25) / .06) + 1);
+  ctx.font = '900 34px system-ui'; ctx.shadowBlur = 22; ctx.shadowColor = acc; ctx.fillStyle = '#fff';
+  ctx.fillText(name.slice(0, shown), W / 2, y0 + 68); ctx.shadowBlur = 0;
+  if (sb.mods.length) {                                                          // modificadores
+    ctx.font = '700 11px system-ui';
+    const items = sb.mods.map(m => MODS[m]), widths = items.map(m => ctx.measureText(m.name).width + 26), total = widths.reduce((a, b) => a + b, 0) + (items.length - 1) * 10;
+    let x = W / 2 - total / 2; ctx.globalAlpha = outK * clamp((t - .8) / .35, 0, 1);
+    items.forEach((m, i) => {
+      ctx.fillStyle = m.color + '26'; roundedRect(x, y0 + 84, widths[i], 22, 11); ctx.fill();
+      ctx.strokeStyle = m.color; ctx.lineWidth = 1; ctx.stroke();
+      drawIcon(ctx, m.icon, x + 12, y0 + 95, 12, m.color);
+      ctx.fillStyle = '#e8f0ff'; ctx.textAlign = 'left'; ctx.fillText(m.name, x + 22, y0 + 99); ctx.textAlign = 'center';
+      x += widths[i] + 10;
+    });
+  } else { ctx.globalAlpha = outK * .8; ctx.fillStyle = '#c5d4f0'; ctx.font = '600 12px system-ui'; ctx.fillText('Novo cenário', W / 2, y0 + 98); }
+  ctx.restore();
+  if (t > .2 && sb.sparks < 28 && Math.random() < .6) {                          // faíscas do tema pela faixa
+    sb.sparks++; burst(rand(10, W - 10), y0 + rand(4, bandH - 4), Math.random() < .5 ? acc : '#ffffff', 2);
+  }
 }
 
 /* ---- render.js ---- */
@@ -1225,7 +1339,7 @@ function draw() {
   ctx.clearRect(0, 0, W, H);
   drawBackground();
   ctx.save();
-  if (shake > 0) ctx.translate(rand(-shake, shake), rand(-shake, shake));
+  if (shake > 0 && !a11y.shake) ctx.translate(rand(-shake, shake), rand(-shake, shake));
   // moldura sutil da área de jogo
   ctx.strokeStyle = theme.frame;
   ctx.lineWidth = 1.5;
@@ -1511,6 +1625,7 @@ function draw() {
   }
 
   drawTierOverlay();
+  if (sectorBanner) drawSectorBanner();
   if (announce && announce.life > 0) {
     const a = Math.min(1, announce.life * 2, announce.max > 1.2 ? (announce.max - announce.life) * 3 : 1);
     ctx.save();
@@ -1584,6 +1699,7 @@ function onPerfect(b) {
   burst(b.x, paddle.y, '#b8fbff', 6 + Math.min(perfectStreak, 8));
   sfx('perfect'); vibrate(8);
   if (lv('reflex') >= 3) registerCombo(b.x, paddle.y - 46);
+  if (lv('fervor')) { fervor = lv('fervor'); floatText(b.x, paddle.y - 52, 'FERVOR ×' + fervor, '#ffb454', 11); }
   if (perfectStreak === 5 || perfectStreak === 10) announce = { title: 'PRECISÃO ×' + perfectStreak, sub: 'Rebatidas perfeitas em sequência', life: 1.3, max: 1.3, color: '#7ef6ff' };
 }
 
@@ -1596,6 +1712,7 @@ function enterReady(kind) {
   stagePowerDropped = false;
   if (kind === 'boss') {
     const bd = boss ? boss.def : BOSS_DEFS.raider;
+    sfx('bossIn');
     announce = { title: bd.title, sub: bd.sub + ' · 3 fases', life: 2.6, max: 2.6, color: bd.c };
   } else if (kind === 'crystal_storm') {
     announce = { title: 'TEMPESTADE DE CRISTAIS', sub: 'Cristais em cadeia · cuidado com o combo', life: 2.2, max: 2.2, color: '#7ef6ff' };
@@ -1622,9 +1739,10 @@ function enterReady(kind) {
   }
   if (sectorIntro && level > 1 && kind !== 'shield' && kind !== 'life') {
     const old = announce;
-    announce = { title: 'SETOR ' + sector + ' · ' + theme.name, sub: mods.length ? mods.map(m => MODS[m].name).join(' + ') + ' — ' + MODS[mods[0]].desc : 'Novo cenário', life: 3, max: 3, color: theme.accent };
-    if (old && old !== announce && kind !== 'stage') floatText(W / 2, H * 0.3, old.title, old.color, 16);
-    sfx('phase'); tierFlash = 1;
+    announce = null;
+    sectorBanner = { t0: animT, dur: 3.4, idx: themeIdx, n: sector, mods: mods.slice(), sparks: 0 };
+    if (old && kind !== 'stage') floatText(W / 2, H * 0.3, old.title, old.color, 16);
+    sfx('sector'); tierFlash = 1;
   }
   sectorIntro = false; updateBrand();
   if (pendingNote) { floatText(W / 2, H * 0.3, pendingNote.title, pendingNote.color, 17); pendingNote = null; }
@@ -1641,7 +1759,7 @@ function buildLevel() {
   bricks = []; drops = []; particles = []; explosions = []; floatingTexts = [];
   boss = null; bossDeath = null; shieldUses = 0; combo = 0; comboTimer = 0; electricCooldown = 0; comboTier = 0;
   stagePowerDropped = false; perfectStreak = 0; regenTimer = 0;
-  stage = { maxCombo: 0, perfects: 0, lostLife: false };
+  stage = { maxCombo: 0, perfects: 0, lostLife: false }; fervor = 0;
   if (level === 1 || level % 4 === 1) {
     sector = Math.floor((level - 1) / 4) + 1;
     themeIdx = themeForSector(sector); theme = THEMES[themeIdx];
@@ -1675,6 +1793,7 @@ function buildLevel() {
         if (r >= 1 && Math.random() < D.hp2) hp = 2;
         if (r >= 2 && Math.random() < D.hp3) hp = 3;
         if (r >= 3 && Math.random() < D.hp4) hp = 4;
+        if (hasMod('armored') && !special && Math.random() < .2) hp++;
         let explosive = !special && Math.random() < D.explosive;
         let kind = 'normal';
         let color = explosive ? '#ff8a32' : theme.bricks[(r + c + level - 1) % theme.bricks.length];
@@ -1765,7 +1884,7 @@ function completeStage() {
 function loseBall() {
   if (state !== 'playing') return;
   drops = []; pierceUntil = 0; wideUntil = 0; grenadeUntil = 0; overchargeHits = 0; chronoUntil = 0;
-  combo = 0; comboTimer = 0;
+  combo = 0; comboTimer = 0; fervor = 0;
   paddle.w = paddle.baseW;
   const shieldLimit = lv('last') >= 3 ? 2 : (lv('last') > 0 ? 1 : 0);
   if (shieldUses < shieldLimit) {
@@ -1895,6 +2014,7 @@ const BOSS_ATTACK = {
       }
     }
     for (const x of slots) dropBossBomb(laneSafeX(x, px, .7), 0, false);
+    sfx('atk_raider');
   },
   warden(b) {
     const stage = b.stage, px = paddle.x + paddle.w / 2, pressure = eventMods.bossPressure || 0;
@@ -1906,12 +2026,14 @@ const BOSS_ATTACK = {
       const near = Math.abs(x - px) < paddle.w * .65;
       dropBossBomb(near ? (x < W / 2 ? M : L) : x, 0, true);
     }
+    sfx('atk_warden');
   },
   /* leque de lava: bombas que se abrem em ângulo a partir do corpo */
   forge(b) {
     const stage = b.stage, cx = b.x + b.w / 2, spread = [55, 70, 88][stage - 1];
     const vxs = stage === 1 ? [-spread, spread] : [-spread, 0, spread];
     for (const vx of vxs) dropBossBomb(cx, -20, false, vx, true);
+    sfx('atk_forge');
     b.attackTimer = [2.5, 2.2, 1.9][stage - 1];
   },
   /* estilhaços MIRADOS: nascem na direção da plataforma, lentos */
@@ -1919,6 +2041,7 @@ const BOSS_ATTACK = {
     const stage = b.stage, px = paddle.x + paddle.w / 2;
     const offs = stage === 1 ? [0] : stage === 2 ? [-paddle.w * .6, paddle.w * .6] : [-paddle.w * .9, 0, paddle.w * .9];
     for (const o of offs) dropBossBomb(px + o + rand(-14, 14), -30, true);
+    sfx('atk_abyss');
     b.attackTimer = [2.4, 2.1, 1.9][stage - 1];
   },
   /* raios: telegrafa 1s e dispara; só começa nova onda quando a anterior acabou */
@@ -1930,7 +2053,7 @@ const BOSS_ATTACK = {
     if (stage === 3) { lanes.push(clamp(W - px, 30, W - 30)); if (Math.abs(lanes[1] - lanes[0]) < paddle.w * 1.2) lanes.pop(); }
     for (const x of lanes) b.beams.push({ x: clamp(x, 24, W - 24), w: bw, t: 0, tel, fire: .5, hit: false });
     b.attackTimer = tel + .5 + [2.3, 2.0, 1.7][stage - 1];
-    sfx('boss');
+    sfx('atk_sun');
   },
   void(b) {      // detritos: poucos e rápidos, vindos de faixas aleatórias
     const stage = b.stage, px = paddle.x + paddle.w / 2, n = stage === 1 ? 1 : 2;
@@ -1938,6 +2061,7 @@ const BOSS_ATTACK = {
       let x = rand(40, W - 40); if (Math.abs(x - px) < paddle.w * .8) x = x < W / 2 ? x + paddle.w : x - paddle.w;
       dropBossBomb(x, 40, false);
     }
+    sfx('atk_void');
     b.attackTimer = [2.1, 1.75, 1.5][stage - 1];
   }
 };
@@ -1950,7 +2074,7 @@ function orbPos(b, o) {
 function coreProtected(b = boss) { return !!b && b.kind === 'forge' && b.orbs.some(o => o.alive); }
 function killOrb(b, o, p) {
   o.alive = false; o.respawnAt = gameNow() + 8500;
-  burst(p.x, p.y, '#ffb454', 16); burst(p.x, p.y, '#fff3b0', 8); sfx('explode'); shake = Math.min(10, shake + 2.5);
+  burst(p.x, p.y, '#ffb454', 16); burst(p.x, p.y, '#fff3b0', 8); sfx('orbBreak'); shake = Math.min(10, shake + 2.5);
   addScore(40, p.x, p.y);
   if (!b.orbs.some(x => x.alive)) {
     b.exposedUntil = gameNow() + 2600;
@@ -1997,7 +2121,7 @@ const BOSS_UPDATE = {
     if (b.hopT < .9 && b.nextSock === b.sock) { do { b.nextSock = Math.floor(Math.random() * 3); } while (b.nextSock === b.sock); }
     if (b.hopT <= 0) {
       const c = bossCore(); burst(c.x, c.y, '#35e8c8', 10);
-      b.sock = b.nextSock; b.coreHide = .2; b.hopT = cfg; sfx('phase');
+      b.sock = b.nextSock; b.coreHide = .2; b.hopT = cfg; sfx('hop');
       const n = bossCore(); burst(n.x, n.y, '#bffff4', 12);
     }
   },
@@ -2005,7 +2129,7 @@ const BOSS_UPDATE = {
     const f = chronoFactor(), now = gameNow();
     for (const bm of b.beams) {
       const before = bm.t; bm.t += dt * f;
-      if (before < bm.tel && bm.t >= bm.tel) { shake = Math.min(10, shake + 3); sfx('explode'); burst(bm.x, b.y + b.h, '#fff3b0', 12); }
+      if (before < bm.tel && bm.t >= bm.tel) { shake = Math.min(10, shake + 3); sfx('beam'); burst(bm.x, b.y + b.h, '#fff3b0', 12); }
       if (bm.t >= bm.tel && bm.t < bm.tel + bm.fire && !bm.hit && state === 'playing') {
         if (paddle.x < bm.x + bm.w / 2 && paddle.x + paddle.w > bm.x - bm.w / 2) {
           bm.hit = true; burst(paddle.x + paddle.w / 2, paddle.y, '#ffd84a', 22); shake = Math.min(12, shake + 6);
@@ -2051,7 +2175,7 @@ const BOSS_UPDATE = {
         if (b.blinkWarn <= 0) {
           burst(b.x + b.w / 2, b.y + b.h / 2, '#b06bff', 18);
           b.x = b.blinkTo; b.blinkTo = null; b.blinkT = rand(5, 7);
-          burst(b.x + b.w / 2, b.y + b.h / 2, '#e8d4ff', 22); sfx('phase'); shake = Math.min(8, shake + 3);
+          burst(b.x + b.w / 2, b.y + b.h / 2, '#e8d4ff', 22); sfx('blink'); shake = Math.min(8, shake + 3);
         }
       }
     }
@@ -2071,8 +2195,9 @@ const BOSS_PAL = {
   sun:    { hi: '#fff6c0', mid: '#f0b81c', lo: '#6a3a02', dark: '#3a2402', acc: '#fff6c8' },
   void:   { hi: '#d9b8ff', mid: '#7a3ad8', lo: '#14062e', dark: '#08040f', acc: '#e8d4ff' }
 };
+function bf(x) { return x.flash > 0 && !a11y.flash; }
 function bgrad(b, x, y, h, p, a = 1) {
-  if (b.flash > 0) return '#fff';
+  if (bf(b)) return '#fff';
   const g = ctx.createLinearGradient(x, y, x, y + h);
   g.addColorStop(0, p.hi); g.addColorStop(.45, p.mid); g.addColorStop(1, p.lo);
   return g;
@@ -2095,7 +2220,7 @@ const BOSS_ART = {
       ctx.shadowBlur = 0;
       poly([[2, -9], [40, -17], [40, 13], [2, 7]]);
       const g = ctx.createLinearGradient(0, 0, 40, 0); g.addColorStop(0, '#1b2b66'); g.addColorStop(1, '#0c1538');
-      ctx.fillStyle = b.flash > 0 ? '#fff' : g; ctx.fill();
+      ctx.fillStyle = bf(b) ? '#fff' : g; ctx.fill();
       ctx.strokeStyle = p.acc; ctx.lineWidth = 1.4; ctx.stroke();
       ctx.strokeStyle = '#7ea6ff66'; ctx.lineWidth = 1;
       for (let i = 1; i < 4; i++) { ctx.beginPath(); ctx.moveTo(2 + i * 9.5, -9 - i * 2); ctx.lineTo(2 + i * 9.5, 7 + i * 1.5); ctx.stroke(); }
@@ -2127,11 +2252,11 @@ const BOSS_ART = {
     heat.addColorStop(0, 'rgba(255,140,40,.35)'); heat.addColorStop(1, 'rgba(255,140,40,0)');
     ctx.shadowBlur = 0; ctx.fillStyle = heat; ctx.fillRect(bx - 30, by - 30, bw + 60, bh + 80);
     ctx.shadowBlur = 24 + b.stage * 5; ctx.shadowColor = '#ff7a2c';
-    ctx.fillStyle = b.flash > 0 ? '#fff' : '#1c0a06';                         // chifres
+    ctx.fillStyle = bf(b) ? '#fff' : '#1c0a06';                         // chifres
     for (const [fx, h] of [[.2, 15], [.5, 22], [.8, 15]]) tri([bx + bw * fx - 11, by + 4], [bx + bw * fx, by - h], [bx + bw * fx + 11, by + 4]), ctx.fill();
     poly([[bx + 8, by + 10], [bx + 18, by], [bx + bw - 18, by], [bx + bw - 8, by + 10], [bx + bw, by + bh - 6], [bx + bw - 14, by + bh + 3], [bx + 14, by + bh + 3], [bx, by + bh - 6]]);
     const g = ctx.createLinearGradient(0, by, 0, by + bh); g.addColorStop(0, '#4a2418'); g.addColorStop(.6, '#241008'); g.addColorStop(1, '#120604');
-    ctx.fillStyle = b.flash > 0 ? '#fff' : g; ctx.fill();
+    ctx.fillStyle = bf(b) ? '#fff' : g; ctx.fill();
     ctx.shadowBlur = 0; ctx.strokeStyle = '#ff8a3c'; ctx.lineWidth = 2; ctx.stroke();
     const glow = .65 + .35 * Math.sin(t * 3);                                 // veios de lava
     ctx.strokeStyle = 'rgba(255,170,60,' + glow.toFixed(2) + ')'; ctx.lineWidth = 2.2; ctx.lineCap = 'round';
@@ -2149,7 +2274,7 @@ const BOSS_ART = {
       const rg = ctx.createRadialGradient(q.x - 2, q.y - 2, 1, q.x, q.y, o.r + 2);
       rg.addColorStop(0, '#fffbe0'); rg.addColorStop(.35, '#ffc050'); rg.addColorStop(1, o.hp <= 1 ? '#a02808' : '#e05a14');
       ctx.shadowBlur = 16; ctx.shadowColor = '#ff7a2c';
-      ctx.fillStyle = o.flash > 0 ? '#fff' : rg; ctx.beginPath(); ctx.arc(q.x, q.y, o.r + 1, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = bf(o) ? '#fff' : rg; ctx.beginPath(); ctx.arc(q.x, q.y, o.r + 1, 0, Math.PI * 2); ctx.fill();
       ctx.shadowBlur = 0; ctx.strokeStyle = '#2a0c04'; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.arc(q.x, q.y, o.r + 1, 0, Math.PI * 2); ctx.stroke();
       if (o.hp <= 1) { ctx.strokeStyle = '#2a0c04'; ctx.beginPath(); ctx.moveTo(q.x - 4, q.y - 4); ctx.lineTo(q.x + 1, q.y); ctx.lineTo(q.x - 1, q.y + 5); ctx.stroke(); }
     }
@@ -2178,7 +2303,7 @@ const BOSS_ART = {
     ctx.closePath();
     const g = ctx.createLinearGradient(0, by - 14, 0, by + bh);
     g.addColorStop(0, p.hi + 'dd'); g.addColorStop(.5, p.mid + 'bb'); g.addColorStop(1, p.lo + 'ee');
-    ctx.fillStyle = b.flash > 0 ? '#fff' : g; ctx.fill();
+    ctx.fillStyle = bf(b) ? '#fff' : g; ctx.fill();
     ctx.shadowBlur = 0; ctx.strokeStyle = p.acc; ctx.lineWidth = 1.8; ctx.stroke();
     ctx.strokeStyle = '#ffffff33'; ctx.lineWidth = 1;
     for (let i = 1; i < 6; i++) { ctx.beginPath(); ctx.moveTo(cx, by - 12); ctx.quadraticCurveTo(bx + i * bw / 6 + (i < 3 ? -8 : 8), by + 8, bx + i * bw / 6, by + bh * .7); ctx.stroke(); }
@@ -2189,7 +2314,7 @@ const BOSS_ART = {
     ctx.globalAlpha = 1;
     for (let s = 0; s < 3; s++) {                                             // encaixes do núcleo
       const x = cx + [-.3, 0, .3][s] * bw, nx = b.nextSock === s && b.sock !== s && b.hopT < .9;
-      ctx.strokeStyle = p.acc; ctx.lineWidth = nx ? 2.4 : 1.2; ctx.globalAlpha = nx ? .5 + .5 * Math.abs(Math.sin(t * 22)) : .28;
+      ctx.strokeStyle = p.acc; ctx.lineWidth = nx ? 2.4 : 1.2; ctx.globalAlpha = nx ? .5 + .5 * Math.abs(Math.sin(t * (a11y.flash ? 3 : 22))) : .28;
       ctx.beginPath(); ctx.arc(x, cy, b.coreR + 5, 0, Math.PI * 2); ctx.stroke();
       if (nx) { ctx.beginPath(); ctx.arc(x, cy, b.coreR + 11 - (b.hopT / .9) * 6, 0, Math.PI * 2); ctx.stroke(); }
     }
@@ -2202,20 +2327,20 @@ const BOSS_ART = {
     for (const s of [-1, 1]) {                                                // cristais flutuantes
       const fx = s < 0 ? bx - 16 : bx + bw + 16, fy = cy + Math.sin(t * 2 + s) * 6;
       ctx.shadowBlur = 16; ctx.shadowColor = p.mid;
-      poly([[fx, fy - 12], [fx + 7, fy], [fx, fy + 12], [fx - 7, fy]]); ctx.fillStyle = b.flash > 0 ? '#fff' : p.mid + 'cc'; ctx.fill();
-      ctx.shadowBlur = 0; poly([[fx, fy - 12], [fx + 7, fy], [fx, fy]]); ctx.fillStyle = b.flash > 0 ? '#fff' : p.hi; ctx.fill();
+      poly([[fx, fy - 12], [fx + 7, fy], [fx, fy + 12], [fx - 7, fy]]); ctx.fillStyle = bf(b) ? '#fff' : p.mid + 'cc'; ctx.fill();
+      ctx.shadowBlur = 0; poly([[fx, fy - 12], [fx + 7, fy], [fx, fy]]); ctx.fillStyle = bf(b) ? '#fff' : p.hi; ctx.fill();
       ctx.strokeStyle = p.acc; ctx.lineWidth = 1.2; poly([[fx, fy - 12], [fx + 7, fy], [fx, fy + 12], [fx - 7, fy]]); ctx.stroke();
     }
     ctx.shadowBlur = 26 + b.stage * 4; ctx.shadowColor = p.mid;
-    ctx.fillStyle = b.flash > 0 ? '#fff' : p.dark;                            // base
+    ctx.fillStyle = bf(b) ? '#fff' : p.dark;                            // base
     poly([[bx + 2, cy - 2], [bx + 14, by + bh + 2], [bx + bw - 14, by + bh + 2], [bx + bw - 2, cy - 2]]); ctx.fill();
     const spires = [[-.42, 22, 15], [-.26, 34, 19], [0, 50, 25], [.26, 34, 19], [.42, 22, 15]];
     for (const [fx, h, hw] of spires) {                                       // espinhos facetados (lado claro / lado escuro)
       const x = cx + fx * bw, top = cy - h - (fx === 0 ? 0 : 0) + 6, base = cy + bh * .32;
       ctx.shadowBlur = 14; ctx.shadowColor = p.mid;
-      poly([[x - hw / 2, base], [x - hw / 2 + 1, top + 10], [x, top], [x, base]]); ctx.fillStyle = b.flash > 0 ? '#fff' : p.hi; ctx.fill();
+      poly([[x - hw / 2, base], [x - hw / 2 + 1, top + 10], [x, top], [x, base]]); ctx.fillStyle = bf(b) ? '#fff' : p.hi; ctx.fill();
       ctx.shadowBlur = 0;
-      poly([[x, base], [x, top], [x + hw / 2 - 1, top + 10], [x + hw / 2, base]]); ctx.fillStyle = b.flash > 0 ? '#fff' : p.mid; ctx.fill();
+      poly([[x, base], [x, top], [x + hw / 2 - 1, top + 10], [x + hw / 2, base]]); ctx.fillStyle = bf(b) ? '#fff' : p.mid; ctx.fill();
       ctx.strokeStyle = p.acc; ctx.lineWidth = 1.4; poly([[x - hw / 2, base], [x - hw / 2 + 1, top + 10], [x, top], [x + hw / 2 - 1, top + 10], [x + hw / 2, base]]); ctx.stroke();
     }
     ctx.save(); ctx.beginPath(); ctx.rect(bx - 6, by - 20, bw + 12, bh + 30); ctx.clip();   // brilho prismático
@@ -2239,13 +2364,13 @@ const BOSS_ART = {
       const a = t * .45 + i * Math.PI * 2 / n, ex = Math.cos(a), ey = Math.sin(a), l = len + (i % 2) * 7;
       const x0 = cx + ex * rx, y0 = cy + ey * ry, x1 = cx + ex * (rx + l), y1 = cy + ey * (ry + l * .8);
       tri([x0 - ey * 4.5, y0 + ex * 3.4], [x1, y1], [x0 + ey * 4.5, y0 - ex * 3.4]);
-      ctx.fillStyle = b.flash > 0 ? '#fff' : (i % 2 ? p.mid : '#ffd84a'); ctx.fill();
+      ctx.fillStyle = bf(b) ? '#fff' : (i % 2 ? p.mid : '#ffd84a'); ctx.fill();
     }
     ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);        // disco
     const g = ctx.createRadialGradient(cx - rx * .25, cy - ry * .3, 3, cx, cy, rx);
     if (hot) { g.addColorStop(0, '#ffffff'); g.addColorStop(.5, '#ffd0a0'); g.addColorStop(1, '#ff4a28'); }
     else { g.addColorStop(0, p.hi); g.addColorStop(.55, p.mid); g.addColorStop(1, p.lo); }
-    ctx.fillStyle = b.flash > 0 ? '#fff' : g; ctx.fill();
+    ctx.fillStyle = bf(b) ? '#fff' : g; ctx.fill();
     ctx.shadowBlur = 0; ctx.strokeStyle = hot ? '#ffe0c0' : p.acc; ctx.lineWidth = 2; ctx.stroke();
     ctx.strokeStyle = '#00000022'; ctx.lineWidth = 1;                         // faixas de plasma
     for (let i = -1; i <= 1; i += 2) { ctx.beginPath(); ctx.ellipse(cx, cy + i * ry * .45, rx * .8, ry * .18, 0, 0, Math.PI); ctx.stroke(); }
@@ -2261,14 +2386,14 @@ const BOSS_ART = {
       for (let k = 0; k < 3; k++) { const f = (t * 1.1 + k / 3) % 1; ctx.strokeStyle = 'rgba(232,212,255,' + (.1 + .4 * f).toFixed(2) + ')'; ctx.beginPath(); ctx.arc(cx, cy, 20 + (1 - f) * 110, 0, Math.PI * 2); ctx.stroke(); }
     }
     if (b.blinkTo != null) {                                                  // aviso de teleporte
-      const gx = b.blinkTo + bw / 2, a = .3 + .5 * Math.abs(Math.sin(t * 20));
+      const gx = b.blinkTo + bw / 2, a = .3 + .5 * Math.abs(Math.sin(t * (a11y.flash ? 3 : 20)));
       ctx.shadowBlur = 0; ctx.globalAlpha = a; ctx.strokeStyle = p.acc; ctx.lineWidth = 1.6; ctx.setLineDash([5, 4]);
       ctx.beginPath(); ctx.ellipse(gx, cy, bw * .5, bh * .5, 0, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
     }
     ctx.save(); ctx.translate(cx, cy); ctx.rotate(-.1);
     ctx.shadowBlur = 24 + b.stage * 5; ctx.shadowColor = p.mid;
     for (let i = 2; i >= 0; i--) {                                            // disco de acreção
-      ctx.strokeStyle = [p.acc, p.hi, p.mid][i]; ctx.lineWidth = 3 - i * .7; ctx.globalAlpha = b.flash > 0 ? 1 : .9 - i * .15;
+      ctx.strokeStyle = [p.acc, p.hi, p.mid][i]; ctx.lineWidth = 3 - i * .7; ctx.globalAlpha = bf(b) ? 1 : .9 - i * .15;
       ctx.setLineDash([22 - i * 4, 9]); ctx.lineDashOffset = -t * (30 + i * 26);
       ctx.beginPath(); ctx.ellipse(0, 0, bw * (.5 - i * .06), bh * (.42 - i * .07), 0, 0, Math.PI * 2); ctx.stroke();
     }
@@ -2277,7 +2402,7 @@ const BOSS_ART = {
     const g = ctx.createRadialGradient(cx, cy, hr * .4, cx, cy, hr + 4);
     g.addColorStop(0, '#000'); g.addColorStop(.8, '#0a0418'); g.addColorStop(1, p.mid);
     ctx.shadowBlur = 20; ctx.shadowColor = p.mid;
-    ctx.fillStyle = b.flash > 0 ? '#fff' : g; ctx.beginPath(); ctx.arc(cx, cy, hr, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = bf(b) ? '#fff' : g; ctx.beginPath(); ctx.arc(cx, cy, hr, 0, Math.PI * 2); ctx.fill();
     ctx.shadowBlur = 0; ctx.strokeStyle = p.acc; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.arc(cx, cy, hr, 0, Math.PI * 2); ctx.stroke();
     for (let i = 0; i < 7; i++) {                                             // detritos orbitando
       const a = t * (.7 + (i % 3) * .35) + i * 1.9, r = bw * (.34 + (i % 4) * .045);
@@ -2310,8 +2435,9 @@ function drawBossCore(b) {
   ctx.shadowBlur = prot ? 6 : 22; ctx.shadowColor = '#ffe66d';
   const g = ctx.createRadialGradient(c.x - 1.5, c.y - 1.5, 0, c.x, c.y, b.coreR + 1);
   g.addColorStop(0, '#fff'); g.addColorStop(.35, '#ffe66d'); g.addColorStop(1, '#a87800');
-  ctx.fillStyle = b.flash > 0 ? '#fff' : g; ctx.globalAlpha = prot ? .55 : 1;
+  ctx.fillStyle = bf(b) ? '#fff' : g; ctx.globalAlpha = prot ? .55 : 1;
   ctx.beginPath(); ctx.arc(c.x, c.y, b.coreR * pulse, 0, Math.PI * 2); ctx.fill();
+  if (lv('lens')) { ctx.shadowBlur = 0; ctx.strokeStyle = '#ffe66d55'; ctx.lineWidth = 1; ctx.setLineDash([2, 3]); ctx.beginPath(); ctx.arc(c.x, c.y, b.coreR + 3 + [0, 2, 4, 6][lv('lens')], 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]); }
   ctx.globalAlpha = 1; ctx.shadowBlur = 0; ctx.strokeStyle = '#fff6b0'; ctx.lineWidth = 1.5;
   ctx.beginPath(); ctx.arc(c.x, c.y, b.coreR + 3, 0, Math.PI * 2); ctx.stroke();
   if (prot) {                                                                 // armadura (Forjador): quebre os orbes
@@ -2331,9 +2457,10 @@ function drawBossBeams(b) {
     if (m.t < m.tel) {
       const k = m.t / m.tel;
       ctx.globalAlpha = .1 + .25 * k; ctx.fillStyle = '#ffd84a'; ctx.fillRect(x0, top, m.w, bot - top);
-      ctx.globalAlpha = .4 + .5 * Math.abs(Math.sin(m.t * (10 + k * 24)));
+      ctx.globalAlpha = .4 + .5 * Math.abs(Math.sin(m.t * (a11y.flash ? 3 : 10 + k * 24)));
       ctx.strokeStyle = '#fff3b0'; ctx.lineWidth = 1.4; ctx.setLineDash([8, 6]); ctx.lineDashOffset = -animT * 60;
       ctx.strokeRect(x0, top, m.w, bot - top); ctx.setLineDash([]);
+      if (a11y.contrast) { ctx.globalAlpha = .55; ctx.fillStyle = '#000'; for (let yy = top; yy < bot; yy += 14) { ctx.beginPath(); ctx.moveTo(x0, yy); ctx.lineTo(x0 + m.w, yy + 8); ctx.lineTo(x0 + m.w, yy + 14); ctx.lineTo(x0, yy + 6); ctx.fill(); } }
       ctx.globalAlpha = .6 + .4 * k; drawIcon(ctx, 'bang', m.x, bot - 18, 16, '#ffe66d'); ctx.globalAlpha = 1;
     } else {
       const k = (m.t - m.tel) / m.fire, a = 1 - k * .6;
@@ -2376,7 +2503,7 @@ function drawBossDeath() {
   const d = bossDeath, b = d.b, p = clamp((animT - d.t0) / 1.15, 0, 1);
   ctx.save();
   const j = (1 - p) * 5; ctx.translate(rand(-j, j), rand(-j, j));
-  b.flash = Math.sin(animT * 50) > 0 ? .05 : 0; b.phase += .016;
+  b.flash = !a11y.flash && Math.sin(animT * 50) > 0 ? .05 : 0; b.phase += .016;
   ctx.globalAlpha = 1 - p * p;
   drawBossArt(b);
   ctx.globalAlpha = 1;
@@ -2592,7 +2719,7 @@ function damageBoss(dmg, crit, x, y) {
     floatText(coreX, coreY - 26, bossExposed() ? 'CRÍTICO ×3' : 'CRÍTICO', '#ffe66d', 14);
     const onField = drops.filter(d => d.fromCritical && !d.dead).length;
     // chance base + exposto + "pity": quanto mais críticos sem drop, maior a chance (6º garante)
-    const chance = Math.min(.65, .33 + lv('scavenger') * .05 * rarityMult('scavenger') + (bossExposed() ? .12 : 0) + boss.critNoDrop * .07);
+    const chance = Math.min(.65, .33 + lv('scavenger') * .05 * rarityMult('scavenger') + (bossExposed() ? .12 : 0) + (lv('lens') >= 3 ? .06 : 0) + boss.critNoDrop * .07);
     if (onField < 2 && now - (boss.lastDropAt || 0) > 3000 && (boss.critNoDrop >= 6 || Math.random() < chance)) {
       boss.lastDropAt = now; boss.critNoDrop = 0;
       drops.push({ x: coreX, y: coreY + boss.h / 2, vy: 105, type: bossPowerType(), r: 10, spin: 0, fromCritical: true });
@@ -2607,7 +2734,7 @@ function damageBoss(dmg, crit, x, y) {
     addScore(600 + level * 55, bx, by);
     burst(bx, by, '#ffcf68', 80); burst(bx, by, '#ff5e83', 40);
     shake = Math.min(14, shake + 8);
-    sfx('explode'); vibrate([30, 40, 30, 40, 20]);
+    sfx('bossDie'); vibrate([30, 40, 30, 40, 20]);
     announce = { title: 'CHEFE DERROTADO', sub: '+' + (600 + level * 55) + ' pts · recompensa a caminho', life: 1.6, max: 1.6, color: '#ffe66d' };
     eventMods.bossPressure = 0;
     if (lives < maxLives()) { lives++; floatText(bx, by - 34, '+1 VIDA', '#ff7a9a', 16); updateHud(); }
@@ -2629,7 +2756,7 @@ function hitBoss(b, px, py) {
   if (!boss || boss.hp <= 0 || bossEntering()) return false;
   if (boss.kind === 'forge' && orbCollide(b)) return true;
   const c = bossCore(), mx = boss.x + boss.w / 2, my = boss.y + boss.h / 2;
-  const coreR = boss.coreR + b.r;
+  const coreR = boss.coreR + [0, 2, 4, 6][lv('lens')] + b.r;
   const inCore = c.active && (b.x - c.x) ** 2 + (b.y - c.y) ** 2 <= coreR * coreR;
   const prot = coreProtected();
   const coreHit = inCore && !prot;
@@ -2676,7 +2803,7 @@ function addScore(n, x, y) {
   const streakBonus = combo >= 2 ? Math.min(0.45, (combo - 1) * 0.045) : 0;
   const multiSyn = has('multi', 'combo') ? Math.min(0.12, (balls.filter(b => !b.attached).length - 1) * 0.03) : 0;
   const chargeSyn = (lv('catalyst') >= 3 && overchargeHits > 0) ? 0.10 : 0;
-  const gained = Math.round(n * (1 + permScaled + lastChanceBonus + streakBonus + multiSyn + chargeSyn) * (hasMod('swift') ? 1.25 : 1));
+  const gained = Math.round(n * (1 + permScaled + lastChanceBonus + streakBonus + multiSyn + chargeSyn) * (hasMod('swift') ? 1.25 : 1) * (hasMod('frenzy') ? 1.3 : 1) * (hasMod('armored') ? 1.2 : 1));
   score += gained; saveBest(); updateHud();
   if (x != null && y != null && gained > 0) floatText(x, y, '+' + gained, combo >= 5 ? '#ffce69' : combo >= 2 ? '#ffe66d' : '#9ef0c8', combo >= 5 ? 16 : 13);
 }
@@ -2858,7 +2985,7 @@ function explodeAt(x, y, source) {
 }
 function registerCombo(x, y) {
   combo++;
-  comboTimer = 1.7;
+  comboTimer = 1.7 + [0, .35, .7, 1.1][lv('pace')] - (hasMod('frenzy') ? .5 : 0);
   if (combo >= 2) {
     const nt = tierOf(combo);
     if (nt > comboTier) onTierUp(nt, x, y);
@@ -2887,6 +3014,7 @@ function applyHitDamage(br) {
     if (has('catalyst', 'conductor') && Math.random() < 0.18) electricStrike(br.x + br.w / 2, br.y + br.h / 2);
   }
   if (br.kind === 'elite' && lv('hunter') > 0) dmg += lv('hunter') >= 3 ? 2 : 1;
+  if (fervor > 0) { dmg += 1; fervor--; }
   br.hp -= dmg;
   br.flash = .13;
   return dmg;
@@ -3102,6 +3230,7 @@ function update(dt) {
       d.y += d.vy * dt * slow;
       if (d.vx) { d.x += d.vx * dt * slow; if (d.x < 14 || d.x > W - 14) { d.vx = -d.vx; d.x = clamp(d.x, 14, W - 14); } }
       d.spin += dt * 4;
+      if (lv('pull') && d.type !== 'bomb' && !d.fromBoss && d.y > paddle.y - [0, 130, 190, 260][lv('pull')]) { const dx = paddle.x + paddle.w / 2 - d.x; d.x += Math.sign(dx) * Math.min(Math.abs(dx), [0, 70, 120, 190][lv('pull')] * dt); }
       const tol = d.type === 'bomb' ? 0 : d.r * .7;
       if (d.y + d.r >= paddle.y && d.y - d.r <= paddle.y + paddle.h && d.x >= paddle.x - tol && d.x <= paddle.x + paddle.w + tol) {
         d.dead = true;
@@ -3249,6 +3378,8 @@ document.addEventListener('contextmenu', e => e.preventDefault());
 document.addEventListener('gesturestart', e => e.preventDefault());
 
 
+[['a11yShake', 'shake'], ['a11yFlash', 'flash'], ['a11yContrast', 'contrast']].forEach(([id, k]) => ui[id].addEventListener('change', () => { a11y[k] = ui[id].checked; saveSettings(); sfx('ui'); }));
+
 /* ---- debug.js ---- */
 /* ========== MODO DEBUG OCULTO ==========
    Abrir: tocar 5x rapido no titulo "BREAKPOINT" (topo), ou tecla ` (crase) / F2.
@@ -3356,6 +3487,26 @@ function dbgFrame(rawDt) {
   });
 })();
 
+/* ---- pwa.js ---- */
+/* ========== PWA: registra o service worker (só em http/https; falha em silêncio no PlayCode/artifact) ==========
+   Atualização: o sw.js busca sempre a versão nova quando há internet. Se uma versão nova assumir durante a partida,
+   mostramos um aviso e ela vale na próxima abertura (nunca recarrega no meio da run). */
+(function () {
+  if (!('serviceWorker' in navigator) || !/^https?:$/.test(location.protocol)) return;
+  let hadController = !!navigator.serviceWorker.controller;
+  const toast = msg => {
+    const d = document.createElement('div');
+    d.textContent = msg;
+    d.style.cssText = 'position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:99;background:#12203f;color:#bff6ff;border:1px solid #5ceeff80;border-radius:14px;padding:10px 16px;font:700 12px system-ui;box-shadow:0 8px 30px #000a;max-width:86vw;text-align:center';
+    document.body.appendChild(d); setTimeout(() => d.remove(), 5200);
+  };
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (hadController) toast('Versão nova instalada — vale ao reabrir o jogo');
+    hadController = true;
+  });
+  window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').then(r => { try { r.update(); } catch (e) {} }).catch(() => {}); });
+})();
+
 /* ---- main.js ---- */
 function loop(now) {
   const dt = Math.min(.025, (now - (last || now)) / 1000);
@@ -3377,6 +3528,8 @@ aimX = 0; aimY = -1;
 attachBalls();
 updateHud();
 requestAnimationFrame(loop);
+const _vt = $('verTag'); if (_vt) _vt.textContent = 'v' + GAME_VERSION;
+
 </script>
 </body>
 </html>
