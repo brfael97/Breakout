@@ -11,12 +11,12 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none}
 .stat{background:linear-gradient(180deg,#15203aee,#0c1428ee);border:1px solid #3d527a;border-radius:12px;padding:7px 9px;min-width:60px;text-align:center;box-shadow:0 4px 16px #0005, inset 0 1px 0 #ffffff12}
 .stat small{display:block;font-size:9px;letter-spacing:1.2px;color:#8fa3d0;font-weight:800}
 .stat b{display:block;font-size:16px;background:linear-gradient(180deg,#fff,#c8d6ff);-webkit-background-clip:text;background-clip:text;color:transparent}
-.brand{position:fixed;top:calc(58px + env(safe-area-inset-top));width:100%;text-align:center;color:#6f82b5;font-size:10px;letter-spacing:3.5px;font-weight:900;pointer-events:none;opacity:.85}
+.brand{position:fixed;top:calc(var(--ti,0px) + 52px);height:48px;justify-content:center;width:100%;text-align:center;color:#6f82b5;font-size:10px;letter-spacing:3.5px;font-weight:900;pointer-events:none;opacity:.85}
 .controls{position:fixed;z-index:3;bottom:calc(12px + env(safe-area-inset-bottom));left:12px;right:12px;display:flex;justify-content:space-between;align-items:center;gap:8px;pointer-events:none}
 .move{width:58px;height:58px;flex-shrink:0;border-radius:50%;border:2px solid #5a6f9e;background:linear-gradient(160deg,#1c2a4ee8,#121c36e8);color:white;font-size:28px;display:grid;place-items:center;pointer-events:auto;touch-action:none;box-shadow:0 4px 14px #0006, inset 0 1px 0 #ffffff18}
 .hint{margin:0 auto;font-size:11px;color:#b8c8ef;text-align:center;flex:1 1 auto;min-width:0;max-width:min(280px,calc(100vw - 48px));line-height:1.3;font-weight:600;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;word-break:break-word;padding:0 2px}
 .hint .go{display:inline-block;margin-top:3px;padding:5px 10px;border-radius:999px;background:linear-gradient(90deg,#35d9ff,#7b7dff);color:#081126;font-size:10px;font-weight:900;letter-spacing:.3px;box-shadow:0 0 18px #35d9ff55;max-width:100%}
-.overlay{position:fixed;z-index:5;inset:0;background:radial-gradient(ellipse at 50% 30%,#12204acc,#050817f0 70%);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto}
+.overlay{position:fixed;z-index:5;inset:0;background:radial-gradient(ellipse at 50% 30%,#12204acc,#050817f0 70%);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:calc(var(--ti,0px) + 14px) 16px calc(env(safe-area-inset-bottom) + 16px);overflow:auto}
 .hidden{display:none!important}
 #buildsummary{white-space:pre-line}
 .overlay{touch-action:pan-y}
@@ -42,7 +42,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none}
 .bar span{display:block;height:100%;background:linear-gradient(90deg,#35d9ff,#7b7dff,#c4a0ff);box-shadow:0 0 8px #35d9ff66}
 .side-actions{position:fixed;z-index:4;top:calc(56px + env(safe-area-inset-top));right:10px;display:flex;flex-direction:column;gap:8px;pointer-events:auto}
 .icon-btn{width:36px;height:36px;border-radius:12px;border:1px solid #3d527a;background:linear-gradient(160deg,#1a2748ee,#101a32ee);color:#c5d0ef;font-size:18px;display:grid;place-items:center;touch-action:manipulation;box-shadow:0 4px 12px #0005}
-.combo-hud{position:fixed;z-index:2;top:calc(58px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);text-align:center;pointer-events:none;opacity:0;transition:opacity .15s}
+.combo-hud{position:fixed;z-index:2;top:calc(var(--ti,0px) + 62px);left:50%;transform:translateX(-50%);text-align:center;pointer-events:none;opacity:0;transition:opacity .15s}
 .combo-hud.show{opacity:1}
 .combo-hud b{display:block;font-size:22px;color:#ffe66d;text-shadow:0 0 14px #ffc44a90}
 .combo-hud small{font-size:10px;letter-spacing:2px;color:#9eafd6;font-weight:800}
@@ -63,7 +63,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none}
 .event-btn p{margin:0;font-size:12px;color:#a8b8dc}
 .event-btn .tag{font-size:10px;font-weight:900;letter-spacing:1.2px;color:#5ceeff}
 @media(min-width:520px){.cards{grid-template-columns:repeat(3,1fr)}.card{min-height:185px}.panel{padding:26px 22px}}
-@media(max-height:570px){.stat{padding:4px 6px}.stat b{font-size:13px}.brand{top:52px}.move{width:48px;height:48px;flex-shrink:0}.panel{padding:14px}.panel h1{font-size:27px}.cards{gap:5px}.card{padding:8px}.combo-hud{top:48px}.combo-hud b{font-size:18px}.side-actions{top:calc(50px + env(safe-area-inset-top));right:8px}.icon-btn{width:32px;height:32px}}
+@media(max-height:570px){.stat{padding:4px 6px}.stat b{font-size:13px}.brand{top:calc(var(--ti,0px) + 48px);height:44px}.move{width:48px;height:48px;flex-shrink:0}.panel{padding:14px}.panel h1{font-size:27px}.cards{gap:5px}.card{padding:8px}.combo-hud{top:calc(var(--ti,0px) + 54px)}.combo-hud b{font-size:18px}.side-actions{top:calc(50px + env(safe-area-inset-top));right:8px}.icon-btn{width:32px;height:32px}}
 
 /* ===== v3 ===== */
 .ic{display:inline-block;vertical-align:middle;flex-shrink:0}
@@ -147,7 +147,10 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none}
 .over-tip:empty{display:none}
 .over-tip b{color:#5ceeff;letter-spacing:1px;font-size:10px;display:block;margin-bottom:2px}
 
-#rerollBtn{margin-top:12px;border-color:#ff7a9a99;color:#ffc2d0}
+#rerollBtn{margin:14px auto 0;display:flex;width:fit-content!important;align-items:center;gap:10px;padding:9px 12px 9px 14px;border-radius:999px;border:1px solid #ff7a9a66;background:linear-gradient(180deg,#2a1a30cc,#1a1128cc);color:#ffd9e2;box-shadow:0 0 18px -6px #ff7a9a88,inset 0 1px 0 #ffffff12;text-align:left}
+#rerollBtn .rr-tx{display:flex;flex-direction:column;line-height:1.15}#rerollBtn .rr-tx b{font-size:13px;letter-spacing:.4px}#rerollBtn .rr-tx small{font-size:10px;color:#c796a6;letter-spacing:.6px}
+#rerollBtn .rr-cost{display:inline-flex;align-items:center;gap:2px;font-weight:900;font-size:12px;padding:3px 8px;border-radius:999px;background:#ff7a9a22;border:1px solid #ff7a9a55;color:#ff9fb6}
+#rerollBtn:active:not(:disabled){transform:scale(.96)}
 #rerollBtn:disabled{opacity:.4}
 .panel.gl{max-height:90vh;overflow-y:auto;text-align:left;-webkit-overflow-scrolling:touch}
 .panel.gl .eyebrow,.panel.gl h1{text-align:center}
@@ -311,6 +314,7 @@ const ICON_PATHS = {
   chrono: _ring(12, 12, 10.2, 8) + 'M11 6.2h2v5.8h4.6v2H11z',
   bomb: _circ(11, 14, 7.6) + _circ(8.6, 11.6, 1.4) + 'M15.6 6.8l2.6-2.6 1.5 1.5-2.6 2.6z' + _star(20.2, 3.8, 2.8, 1, 4),
   heart: _heart,
+  refresh: _ring(12, 12, 9, 6.6) + 'M16 1.5l6 5.2-6.8 2.2z',
   shard: 'M12 1.5l8 10.5-8 10.5-8-10.5z' + 'M12 6.5l3.8 5.5-3.8 5.5-3.8-5.5z',
   shield: 'M12 1.8l8.6 3v6.4c0 5.2-3.7 9.4-8.6 11-4.9-1.6-8.6-5.8-8.6-11V4.8z' + 'M12 6l4.6 1.6v3.6c0 2.8-1.8 5.1-4.6 6.3-2.8-1.2-4.6-3.5-4.6-6.3V7.6z',
   velocity: 'M2.5 5l8.5 7-8.5 7zM12.5 5l8.5 7-8.5 7z',
@@ -521,7 +525,7 @@ let perfectStreak = 0, comboTier = 0, timeScale = 1, godMode = false, cheated = 
 let runStats = { picks: {}, stages: 0, bosses: [], perfects: 0, maxCombo: 0, rerolls: 0 }, deathCause = 'bola', hudLivesKey = '', hudLivesPrev = 3;
 let curSpecial = '', sectorBanner = null, fervor = 0, resumeCd = 0, lastSpecial = '', deathBossKind = '';
 let a11y = { shake: false, flash: false, contrast: false };
-const GAME_VERSION = '3.8';
+const GAME_VERSION = '3.9';
 let paddleFlash = 0, regenTimer = 0, tierFlash = 0, bgDirty = true, musicVol = 0.6, windPhase = 0;
 
 const paddle = { x: 0, y: 0, w: 104, h: 13, baseW: 104, speed: 420 };
@@ -1079,8 +1083,8 @@ function showUpgrades(bossReward = false, rerolled = false) {
     }, 350 + i * 480));
   });
   const rb = $('rerollBtn'), canRe = !rerolled && lives >= 2;      // 1 troca por oferta · custa 1 vida · só com 2+ vidas
-  rb.style.display = canRe ? '' : 'none'; rb.disabled = true;
-  rb.innerHTML = iconSVG('heart', 14, '#ff7a9a', 'vertical-align:-2px;margin-right:6px') + 'TROCAR OFERTA · −1 vida';
+  rb.style.display = canRe ? 'flex' : 'none'; rb.disabled = true;
+  rb.innerHTML = '<span class="rr-ic">' + iconSVG('refresh', 16, '#ffd0dc') + '</span><span class="rr-tx"><b>Sortear de novo</b><small>gasta 1 vida</small></span><span class="rr-cost">−' + iconSVG('heart', 13, '#ff7a9a') + '</span>';
   revealTimers.push(setTimeout(() => { for (const el of ui.cards.children) el.classList.remove('locked'); rb.disabled = false; revealTimers = []; }, 350 + rolled.length * 480 + 150));
 }
 function doReroll() {
@@ -1599,6 +1603,7 @@ function measureInset() {
 function resize() {
   const ow = W, oh = H;
   topInset = measureInset();
+  document.documentElement.style.setProperty('--ti', topInset + 'px');
   W = innerWidth; H = innerHeight;
   dpr = Math.min(devicePixelRatio || 1, 2);
   canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
@@ -2092,7 +2097,7 @@ function buildLevel() {
     const special = pickSpecial(); curSpecial = special || '';
     const cols = clamp(Math.floor((W - 24) / 43), 5, 11), gap = 5;
     const bw = Math.min(48, (W - 24 - (cols - 1) * gap) / cols), bh = 18;
-    const topY = Math.max(112 + topInset, H * .18);
+    const topY = Math.max(126 + topInset, H * .18 + 12);
     const maxBottom = paddle.y - 90;
     const maxRowsBySpace = Math.max(3, Math.floor((maxBottom - topY) / (bh + gap)));
     let rows = Math.min(D.rows, maxRowsBySpace);
