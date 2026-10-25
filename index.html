@@ -435,6 +435,7 @@ let aimStartX = 0, aimStartY = 0, aimDragged = false, announce = null;
 let stageStartTime = 0, stagePowerDropped = false, skipNextUpgrade = false;
 let eventMods = { bossPressure: 0, rarityBoost: false };
 let pendingAfterEvent = null, pendingNote = null;
+let themeIdx = 0, sectorSeq = [0], themeCycle = [0];
 let theme = THEMES[0], sector = 1, mods = [], sectorIntro = false;
 let stage = { maxCombo: 0, perfects: 0, lostLife: false };
 let perfectStreak = 0, comboTier = 0, timeScale = 1, godMode = false, cheated = false, animT = 0;
@@ -510,6 +511,26 @@ function has(a, b) { return lv(a) > 0 && lv(b) > 0; }
 function vibrate(ms) {
   if (!vibrationOn) return;
   try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) {}
+}
+
+/* ===== ordem dos setores: setor 1 = ÓRBITA; depois sorteio sem repetir até saírem todos =====
+   Temas nunca vistos em runs anteriores têm peso 2 (incentiva descobrir). */
+function seenThemes() { try { return JSON.parse(localStorage.getItem('breakpointSeenThemes') || '[]'); } catch (e) { return []; } }
+function markThemeSeen(i) { try { const s = seenThemes(); if (!s.includes(i)) { s.push(i); localStorage.setItem('breakpointSeenThemes', JSON.stringify(s)); } } catch (e) {} }
+function nextTheme() {
+  const all = THEMES.map((_, i) => i);
+  let pool = all.filter(i => !themeCycle.includes(i));
+  if (!pool.length) { const last = sectorSeq[sectorSeq.length - 1]; themeCycle = [last]; pool = all.filter(i => i !== last); }
+  const seen = seenThemes(), w = pool.map(i => seen.includes(i) ? 1 : 2), tot = w.reduce((a, b) => a + b, 0);
+  let r = Math.random() * tot, pick = pool[pool.length - 1];
+  for (let k = 0; k < pool.length; k++) { r -= w[k]; if (r <= 0) { pick = pool[k]; break; } }
+  themeCycle.push(pick);
+  return pick;
+}
+function themeForSector(s) {
+  while (sectorSeq.length < s) sectorSeq.push(nextTheme());
+  markThemeSeen(sectorSeq[s - 1]);
+  return sectorSeq[s - 1];
 }
 
 /* ---- storage.js ---- */
@@ -1623,7 +1644,7 @@ function buildLevel() {
   stage = { maxCombo: 0, perfects: 0, lostLife: false };
   if (level === 1 || level % 4 === 1) {
     sector = Math.floor((level - 1) / 4) + 1;
-    theme = THEMES[(sector - 1) % THEMES.length];
+    themeIdx = themeForSector(sector); theme = THEMES[themeIdx];
     mods = rollMods(); sectorIntro = true; bgDirty = true;
   }
   const D = diff(level);
@@ -1697,7 +1718,7 @@ function newGame() {
   runUpgrades = {}; runUpgradeRarity = {};
   combo = 0; shieldUses = 0; electricCooldown = 0; moveLeft = moveRight = false;
   skipNextUpgrade = false; eventMods = { bossPressure: 0, rarityBoost: false };
-  runStats = { picks: {}, stages: 0 }; godMode = false; cheated = false; theme = THEMES[0]; sector = 1; mods = []; bgDirty = true; comboTier = 0; perfectStreak = 0;
+  runStats = { picks: {}, stages: 0 }; godMode = false; cheated = false; theme = THEMES[0]; themeIdx = 0; sectorSeq = [0]; themeCycle = [0]; sector = 1; mods = []; bgDirty = true; comboTier = 0; perfectStreak = 0;
   try { tutorialOn = localStorage.getItem('breakpointTutored') !== '1'; } catch (e) { tutorialOn = true; }
   tutorialStep = 0;
   ui.menu.classList.add('hidden'); ui.over.classList.add('hidden'); ui.over.style.zIndex = '';
@@ -1810,7 +1831,7 @@ const BOSS_DEFS = {
   },
   warden: {
     name: 'GUARDIÃO DE CRISTAL', title: 'CHEFE · GUARDIÃO', sub: 'Escudo intermitente · ★ Estrela e Cronos quebram', c: '#7ec8ff', c2: '#c8ecff',
-    hpBonus: 4, speed: .85, wMul: 1, bob: [1.2, 7], atk0: 2.1, dash: true,
+    hpBonus: -3, speed: .85, wMul: 1, bob: [1.2, 7], atk0: 2.1, dash: true,
     shield: [{ on: 1.4, off: 5.0 }, { on: 1.9, off: 4.2 }, { on: 2.4, off: 3.6 }],
     stageNames: ['FASE 2 · PRISMA', 'FASE FINAL · REFRAÇÃO'], stageSubs: ['Fragmentos lentos, leia o padrão', 'Fragmentos em ritmo rápido — faixas seguras']
   },
@@ -1821,7 +1842,7 @@ const BOSS_DEFS = {
   },
   void: {
     name: 'SINGULARIDADE', title: 'CHEFE · SINGULARIDADE', sub: 'A gravidade curva a bola · cuidado com o teleporte', c: '#b06bff', c2: '#e8d4ff',
-    hpBonus: 6, speed: .9, wMul: 1.05, bob: [1.4, 8], atk0: 2.2, dash: false,
+    hpBonus: 10, speed: .9, wMul: 1.05, bob: [1.4, 8], atk0: 2.2, dash: false,
     shield: [null, { on: 1.5, off: 5.2 }, { on: 2.0, off: 4.4 }],
     stageNames: ['FASE 2 · HORIZONTE', 'FASE FINAL · COLAPSO'], stageSubs: ['Teleporte ativado', 'Gravidade mais forte']
   }
@@ -2377,7 +2398,7 @@ function bossEntering() { return !!boss && (animT - boss.born) < 1.1; }
 function spawnBoss() {
   const sector = Math.max(1, Math.floor(level / 4));
   const pressure = eventMods.bossPressure || 0;
-  const kind = bossKindForSector(sector), def = BOSS_DEFS[kind];
+  const kind = BOSS_ORDER[themeIdx % BOSS_ORDER.length], def = BOSS_DEFS[kind];
   const bw = Math.min(150, W * .38) * def.wMul;
   const hp = 30 + (sector - 1) * 8 + pressure * 4 + def.hpBonus;
   const cracks = [];
@@ -3290,7 +3311,7 @@ function dbgAction(a) {
   else if (a === 'giveup') { dbgEl._up = $('dbgUp').value; dbgGiveUpgrade($('dbgUp').value, $('dbgRar').value); }
   else if (a.startsWith('pw:')) { dbgToggle(false); if (dbgEnsurePlaying()) catchDrop({ type: a.slice(3), x: paddle.x + paddle.w / 2, y: paddle.y - 30 }); }
   else if (a === 'spawnbomb') { dbgToggle(false); dropAt(W / 2, H * .3, 'bomb', 125); }
-  else if (a === 'settheme') { theme = THEMES[Number($('dbgTheme').value)]; const m = $('dbgMod').value; mods = m ? [m] : []; bgDirty = true; updateBrand(); }
+  else if (a === 'settheme') { themeIdx = Number($('dbgTheme').value); theme = THEMES[themeIdx]; const m = $('dbgMod').value; mods = m ? [m] : []; bgDirty = true; updateBrand(); }
   else if (a.startsWith('combo:')) { combo = Number(a.slice(6)); comboTier = tierOf(combo); comboTimer = 4; stage.maxCombo = Math.max(stage.maxCombo, combo); updateHud(); }
   else if (a.startsWith('ts:')) timeScale = Number(a.slice(3));
   dbgRender();
