@@ -16,11 +16,11 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none}
 .move{width:58px;height:58px;flex-shrink:0;border-radius:50%;border:2px solid #5a6f9e;background:linear-gradient(160deg,#1c2a4ee8,#121c36e8);color:white;font-size:28px;display:grid;place-items:center;pointer-events:auto;touch-action:none;box-shadow:0 4px 14px #0006, inset 0 1px 0 #ffffff18}
 .hint{margin:0 auto;font-size:11px;color:#b8c8ef;text-align:center;flex:1 1 auto;min-width:0;max-width:min(280px,calc(100vw - 48px));line-height:1.3;font-weight:600;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;word-break:break-word;padding:0 2px}
 .hint .go{display:inline-block;margin-top:3px;padding:5px 10px;border-radius:999px;background:linear-gradient(90deg,#35d9ff,#7b7dff);color:#081126;font-size:10px;font-weight:900;letter-spacing:.3px;box-shadow:0 0 18px #35d9ff55;max-width:100%}
-.overlay{position:fixed;z-index:5;inset:0;background:radial-gradient(ellipse at 50% 30%,#12204acc,#050817f0 70%);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:calc(var(--ti,0px) + 14px) 16px calc(env(safe-area-inset-bottom) + 16px);overflow:auto}
+.overlay{position:fixed;z-index:5;inset:0;background:radial-gradient(ellipse at 50% 30%,#12204acc,#050817f0 70%);backdrop-filter:blur(10px);display:flex;align-items:flex-start;justify-content:center;padding:calc(max(var(--ti,0px),env(safe-area-inset-top)) + 14px) 16px calc(env(safe-area-inset-bottom) + 16px);overflow:hidden}
 .hidden{display:none!important}
 #buildsummary{white-space:pre-line}
 .overlay{touch-action:pan-y}
-.panel{width:min(460px,100%);text-align:center;padding:26px 20px;border:1px solid #4a64a0;border-radius:24px;background:linear-gradient(160deg,#1a2748f7 0%,#0d1530fa 55%,#0a1028fa 100%);box-shadow:0 24px 80px #000a,0 0 0 1px #ffffff08,inset 0 1px 0 #ffffff14}
+.panel{margin:auto;flex-shrink:0;width:min(460px,100%);text-align:center;padding:26px 20px;border:1px solid #4a64a0;border-radius:24px;background:linear-gradient(160deg,#1a2748f7 0%,#0d1530fa 55%,#0a1028fa 100%);box-shadow:0 24px 80px #000a,0 0 0 1px #ffffff08,inset 0 1px 0 #ffffff14}
 .eyebrow{font-size:10px;letter-spacing:3.2px;color:#5ceeff;font-weight:900;text-shadow:0 0 12px #5ceeff66}
 .panel h1{font-size:clamp(28px,8vw,44px);line-height:1.02;margin:12px 0;color:white;text-shadow:0 0 28px #00d9ff60,0 2px 0 #0006;letter-spacing:-.5px}
 .panel p{color:#b0bfE3;font-size:13px;line-height:1.55}
@@ -42,10 +42,10 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none}
 .bar span{display:block;height:100%;background:linear-gradient(90deg,#35d9ff,#7b7dff,#c4a0ff);box-shadow:0 0 8px #35d9ff66}
 .side-actions{position:fixed;z-index:4;top:calc(56px + env(safe-area-inset-top));right:10px;display:flex;flex-direction:column;gap:8px;pointer-events:auto}
 .icon-btn{width:36px;height:36px;border-radius:12px;border:1px solid #3d527a;background:linear-gradient(160deg,#1a2748ee,#101a32ee);color:#c5d0ef;font-size:18px;display:grid;place-items:center;touch-action:manipulation;box-shadow:0 4px 12px #0005}
-.combo-hud{position:fixed;z-index:2;top:calc(var(--ti,0px) + 62px);left:50%;transform:translateX(-50%);text-align:center;pointer-events:none;opacity:0;transition:opacity .15s}
+.combo-hud{position:fixed;z-index:2;top:calc(var(--ti,0px) + 52px);height:48px;display:flex;flex-direction:column;justify-content:center;left:14px;text-align:left;pointer-events:none;opacity:0;transition:opacity .15s}
 .combo-hud.show{opacity:1}
-.combo-hud b{display:block;font-size:22px;color:#ffe66d;text-shadow:0 0 14px #ffc44a90}
-.combo-hud small{font-size:10px;letter-spacing:2px;color:#9eafd6;font-weight:800}
+.combo-hud b{display:block;line-height:1;font-size:24px;color:#ffe66d;text-shadow:0 0 14px #ffc44a90}
+.combo-hud small{font-size:8px;letter-spacing:1.2px;margin-top:2px;color:#9eafd6;font-weight:800}
 .setting-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:14px 0;padding:12px;border-radius:12px;background:#0c1228;border:1px solid #2a3a62;text-align:left}
 .setting-row label{font-size:13px;color:#c5d0ef;font-weight:700}
 .setting-row small{display:block;font-size:10px;color:#7f90b8;font-weight:500;margin-top:2px}
@@ -63,7 +63,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none}
 .event-btn p{margin:0;font-size:12px;color:#a8b8dc}
 .event-btn .tag{font-size:10px;font-weight:900;letter-spacing:1.2px;color:#5ceeff}
 @media(min-width:520px){.cards{grid-template-columns:repeat(3,1fr)}.card{min-height:185px}.panel{padding:26px 22px}}
-@media(max-height:570px){.stat{padding:4px 6px}.stat b{font-size:13px}.brand{top:calc(var(--ti,0px) + 48px);height:44px}.move{width:48px;height:48px;flex-shrink:0}.panel{padding:14px}.panel h1{font-size:27px}.cards{gap:5px}.card{padding:8px}.combo-hud{top:calc(var(--ti,0px) + 54px)}.combo-hud b{font-size:18px}.side-actions{top:calc(50px + env(safe-area-inset-top));right:8px}.icon-btn{width:32px;height:32px}}
+@media(max-height:570px){.stat{padding:4px 6px}.stat b{font-size:13px}.brand{top:calc(var(--ti,0px) + 48px);height:44px}.move{width:48px;height:48px;flex-shrink:0}.panel{padding:14px}.panel h1{font-size:27px}.cards{gap:5px}.card{padding:8px}.combo-hud{top:calc(var(--ti,0px) + 48px);height:44px}.combo-hud b{font-size:18px}.side-actions{top:calc(50px + env(safe-area-inset-top));right:8px}.icon-btn{width:32px;height:32px}}
 
 /* ===== v3 ===== */
 .ic{display:inline-block;vertical-align:middle;flex-shrink:0}
@@ -77,7 +77,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none}
 .legend span{display:inline-flex;align-items:center;gap:4px}
 #comboName{display:block}
 .combo-hud b{transition:transform .12s,color .2s}
-.combo-hud.pop b{transform:scale(1.35)}
+.combo-hud.pop b{transform:scale(1.3);transform-origin:left center}
 /* cartas reveladas uma a uma */
 .card{opacity:0;transform:translateY(26px) rotateX(35deg) scale(.9)}
 .card.reveal{animation:cardIn .55s cubic-bezier(.2,1.2,.3,1) forwards}
@@ -161,6 +161,14 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none}
 .gl-row p{margin:2px 0 0;font-size:11.5px;color:#a8b8dc;line-height:1.45}
 .gl-dot{width:16px;height:16px;border-radius:5px;display:block}
 .panel.gl .primary{margin-top:16px}
+
+/* v3.10 painéis: rolam por dentro, nunca sob o notch */
+.overlay .panel{max-height:calc(100dvh - var(--ti,0px) - env(safe-area-inset-bottom) - 32px);overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y}
+.panel.gl,#settings .panel{max-height:calc(100dvh - var(--ti,0px) - env(safe-area-inset-bottom) - 32px)}
+.combo-hud{left:14px;transform:none;top:calc(var(--ti,0px) + 54px);text-align:left;height:40px;display:flex;flex-direction:column;justify-content:center}
+.combo-hud b{font-size:20px;line-height:1}.combo-hud small{font-size:8px;letter-spacing:1.2px;white-space:nowrap}
+.brand{max-width:56%;left:50%;width:auto;transform:translateX(-50%)}
+.combo-hud b{transform-origin:left center}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#090d20">
@@ -523,9 +531,9 @@ let theme = THEMES[0], sector = 1, mods = [], sectorIntro = false;
 let stage = { maxCombo: 0, perfects: 0, lostLife: false };
 let perfectStreak = 0, comboTier = 0, timeScale = 1, godMode = false, cheated = false, animT = 0;
 let runStats = { picks: {}, stages: 0, bosses: [], perfects: 0, maxCombo: 0, rerolls: 0 }, deathCause = 'bola', hudLivesKey = '', hudLivesPrev = 3;
-let curSpecial = '', sectorBanner = null, fervor = 0, resumeCd = 0, lastSpecial = '', deathBossKind = '';
+let curSpecial = '', sectorBanner = null, fervor = 0, resumeCd = 0, lastSpecial = '', specialBag = [], deathBossKind = '';
 let a11y = { shake: false, flash: false, contrast: false };
-const GAME_VERSION = '3.9';
+const GAME_VERSION = '3.10';
 let paddleFlash = 0, regenTimer = 0, tierFlash = 0, bgDirty = true, musicVol = 0.6, windPhase = 0;
 
 const paddle = { x: 0, y: 0, w: 104, h: 13, baseW: 104, speed: 420 };
@@ -962,7 +970,7 @@ function updateHud() {
     ui.comboHud.classList.add('show');
     ui.comboValue.textContent = '×' + combo;
     ui.comboValue.style.color = TIERS[comboTier].color;
-    ui.comboName.textContent = TIERS[comboTier].name || 'COMBO';
+    ui.comboName.textContent = (TIERS[comboTier].name || 'COMBO') + ' +' + Math.round(Math.min(0.45, (combo - 1) * 0.045) * 100) + '%';
   } else ui.comboHud.classList.remove('show');
 }
 function updateBrand() {
@@ -1170,9 +1178,10 @@ function showSummary(rows, total, stars, wasBoss, done) {
   const els = rows.map(r => {
     const d = document.createElement('div');
     d.className = 'sum-row' + (r.val > 0 ? '' : ' zero');
-    d.innerHTML = '<span>' + iconSVG(r.icon, 16, r.val > 0 ? '#9ef0c8' : '#5a6a90') + r.label + '</span><b>' + (r.val > 0 ? '+0' : '—') + '</b>';
+    d.innerHTML = '<span>' + iconSVG(r.icon, 16, r.val > 0 ? '#9ef0c8' : '#5a6a90') + r.label + (r.st === undefined ? '' : iconSVG('star', 12, r.st ? '#ffd56a' : '#46527a', 'margin-left:4px'))  + '</span><b>' + (r.val > 0 ? '+0' : '—') + '</b>';
     box.appendChild(d); return d;
   });
+  const gh = document.createElement('div'); gh.style.cssText = 'font-size:10px;color:#7f92c0;margin-top:8px;letter-spacing:.4px'; gh.textContent = '★ = cada meta cumprida: tempo, perfeitas e sem perder vida. 3 estrelas = Fase perfeita.'; box.appendChild(gh);
   $('sumTotal').classList.add('hidden');
   $('sumContinue').textContent = 'PULAR';
   sumCtl = { rows, els, total, stars, done, i: 0, starsLit: 0, totalShown: false, finished: false, cont: false, timer: null };
@@ -1284,6 +1293,11 @@ function glossaryHTML() {
   GL_BLOCKS.forEach(([c, n, d]) => { h += row('<span class="gl-dot" style="background:' + c + ';box-shadow:0 0 10px ' + c + '88"></span>', n, d); });
   h += sec('CHEFES · um por setor');
   BOSS_ORDER.forEach((k, i) => { const df = BOSS_DEFS[k]; h += row(iconSVG('core', 22, df.c), '<span style="color:' + df.c2 + '">' + df.name + '</span> <small>' + THEMES[i].name + '</small>', BOSS_TIPS[k]); });
+  h += sec('MECÂNICAS');
+  h += row(iconSVG('target', 22, '#7ef6ff'), 'Rebatida perfeita', 'Acerte o centro da plataforma: pontos crescem na sequência e a cada 5 seguidas você ganha +4 hits de sobrecarga. 4 por fase = 1 estrela.');
+  h += row(iconSVG('target', 22, '#7ef6ff'), 'Rebatida perfeita', 'Acerte a bola no centro da plataforma: pontos crescem com a sequência (até ×10) e a cada 5 seguidas você ganha +4 hits de sobrecarga. Perder a bola zera a sequência.');
+  h += row(iconSVG('combo', 22, '#ffb454'), 'Combo', 'Quebre blocos em sequência sem deixar o tempo acabar: +4,5% de pontos por degrau (até +45%) e mais chance de power-up a cada nível do combo.');
+  h += row(iconSVG('star', 22, '#ffd56a'), 'Estrelas da fase', 'Tempo abaixo da meta, 4+ perfeitas e nenhuma vida perdida. Cada uma vale uma estrela.');
   h += sec('FASES ESPECIAIS');
   SPECIALS.forEach(k => { const si = SPECIAL_INFO[k]; h += row(iconSVG('sparkle', 22, si.c), '<span style="color:' + si.c + '">' + si.t + '</span>', si.s); });
   return h;
@@ -2004,7 +2018,7 @@ function onPerfect(b) {
   sfx('perfect'); buzz('perfect');
   if (lv('reflex') >= 3) registerCombo(b.x, paddle.y - 46);
   if (lv('fervor')) { fervor = lv('fervor'); floatText(b.x, paddle.y - 52, 'FERVOR ×' + fervor, '#ffb454', 11); }
-  if (perfectStreak === 5 || perfectStreak === 10) announce = { title: 'PRECISÃO ×' + perfectStreak, sub: 'Rebatidas perfeitas em sequência', life: 1.3, max: 1.3, color: '#7ef6ff' };
+  if (perfectStreak % 5 === 0) { overchargeHits = Math.min(12, overchargeHits + 4); announce = { title: 'PRECISÃO ×' + perfectStreak, sub: '+4 hits de sobrecarga', life: 1.3, max: 1.3, color: '#7ef6ff' }; }
 }
 
 /* ---- level.js ---- */
@@ -2022,9 +2036,14 @@ function pickSpecial() {
   if (level < 5) { lastSpecial = ''; return null; }
   const st = (level - 1) % 4 + 1;
   if (!(level % 5 === 0 || (sector >= 2 && st >= 2 && Math.random() < .4))) return null;
-  let pool = SPECIALS.filter(s => s !== lastSpecial);
-  if (level < 9) pool = pool.filter(s => s !== 'elite_hunt');
-  const s = pool[Math.floor(Math.random() * pool.length)];
+  // "baralho": todas as fases especiais saem uma vez em ordem aleatória antes de repetir
+  const ok = s => level >= 9 || s !== 'elite_hunt';
+  specialBag = specialBag.filter(ok);
+  if (!specialBag.length) {
+    specialBag = SPECIALS.filter(ok).sort(() => Math.random() - .5);
+    if (specialBag[0] === lastSpecial && specialBag.length > 1) specialBag.push(specialBag.shift());
+  }
+  const s = specialBag.shift();
   lastSpecial = s; return s;
 }
 function enterReady(kind) {
@@ -2130,7 +2149,8 @@ function buildLevel() {
         if (r >= 3 && Math.random() < D.hp4) hp = 4;
         if (hasMod('armored') && !special && Math.random() < .2) hp++;
         if (special === 'fortress') hp = 1 + Math.floor(r * 3 / Math.max(1, rows - 1));
-        let explosive = (!special && Math.random() < D.explosive) || (special === 'minefield' && Math.random() < .4) || (special === 'corridor' && r >= 2 && Math.random() < .22);
+        if (special === 'minefield' && r >= 1) hp = Math.max(hp, 2);
+        let explosive = (!special && Math.random() < D.explosive) || (special === 'minefield' && Math.random() < .32 && !bricks.some(o => o.explosive && Math.hypot(o.x - (sx + c * (bw + gap)), o.y - (sy + r * (bh + gap))) < 135)) || (special === 'corridor' && r >= 2 && Math.random() < .22);
         let kind = 'normal';
         let color = explosive ? '#ff8a32' : theme.bricks[(r + c + level - 1) % theme.bricks.length];
         const roll = Math.random();
@@ -2182,7 +2202,7 @@ function newGame() {
   runUpgrades = {}; runUpgradeRarity = {};
   combo = 0; shieldUses = 0; electricCooldown = 0; moveLeft = moveRight = false;
   skipNextUpgrade = false; eventMods = { bossPressure: 0, rarityBoost: false };
-  runStats = { picks: {}, stages: 0, bosses: [], perfects: 0, maxCombo: 0, rerolls: 0 }; lastSpecial = ''; deathBossKind = ''; resumeCd = 0; godMode = false; cheated = false; theme = THEMES[0]; themeIdx = 0; sectorSeq = [0]; themeCycle = [0]; sector = 1; mods = []; bgDirty = true; comboTier = 0; perfectStreak = 0;
+  runStats = { picks: {}, stages: 0, bosses: [], perfects: 0, maxCombo: 0, rerolls: 0 }; lastSpecial = ''; specialBag = []; deathBossKind = ''; resumeCd = 0; godMode = false; cheated = false; theme = THEMES[0]; themeIdx = 0; sectorSeq = [0]; themeCycle = [0]; sector = 1; mods = []; bgDirty = true; comboTier = 0; perfectStreak = 0;
   try { tutorialOn = localStorage.getItem('breakpointTutored') !== '1'; } catch (e) { tutorialOn = true; }
   tutorialStep = 0;
   ui.menu.classList.add('hidden'); ui.over.classList.add('hidden'); ui.over.style.zIndex = '';
@@ -2204,13 +2224,13 @@ function completeStage() {
   runStats.stages++;
 
   const elapsed = gameNow() - stageStartTime;
-  const limit = wasBoss ? 70000 : 28000;
+  const limit = wasBoss ? 80000 : 40000;
   const rx = [1, 1, 1.5, 2][lv('reflex')];
   const rows = [
-    { icon: 'velocity', label: 'Tempo ' + (elapsed / 1000).toFixed(1) + 's', val: elapsed < limit ? Math.round((wasBoss ? 80 : 100) + (1 - elapsed / limit) * 120) : 0 },
+    { icon: 'velocity', st: elapsed < limit, label: 'Tempo ' + (elapsed / 1000).toFixed(1) + 's · meta ' + (limit / 1000) + 's', val: elapsed < limit ? Math.round((wasBoss ? 80 : 100) + (1 - elapsed / limit) * 120) : 0 },
     { icon: 'combo', label: 'Combo máximo ×' + stage.maxCombo, val: stage.maxCombo * 8 },
-    { icon: 'target', label: 'Rebatidas perfeitas ×' + stage.perfects, val: Math.round(stage.perfects * 12 * rx) },
-    { icon: 'shield', label: 'Impecável', val: stage.lostLife ? 0 : 120 }
+    { icon: 'target', st: stage.perfects >= 4, label: 'Rebatidas perfeitas ×' + stage.perfects + ' · meta 4', val: Math.round(stage.perfects * 12 * rx) },
+    { icon: 'shield', st: !stage.lostLife, label: 'Impecável · sem perder vida', val: stage.lostLife ? 0 : 120 }
   ];
   const stars = (elapsed < limit ? 1 : 0) + (stage.perfects >= 4 ? 1 : 0) + (stage.lostLife ? 0 : 1);
   if (stars === 3) rows.push({ icon: 'star', label: 'Fase perfeita', val: 100 });
@@ -3252,7 +3272,7 @@ function maybeDrop(br, forcePower = false) {
   }
   const mercy = lives <= 1 ? 1.2 : 1, jack = hasMod('jackpot') ? 1.35 : 1;
   const rain = curSpecial === 'power_rain';
-  const powerChance = rain ? .42 : Math.min(.3, (.11 + sc * .04) * (sc ? rm : 1) * mercy * jack);
+  const powerChance = rain ? .42 : Math.min(.3, (.11 + sc * .04) * (sc ? rm : 1) * mercy * jack + comboTier * .012);
   const bombBase = level < 5 ? .06 : .085;
   const bombChance = Math.max(.02, (bombBase - sc * .025) * (sc ? (2 - rm * 0.5) : 1) * diff(level).bombMul * (hasMod('jackpot') ? 1.4 : 1)) * (rain ? 1.9 : 1);
   const roll = Math.random();
