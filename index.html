@@ -216,11 +216,11 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none}
   <div class="panel">
     <div class="eyebrow">BREAKPOINT • CHAIN REACTION ROGUELITE</div>
     <h1>BREAK<br>POINT</h1>
-    <p>Monte uma build, cause reações em cadeia e enfrente chefes com identidade própria. Cada run muda — upgrades, sinergias e eventos de setor.</p>
+    <p>Monte uma build, cause reações em cadeia e enfrente chefes com identidade própria. Cada run muda — upgrades, sinergias, modificadores de setor e fases especiais.</p>
     <div class="legend" id="legend"></div>
     <button class="primary" id="start">COMEÇAR JOGO</button>
     <button class="secondary" id="glMenu">GLOSSÁRIO</button>
-    <p class="tip">3 vidas · 2 tipos de chefe · fases especiais · tutorial na 1ª run<br>Upgrade a cada 3 fases · Arraste para mirar · Toque para lançar</p>
+    <p class="tip">3 vidas · 6 chefes únicos · 7 fases especiais · setores em ordem aleatória<br>Upgrade a cada 3 fases e após cada chefe · troque a oferta por 1 vida<br>Arraste para mirar · Toque para lançar</p>
   </div>
 </div>
 
@@ -1000,7 +1000,7 @@ function updateBrand() {
 }
 function buildLegend() {
   const items = [['gem', '#c9a4ff', 'Elite'], ['sparkle', '#7ef6ff', 'Cristal'], ['lock', '#e8d48a', 'Cofre'], ['wide', '#62f4a6', 'Ampla'], ['multi', '#ffd166', 'Multi'], ['star', '#ffe66d', 'Estrela'], ['grenade', '#ffb020', 'Granada'], ['overcharge', '#b794ff', 'Carga'], ['chrono', '#8fd6ff', 'Cronos'], ['heart', '#ff5e83', 'Vida'], ['bomb', '#ff426b', 'Bomba'], ['shard', '#5eb0ff', 'Fragmento']];
-  $('legend').innerHTML = items.map(i => '<span>' + iconSVG(i[0], 15, i[1]) + i[2] + '</span>').join('');
+  $('legend').innerHTML = items.map(i => '<span>' + (i[0] === 'bomb' ? GL_BOMB.replace(/width="22" height="22"/, 'width="15" height="15"') : iconSVG(i[0], 15, i[1])) + i[2] + '</span>').join('');
 }
 function rollRarity(c) {
   let r = Math.random();
@@ -1295,7 +1295,8 @@ const GL_POWERS = [
   ['overcharge', 'Sobrecarga', 'Os próximos acertos causam dano extra.'],
   ['chrono', 'Cronos', 'Desacelera bombas e o chefe, e derruba o escudo dele.'],
   ['heart', 'Coração', '+1 vida. Cai de elites e cofres.'],
-  ['bomb', 'Bomba', 'Não deixe tocar na plataforma: custa uma vida.']
+  ['bomb', 'Bomba', 'Não deixe tocar na plataforma: custa uma vida.'],
+  ['shard', 'Fragmento', 'Projétil lento dos chefes (como o Guardião de Cristal). Funciona como a bomba: custa uma vida se tocar na plataforma.']
 ];
 const GL_BLOCKS = [
   ['#c9a4ff', 'Elite', 'Mais resistente. Sempre solta um power-up e pode soltar coração.'],
@@ -1307,14 +1308,13 @@ function glossaryHTML() {
   const sec = t => '<div class="gl-sec">' + t + '</div>';
   const row = (ic, name, txt) => '<div class="gl-row"><div class="gl-ic">' + ic + '</div><div><b>' + name + '</b><p>' + txt + '</p></div></div>';
   let h = sec('POWER-UPS');
-  GL_POWERS.forEach(([id, n, d]) => { const col = id === 'bomb' ? '#ff426b' : (DROP_COL[id] || '#ffd166'); h += row(id === 'bomb' ? GL_BOMB : iconSVG(DROP_ICON[id] || id, 22, col), n, d); });
+  GL_POWERS.forEach(([id, n, d]) => { const col = id === 'bomb' ? '#ff426b' : id === 'shard' ? '#5eb0ff' : (DROP_COL[id] || '#ffd166'); h += row(id === 'bomb' ? GL_BOMB : iconSVG(DROP_ICON[id] || id, 22, col), n, d); });
   h += sec('BLOCOS');
   GL_BLOCKS.forEach(([c, n, d]) => { h += row('<span class="gl-dot" style="background:' + c + ';box-shadow:0 0 10px ' + c + '88"></span>', n, d); });
   h += sec('CHEFES · um por setor');
   BOSS_ORDER.forEach((k, i) => { const df = BOSS_DEFS[k]; h += row(iconSVG('core', 22, df.c), '<span style="color:' + df.c2 + '">' + df.name + '</span> <small>' + THEMES[i].name + '</small>', BOSS_TIPS[k]); });
   h += sec('MECÂNICAS');
   h += row(iconSVG('target', 22, '#7ef6ff'), 'Rebatida perfeita', 'Acerte o centro da plataforma: pontos crescem na sequência e a cada 5 seguidas você ganha +4 hits de sobrecarga. 4 por fase = 1 estrela.');
-  h += row(iconSVG('target', 22, '#7ef6ff'), 'Rebatida perfeita', 'Acerte a bola no centro da plataforma: pontos crescem com a sequência (até ×10) e a cada 5 seguidas você ganha +4 hits de sobrecarga. Perder a bola zera a sequência.');
   h += row(iconSVG('combo', 22, '#ffb454'), 'Combo', 'Quebre blocos em sequência sem deixar o tempo acabar: +4,5% de pontos por degrau (até +45%) e mais chance de power-up a cada nível do combo.');
   h += row(iconSVG('star', 22, '#ffd56a'), 'Estrelas da fase', 'Tempo abaixo da meta, 4+ perfeitas e nenhuma vida perdida. Cada uma vale uma estrela.');
   h += sec('FASES ESPECIAIS');
