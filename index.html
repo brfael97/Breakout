@@ -187,6 +187,43 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none}
  #upgrade .card p.tip{display:none}
  #rerollBtn{margin-top:12px}
 }
+
+/* ===== v3.11: conquistas, estatísticas, continuar, compartilhar ===== */
+.ach-toast{position:fixed;z-index:60;top:calc(var(--ti,0px) + 50px);left:10px;right:10px;max-width:400px;margin:0 auto;height:54px;display:flex;align-items:center;gap:10px;padding:5px 14px 5px 10px;border-radius:15px;background:linear-gradient(160deg,#1b2850f5,#0b1230f7);border:1px solid var(--tc,#ffd56a);box-shadow:0 8px 28px #000a,0 0 22px -6px var(--tc,#ffd56a),inset 0 1px 0 #ffffff14;opacity:0;transform:translateY(-18px) scale(.97);transition:opacity .3s,transform .38s cubic-bezier(.2,1.3,.4,1);pointer-events:none;overflow:hidden}
+.ach-toast.show{opacity:1;transform:none}
+.ach-toast::after{content:'';position:absolute;inset:0;background:linear-gradient(105deg,transparent 30%,#ffffff22 50%,transparent 70%);transform:translateX(-120%)}
+.ach-toast.show::after{animation:achShine 1.1s .25s ease-out}
+@keyframes achShine{to{transform:translateX(120%)}}
+.at-medal{flex-shrink:0;filter:drop-shadow(0 0 8px var(--tc,#ffd56a))}
+.at-tx{display:flex;flex-direction:column;min-width:0;line-height:1.15;text-align:left}
+.at-tx small{font-size:8px;letter-spacing:1.8px;font-weight:900;color:var(--tc,#ffd56a)}
+.at-tx b{font-size:14px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.at-tx span{font-size:10px;color:#a8b8dc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btn-row{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:8px}
+.btn-row .secondary{margin-top:0;padding:11px 2px;font-size:10px;letter-spacing:.2px}
+.primary.cont{display:flex;flex-direction:column;align-items:center;gap:3px;padding:12px}
+.primary.cont small{font-size:11px;font-weight:700;letter-spacing:.2px;opacity:.78}
+.title-tag{color:#ffd56a;font-size:12px;font-weight:800;letter-spacing:2px;margin:-4px 0 10px;text-shadow:0 0 12px #ffd56a55}
+.share-msg{font-size:11px;color:#9ef0c8;min-height:0;margin-top:6px}
+.share-msg:empty{display:none}
+.ach-sum{display:flex;align-items:center;gap:12px;margin:8px 0 2px}.ach-sum b{font-size:18px;color:#ffd56a;white-space:nowrap}.ach-sum .bar{flex:1;margin:0}
+.ach-sec{margin:16px 0 6px;font-size:10px;letter-spacing:2.4px;font-weight:900;color:#5ceeff;text-align:left}
+.ach-sec i{font-style:normal;color:#6f82b5;letter-spacing:1px;margin-left:6px}
+.ach-titles{display:flex;flex-wrap:wrap;gap:6px}
+.tchip{padding:6px 11px;border-radius:999px;border:1px solid #3d5488;background:#0c1228;color:var(--tc,#c5d0ef);font-size:11px;font-weight:800;touch-action:manipulation}
+.tchip.on{background:#1d2c58;border-color:var(--tc,#5ceeff);box-shadow:0 0 14px -4px var(--tc,#5ceeff)}
+.ach-none{font-size:11px;color:#6f82b5}
+.ach-row{display:grid;grid-template-columns:38px 1fr auto;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid #1d2a4a;text-align:left}
+.ach-row:not(.got) .ach-t b{color:#8896bd}.ach-row:not(.got) .ach-t p{color:#5f6f98}
+.ach-t b{font-size:14px;color:#fff}.ach-t p{margin:2px 0 0;font-size:11px;color:#a8b8dc}.ach-t em{font-style:normal;font-size:9px;color:#6f82b5;letter-spacing:.6px}
+.ach-tier{font-size:8px;font-weight:900;letter-spacing:1.2px;align-self:start;margin-top:4px}
+.bar.sm{height:4px;margin:6px 0 2px}
+.st-grid{grid-template-columns:repeat(3,1fr)}.st-grid .over-cell b{font-size:15px}
+.st-row{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid #1d2a4a;font-size:12px;font-weight:800;text-align:left}
+.st-row em{font-style:normal;font-size:10px;color:#8fa3d0;font-weight:700;text-align:right}
+.st-bar{display:grid;grid-template-columns:96px 1fr 28px;gap:8px;align-items:center;font-size:11px;color:#c5d0ef;text-align:left;margin:4px 0}.st-bar .bar{margin:0}.st-bar em{font-style:normal;color:#8fa3d0;text-align:right}
+.st-picks{display:flex;flex-wrap:wrap;gap:5px}.st-picks .chip{color:#c5d0ef}.st-picks .chip b{color:#9ef0c8}
+.st-grid .over-cell{text-align:center}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#090d20">
@@ -206,6 +243,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none}
   <div class="stat"><small>RECORDE</small><b id="best">0</b></div>
 </div>
 <div class="side-actions"><button class="icon-btn" id="settingsBtn" title="Configurações" aria-label="Configurações">⚙</button></div>
+<div class="ach-toast" id="achToast"></div>
 <div class="brand" id="brand">BREAKPOINT • CHAIN REACTION</div>
 <div class="combo-hud" id="comboHud"><b id="comboValue">×2</b><small id="comboName">COMBO</small></div>
 <div class="controls">
@@ -216,10 +254,12 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none}
   <div class="panel">
     <div class="eyebrow">BREAKPOINT • CHAIN REACTION ROGUELITE</div>
     <h1>BREAK<br>POINT</h1>
+    <div class="title-tag" id="menuTitleTag" style="display:none"></div>
     <p>Monte uma build, cause reações em cadeia e enfrente chefes com identidade própria. Cada run muda — upgrades, sinergias, modificadores de setor e fases especiais.</p>
     <div class="legend" id="legend"></div>
+    <button class="primary cont hidden" id="continueBtn"><span>CONTINUAR</span><small id="contInfo"></small></button>
     <button class="primary" id="start">COMEÇAR JOGO</button>
-    <button class="secondary" id="glMenu">GLOSSÁRIO</button>
+    <div class="btn-row"><button class="secondary" id="glMenu">GLOSSÁRIO</button><button class="secondary" id="achMenu">CONQUISTAS</button><button class="secondary" id="statsMenu">ESTATÍSTICAS</button></div>
     <p class="tip">3 vidas · 6 chefes únicos · 7 fases especiais · setores em ordem aleatória<br>Upgrade a cada 3 fases e após cada chefe · troque a oferta por 1 vida<br>Arraste para mirar · Toque para lançar</p>
   </div>
 </div>
@@ -260,7 +300,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none}
     <div class="setting-row"><div><label>Reduzir flashes</label><small>Sem piscadas rápidas e clarões</small></div><label class="toggle"><input type="checkbox" id="a11yFlash"><span></span></label></div>
     <div class="setting-row"><div><label>Perigos em destaque</label><small>Anel preto/branco em bombas e listras nos raios (daltonismo)</small></div><label class="toggle"><input type="checkbox" id="a11yContrast"><span></span></label></div>
     <button class="primary" id="resumeSettings">CONTINUAR</button>
-    <button class="secondary" id="glSettings">GLOSSÁRIO</button>
+    <div class="btn-row"><button class="secondary" id="glSettings">GLOSSÁRIO</button><button class="secondary" id="achSettings">CONQUISTAS</button><button class="secondary" id="statsSettings">ESTATÍSTICAS</button></div>
     <button class="secondary" id="restartSettings">NOVA PARTIDA</button>
     <p class="tip">Atalhos: P ou Esc abrem/fecham as configurações · <span id="verTag"></span></p>
   </div>
@@ -282,17 +322,37 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none}
   <div class="panel overp">
     <div class="eyebrow">FIM DE JOGO</div>
     <h1>GAME OVER</h1>
+    <div class="title-tag" id="overTitleTag" style="display:none"></div>
     <div class="over-score"><small>PONTUAÇÃO</small><b id="finalscore">0</b><span id="overBest"></span></div>
     <div class="over-grid" id="overStats"></div>
     <div class="over-sec" id="overRoute"></div>
     <div class="over-sec">BUILD · <span id="buildsummary"></span></div>
     <div class="over-build" id="overBuild"></div>
     <div class="over-syn" id="overSyn"></div>
+    <div class="over-sec" id="overAch"></div>
     <div class="over-tip" id="overTip"></div>
     <button class="primary" id="again">NOVA PARTIDA</button>
+    <button class="secondary" id="shareBtn">COMPARTILHAR RESULTADO</button>
+    <div class="share-msg" id="shareMsg"></div>
   </div>
 </div>
 
+<div class="overlay hidden" id="achv" style="z-index:30">
+  <div class="panel gl">
+    <div class="eyebrow">MEDALHAS E TÍTULOS</div>
+    <h1>CONQUISTAS</h1>
+    <div id="achBody"></div>
+    <button class="primary" id="achClose">FECHAR</button>
+  </div>
+</div>
+<div class="overlay hidden" id="stats" style="z-index:30">
+  <div class="panel gl">
+    <div class="eyebrow">SEU HISTÓRICO · SÓ NESTE APARELHO</div>
+    <h1>ESTATÍSTICAS</h1>
+    <div id="statsBody"></div>
+    <button class="primary" id="statsClose">FECHAR</button>
+  </div>
+</div>
 <div class="overlay hidden" id="glossary" style="z-index:30">
   <div class="panel gl">
     <div class="eyebrow">GUIA RÁPIDO</div>
@@ -551,7 +611,7 @@ let perfectStreak = 0, comboTier = 0, timeScale = 1, godMode = false, cheated = 
 let runStats = { picks: {}, stages: 0, bosses: [], perfects: 0, maxCombo: 0, rerolls: 0 }, deathCause = 'bola', hudLivesKey = '', hudLivesPrev = 3;
 let curSpecial = '', sectorBanner = null, fervor = 0, resumeCd = 0, lastSpecial = '', specialBag = [], deathBossKind = '';
 let a11y = { shake: false, flash: false, contrast: false };
-const GAME_VERSION = '3.10';
+const GAME_VERSION = '3.11';
 let paddleFlash = 0, regenTimer = 0, tierFlash = 0, bgDirty = true, musicVol = 0.6, windPhase = 0;
 
 const paddle = { x: 0, y: 0, w: 104, h: 13, baseW: 104, speed: 420 };
@@ -627,7 +687,7 @@ const VIB = {
   launch: 12, perfect: 8, power: 15, brick: 10, boom: 18, chain: [20, 40, 20], tier: [14, 20, 14], tier3: [16, 22, 16, 22, 30],
   heart: [12, 30, 12, 30, 24], shield: [25, 40, 25], lose: [70, 50, 70], over: [120, 60, 120, 60, 220],
   bossIn: [30, 60, 30], bossCrit: 26, bossHit: 8, bossPhase: [30, 40, 30, 40, 60], bossDie: [40, 50, 40, 50, 40, 50, 220],
-  bomb: [90, 40, 40], legend: [20, 30, 40, 30, 70], stars: [12, 40, 12, 40, 26], ui: 10, tick: 6
+  bomb: [90, 40, 40], legend: [20, 30, 40, 30, 70], stars: [12, 40, 12, 40, 26], ach: [14, 30, 14, 30, 22], ui: 10, tick: 6
 };
 let hapticLabel = null;
 function iosTick() {
@@ -787,6 +847,7 @@ function sfx(name) {
     case 'combo': beep(640 + combo * 20, .07, 'sine', 0.26); break;
     case 'comboBig': beep(720, .1, 'sine', 0.3); beep(880, .12, 'triangle', 0.22, 100); break;
     case 'ui': beep(480, .07, 'sine', 0.22); break;
+    case 'ach': [784, 988, 1319].forEach((f, i) => setTimeout(() => beep(f, .16, 'triangle', 0.24), i * 90)); break;
     case 'shield': beep(740, .15, 'sine', 0.3, 180); break;
     case 'boss': beep(200, .14, 'square', 0.32); break;
     case 'paddle': beep(280 + rand(0, 30), .05, 'triangle', 0.22, 40); break;
@@ -1032,6 +1093,7 @@ function sparksAt(el, color, n = 16) {
   }
 }
 function applyUpgrade(c, next, rarity, bossReward) {
+  const synBefore = activeSynergies().length;
   runUpgrades[c.id] = next;
   if (c.id === 'vital') lives = next >= 3 ? maxLives() : Math.min(maxLives(), lives + 1);
   const prev = runUpgradeRarity[c.id];
@@ -1041,6 +1103,7 @@ function applyUpgrade(c, next, rarity, bossReward) {
     announce = { title: 'LENDÁRIO!', sub: c.name, life: 1.5, max: 1.5, color: '#ffce69' };
   } else sfx('ui');
   const synNow = activeSynergies();
+  trackUpgrade(c.id, next, rarity, synNow.length > synBefore);
   if (synNow.length) {
     const lastSyn = synNow[synNow.length - 1];
     setTimeout(() => {
@@ -1115,7 +1178,7 @@ function showUpgrades(bossReward = false, rerolled = false) {
 }
 function doReroll() {
   if (state !== 'upgrade' || pickedUpgrade || upgradeOffer.rerolled || lives < 2) return;
-  lives--; runStats.rerolls = (runStats.rerolls || 0) + 1;
+  lives--; trackLifeLost(); runStats.rerolls = (runStats.rerolls || 0) + 1; trackReroll();
   sfx('lose'); buzz('lose'); updateHud();
   floatText(W / 2, H * .3, '−1 ♥  OFERTA TROCADA', '#ff7a9a', 14);
   revealTimers.forEach(clearTimeout); revealTimers = [];
@@ -1130,6 +1193,7 @@ function showEvent() {
 }
 function pickEvent(kind) {
   ui.event.classList.add('hidden');
+  trackEvent(kind === 'risk' || kind === 'greed' ? kind : 'safe');
   if (kind === 'risk') {
     eventMods.bossPressure = 1;
     eventMods.rarityBoost = true;
@@ -1281,6 +1345,11 @@ function showGameOver(cause) {
   const syn = activeSynergies();
   $('overSyn').textContent = syn.length ? '✦ Sinergias: ' + syn.join(' · ') : '';
   $('overTip').innerHTML = '<b>DICA</b>' + deathTip(cause);
+  const na = RC.unlocked.map(id => ACH.find(a => a.id === id)).filter(Boolean);
+  $('overAch').innerHTML = na.length ? 'CONQUISTAS DESTA PARTIDA<div class="over-route" style="margin-top:6px">' + na.map(a => '<span class="chip" style="color:' + TIER_COL[a.tier] + '">' + medalSVG(14, a.tier, false) + a.name + '</span>').join('') + '</div>' : '';
+  const tt = titleName(); $('overTitleTag').textContent = tt ? '★ ' + tt : ''; $('overTitleTag').style.display = tt ? '' : 'none';
+  $('shareMsg').textContent = '';
+  captureRun(cause, isNew);
   const p = ui.over.querySelector('.panel'); if (p) p.scrollTop = 0;
 }
 
@@ -2116,6 +2185,7 @@ function enterReady(kind) {
 
 /* ========== LEVEL BUILD (elites / cristal / cofre) ========== */
 function buildLevel() {
+  saveRun();
   aimX = 0; aimY = -1; wideUntil = 0; pierceUntil = 0; grenadeUntil = 0; overchargeHits = 0; chronoUntil = 0;
   paddle.baseW = clamp(W * .25, 82, 118) * (1 + [0, .08, .16, .25][lv('magnet')]) * (1 + (rarityMult('magnet') - 1) * .6);
   // sinergia Cronista + Magnético: plataforma um pouco maior sob cronos (base já conta magnet)
@@ -2220,7 +2290,7 @@ function buildLevel() {
   ui.event.classList.add('hidden');
 }
 
-function newGame() {
+function newGame(saved) {
   aimX = 0; aimY = -1; score = 0; level = 1; lives = 3;
   wideUntil = 0; pierceUntil = 0; grenadeUntil = 0; overchargeHits = 0; chronoUntil = 0;
   runUpgrades = {}; runUpgradeRarity = {};
@@ -2233,6 +2303,8 @@ function newGame() {
   ui.upgrade.classList.add('hidden'); ui.settings.classList.add('hidden'); ui.event.classList.add('hidden');
   paddle.baseW = clamp(W * .25, 82, 118); paddle.w = paddle.baseW;
   $('summary').classList.add('hidden'); if (sumCtl) { clearTimeout(sumCtl.timer); sumCtl = null; }
+  RC = newRC();
+  if (saved) applySavedRun(saved); else trackRunStart();
   unlockAudio(); sfx('ui'); buildLevel();
 }
 
@@ -2258,6 +2330,7 @@ function completeStage() {
   ];
   const stars = (elapsed < limit ? 1 : 0) + (stage.perfects >= 4 ? 1 : 0) + (stage.lostLife ? 0 : 1);
   if (stars === 3) rows.push({ icon: 'star', label: 'Fase perfeita', val: 100 });
+  trackStage({ stars, elapsed, wasBoss, lost: stage.lostLife, special: curSpecial, mods: mods.slice() });
   const total = rows.reduce((a, r) => a + r.val, 0);
   score += total; saveBest(); updateHud();
 
@@ -2277,16 +2350,16 @@ function loseBall() {
   paddle.w = paddle.baseW;
   const shieldLimit = lv('last') >= 3 ? 2 : (lv('last') > 0 ? 1 : 0);
   if (shieldUses < shieldLimit) {
-    shieldUses++; deathCause = 'bola'; sfx('shield'); buzz('shield'); enterReady('shield'); return;
+    shieldUses++; trackShield(); deathCause = 'bola'; sfx('shield'); buzz('shield'); enterReady('shield'); return;
   }
   const cause = deathCause; deathCause = 'bola';
   if (!godMode) lives--;
-  stage.lostLife = true; perfectStreak = 0; sfx('lose'); buzz(lives <= 0 ? 'over' : 'lose');
+  stage.lostLife = true; trackLifeLost(); perfectStreak = 0; sfx('lose'); buzz(lives <= 0 ? 'over' : 'lose');
   paddle.x = clamp(paddle.x, 5, W - paddle.w - 5);
   updateHud();
   if (lives <= 0) {
     deathBossKind = boss ? boss.kind : '';
-    state = 'over'; saveBest(); flushBest(); recordRun(cause);
+    state = 'over'; saveBest(); flushBest(); recordRun(cause); trackOver(cause, deathBossKind); clearRun();
     showGameOver(cause);
     ui.over.style.zIndex = '20';
     ui.over.classList.remove('hidden');
@@ -2296,6 +2369,7 @@ function loseBall() {
     moveLeft = moveRight = false;
     return;
   }
+  saveRun();
   enterReady('life');
 }
 
@@ -3117,6 +3191,7 @@ function damageBoss(dmg, crit, x, y) {
     shake = Math.min(14, shake + 8);
     sfx('bossDie'); buzz('bossDie');
     announce = { title: 'CHEFE DERROTADO', sub: '+' + (600 + level * 55) + ' pts · recompensa a caminho', life: 1.6, max: 1.6, color: '#ffe66d' };
+    trackBoss(boss.kind, !stage.lostLife, gameNow() - stageStartTime, lives, eventMods.bossPressure > 0);
     eventMods.bossPressure = 0;
     if (lives < maxLives()) { lives++; floatText(bx, by - 34, '+1 VIDA', '#ff7a9a', 16); updateHud(); }
     runStats.bosses.push(boss.kind);
@@ -3177,6 +3252,441 @@ function hitBoss(b, px, py) {
   return true;
 }
 
+/* ---- ach.js ---- */
+/* ========== PERFIL LOCAL · CONQUISTAS · TÍTULOS · ESTATÍSTICAS · CONTINUAR · COMPARTILHAR ==========
+   Tudo fica só no aparelho (localStorage). Runs com debug/god mode não contam. */
+const PROFILE_KEY = 'breakpointProfile', RUN_KEY = 'breakpointRun';
+const TIER_COL = ['#d89a62', '#c9d6ee', '#ffd56a', '#c4a0ff'], TIER_NAME = ['BRONZE', 'PRATA', 'OURO', 'LENDÁRIA'];
+const POWER_TYPES = ['wide', 'multi', 'pierce', 'grenade', 'overcharge', 'chrono', 'heart'];
+let P = loadProfile(), RC = newRC(), achQueue = [], achBusy = false, profDirty = false, achClock = 0, secAcc = 0, lastRun = null, shareFile = null;
+
+function newRC() { return { cleanStreak: 0, starStreak: 0, lostAny: false, hadOne: false, owl: false, unlocked: [] }; }
+function blankProfile() { return { c: {}, ach: {}, title: '', bossKills: {}, bossNoHit: {}, bossDeaths: {}, specials: {}, mods: {}, picks: {}, powers: {}, deaths: {}, events: {}, migrated: false }; }
+function loadProfile() {
+  let p = blankProfile();
+  try { const s = JSON.parse(localStorage.getItem(PROFILE_KEY)); if (s && typeof s === 'object') p = Object.assign(p, s); } catch (e) {}
+  for (const k of ['c', 'ach', 'bossKills', 'bossNoHit', 'bossDeaths', 'specials', 'mods', 'picks', 'powers', 'deaths', 'events']) if (!p[k] || typeof p[k] !== 'object') p[k] = {};
+  if (!p.migrated) {
+    try {
+      const st = JSON.parse(localStorage.getItem('breakpointStats'));
+      if (st && st.runs) { p.c.runs = Math.max(p.c.runs || 0, st.runs); p.c.totalLevel = st.totalLevel || 0; p.c.bestLevel = Math.max(p.c.bestLevel || 0, st.bestLevel || 0); Object.assign(p.deaths, st.deaths || {}); Object.assign(p.picks, st.picks || {}); }
+      p.c.bestScore = Math.max(p.c.bestScore || 0, Number(localStorage.getItem('breakpointBest')) || 0);
+    } catch (e) {}
+    p.migrated = true;
+  }
+  return p;
+}
+function flushProfile() { if (!profDirty) return; profDirty = false; try { localStorage.setItem(PROFILE_KEY, JSON.stringify(P)); } catch (e) {} }
+const pc = k => P.c[k] || 0;
+const inc = (k, n = 1) => { P.c[k] = pc(k) + n; profDirty = true; };
+const mx = (k, v) => { if (v > pc(k)) { P.c[k] = v; profDirty = true; } };
+const mark = k => { if (!P.c[k]) { P.c[k] = 1; profDirty = true; } };
+const countOf = o => Object.keys(o).length;
+const tracking = () => !cheated && !godMode;
+
+/* ---------- lista de conquistas ---------- */
+const ACH = [];
+function A(id, cat, tier, name, desc, test, prog, opts) { ACH.push(Object.assign({ id, cat, tier, name, desc, test, prog: prog || null }, opts || {})); }
+function K(id, cat, tier, name, desc, key, n, opts) { A(id, cat, tier, name, desc, () => pc(key) >= n, () => [pc(key), n], opts); }
+function SETN(id, cat, tier, name, desc, getObj, n, opts) { A(id, cat, tier, name, desc, () => countOf(getObj()) >= n, () => [Math.min(n, countOf(getObj())), n], opts); }
+const BNAME = { raider: 'Raider Orbital', forge: 'Forjador de Magma', abyss: 'Leviatã Abissal', warden: 'Guardião de Cristal', sun: 'Sentinela Solar', void: 'Singularidade' };
+const BACH = { raider: 'Raider Abatido', forge: 'Forja Apagada', abyss: 'Leviatã Afogado', warden: 'Cristal Quebrado', sun: 'Eclipse Total', void: 'Colapso' };
+
+const CAT_ORDER = ['Progresso', 'Chefes', 'Blocos', 'Precisão', 'Combos', 'Builds', 'Desafios', 'Segredos'];
+// Progresso
+K('first', 'Progresso', 0, 'Primeiros Passos', 'Comece sua primeira partida.', 'runs', 1, { title: 'Recruta' });
+K('lv5', 'Progresso', 0, 'Aquecimento', 'Chegue à fase 5.', 'bestLevel', 5);
+K('lv10', 'Progresso', 1, 'Veterano', 'Chegue à fase 10.', 'bestLevel', 10, { title: 'Veterano' });
+K('lv16', 'Progresso', 2, 'Sobrevivente', 'Chegue à fase 16.', 'bestLevel', 16);
+K('lv24', 'Progresso', 2, 'Lenda do Vazio', 'Chegue à fase 24.', 'bestLevel', 24, { title: 'Lenda do Vazio' });
+K('lv32', 'Progresso', 3, 'Além do Limite', 'Chegue à fase 32.', 'bestLevel', 32, { title: 'Transcendente' });
+K('sec2', 'Progresso', 0, 'Novos Horizontes', 'Alcance o setor 2.', 'bestSector', 2);
+K('sec4', 'Progresso', 1, 'Viajante Estelar', 'Alcance o setor 4.', 'bestSector', 4);
+K('sec7', 'Progresso', 2, 'Ciclo Completo', 'Alcance o setor 7: você passou pelos 6 mundos.', 'bestSector', 7, { title: 'Cartógrafo' });
+K('runs10', 'Progresso', 0, 'Persistente', 'Jogue 10 partidas.', 'runs', 10);
+K('runs50', 'Progresso', 1, 'Dedicado', 'Jogue 50 partidas.', 'runs', 50, { title: 'Dedicado' });
+K('runs150', 'Progresso', 2, 'Sem Volta', 'Jogue 150 partidas.', 'runs', 150);
+K('sc5k', 'Progresso', 0, 'Pontuador', 'Faça 5.000 pontos em uma partida.', 'bestScore', 5000);
+K('sc25k', 'Progresso', 1, 'Chuva de Pontos', 'Faça 25.000 pontos em uma partida.', 'bestScore', 25000);
+K('sc75k', 'Progresso', 2, 'Fábrica de Pontos', 'Faça 75.000 pontos em uma partida.', 'bestScore', 75000);
+K('sc200k', 'Progresso', 3, 'Mestre dos Números', 'Faça 200.000 pontos em uma partida.', 'bestScore', 200000, { title: 'Mestre dos Números' });
+K('time1', 'Progresso', 0, 'Hora Bem Gasta', 'Acumule 1 hora de jogo.', 'playSec', 3600);
+K('time10', 'Progresso', 2, 'Residente', 'Acumule 10 horas de jogo.', 'playSec', 36000);
+K('stg25', 'Progresso', 0, 'Faxineiro', 'Conclua 25 fases.', 'stages', 25);
+K('stg250', 'Progresso', 2, 'Maratonista', 'Conclua 250 fases.', 'stages', 250);
+// Chefes
+K('boss1', 'Chefes', 0, 'Caçador de Chefes', 'Derrote seu primeiro chefe.', 'bossesTotal', 1, { title: 'Caçador de Chefes' });
+for (const k of BOSS_ORDER) A('boss_' + k, 'Chefes', 1, BACH[k], 'Derrote o ' + BNAME[k] + '.', () => (P.bossKills[k] || 0) >= 1);
+A('boss_all', 'Chefes', 3, 'Quebra-Chefes', 'Derrote os 6 chefes diferentes.', () => BOSS_ORDER.every(k => P.bossKills[k] > 0), () => [BOSS_ORDER.filter(k => P.bossKills[k] > 0).length, 6], { title: 'Quebra-Chefes' });
+K('boss10', 'Chefes', 2, 'Carrasco', 'Derrote 10 chefes no total.', 'bossesTotal', 10);
+K('nohit1', 'Chefes', 1, 'Intocável', 'Derrote um chefe sem perder vida.', 'bossNoHitTotal', 1, { title: 'Intocável' });
+A('nohit6', 'Chefes', 3, 'Sem Arranhão', 'Derrote cada um dos 6 chefes sem perder vida.', () => BOSS_ORDER.every(k => P.bossNoHit[k] > 0), () => [BOSS_ORDER.filter(k => P.bossNoHit[k] > 0).length, 6], { title: 'Sem Arranhão' });
+K('bossfast', 'Chefes', 2, 'Relâmpago', 'Derrote um chefe em menos de 45 segundos.', 'bossFast', 1);
+K('bosslast', 'Chefes', 2, 'Na Corda Bamba', 'Derrote um chefe com apenas 1 vida.', 'bossLast', 1);
+K('bosspress', 'Chefes', 1, 'Aposta Alta', 'Derrote um chefe depois de escolher Pressão Máxima.', 'bossPressure', 1);
+// Blocos
+K('br100', 'Blocos', 0, 'Demolidor Novato', 'Destrua 100 blocos.', 'bricks', 100);
+K('br1k', 'Blocos', 1, 'Demolidor', 'Destrua 1.000 blocos.', 'bricks', 1000, { title: 'Demolidor' });
+K('br10k', 'Blocos', 2, 'Terremoto', 'Destrua 10.000 blocos.', 'bricks', 10000);
+K('br50k', 'Blocos', 3, 'Fim dos Tempos', 'Destrua 50.000 blocos.', 'bricks', 50000);
+K('elite25', 'Blocos', 1, 'Caçador de Elites', 'Destrua 25 blocos elite.', 'elites', 25);
+K('elite150', 'Blocos', 2, 'Algoz de Elites', 'Destrua 150 blocos elite.', 'elites', 150);
+K('crys30', 'Blocos', 1, 'Joalheiro', 'Destrua 30 blocos de cristal.', 'crystals', 30);
+K('vault10', 'Blocos', 1, 'Arrombador', 'Abra 10 cofres.', 'vaults', 10);
+K('vault50', 'Blocos', 2, 'Mestre do Cofre', 'Abra 50 cofres.', 'vaults', 50);
+K('exp50', 'Blocos', 0, 'Pirotécnico', 'Detone 50 blocos explosivos.', 'explosives', 50);
+K('exp500', 'Blocos', 2, 'Mestre das Bombas', 'Detone 500 blocos explosivos.', 'explosives', 500, { title: 'Pirotécnico' });
+K('chain4', 'Blocos', 0, 'Efeito Dominó', 'Provoque uma cadeia de 4 explosões.', 'maxChain', 4);
+K('chain8', 'Blocos', 2, 'Reação em Cadeia', 'Provoque uma cadeia de 8 explosões.', 'maxChain', 8);
+K('chain12', 'Blocos', 3, 'Supernova', 'Provoque uma cadeia de 12 explosões.', 'maxChain', 12, { title: 'Supernova' });
+// Precisão
+K('perf50', 'Precisão', 0, 'Mira Afiada', 'Faça 50 rebatidas perfeitas.', 'perfects', 50);
+K('perf500', 'Precisão', 1, 'Atirador de Elite', 'Faça 500 rebatidas perfeitas.', 'perfects', 500, { title: 'Atirador de Elite' });
+K('perf2500', 'Precisão', 3, 'Relojoeiro', 'Faça 2.500 rebatidas perfeitas.', 'perfects', 2500, { title: 'Relojoeiro' });
+K('str5', 'Precisão', 0, 'Sequência', '5 rebatidas perfeitas seguidas.', 'bestStreak', 5);
+K('str10', 'Precisão', 1, 'Ritmo Firme', '10 rebatidas perfeitas seguidas.', 'bestStreak', 10);
+K('str20', 'Precisão', 2, 'Inabalável', '20 rebatidas perfeitas seguidas.', 'bestStreak', 20, { title: 'Inabalável' });
+K('star1', 'Precisão', 0, 'Fase Perfeita', 'Conquiste 3 estrelas em uma fase.', 'stars3', 1);
+K('star10', 'Precisão', 1, 'Estrelado', 'Conquiste 3 estrelas em 10 fases.', 'stars3', 10);
+K('star50', 'Precisão', 2, 'Constelação', 'Conquiste 3 estrelas em 50 fases.', 'stars3', 50, { title: 'Constelação' });
+K('starboss', 'Precisão', 2, 'Chefe Perfeito', 'Conquiste 3 estrelas em uma fase de chefe.', 'starBoss', 1);
+A('starstreak', 'Precisão', 2, 'Sequência Dourada', '3 estrelas em 5 fases seguidas na mesma partida.', () => RC.starStreak >= 5, () => [Math.min(5, RC.starStreak), 5]);
+K('speed15', 'Precisão', 1, 'Velocista', 'Termine uma fase comum em menos de 15 segundos.', 'speed15', 1);
+K('speed10', 'Precisão', 2, 'Raio', 'Termine uma fase comum em menos de 10 segundos.', 'speed10', 1);
+// Combos
+K('cmb5', 'Combos', 0, 'Aquecendo', 'Chegue a um combo ×5.', 'bestCombo', 5);
+K('cmb10', 'Combos', 0, 'Em Chamas', 'Chegue a um combo ×10.', 'bestCombo', 10);
+K('cmb15', 'Combos', 1, 'Imparável', 'Chegue a um combo ×15.', 'bestCombo', 15, { title: 'Imparável' });
+K('cmb25', 'Combos', 2, 'Combo Lendário', 'Chegue a um combo ×25.', 'bestCombo', 25, { title: 'Combo Lendário' });
+K('cmb40', 'Combos', 3, 'Reação Máxima', 'Chegue a um combo ×40.', 'bestCombo', 40, { title: 'Reação Máxima' });
+// Builds
+K('up10', 'Builds', 0, 'Montador', 'Escolha 10 upgrades.', 'upgrades', 10);
+K('up60', 'Builds', 1, 'Engenheiro', 'Escolha 60 upgrades.', 'upgrades', 60, { title: 'Engenheiro' });
+K('up250', 'Builds', 2, 'Arquiteto', 'Escolha 250 upgrades.', 'upgrades', 250);
+K('legend', 'Builds', 2, 'Sorte Lendária', 'Escolha um upgrade lendário.', 'legend', 1);
+K('lvl3', 'Builds', 1, 'Maxado', 'Leve um upgrade ao nível 3.', 'lvl3', 1);
+A('lvl3x3', 'Builds', 2, 'Build Madura', 'Tenha 3 upgrades no nível 3 na mesma partida.', () => Object.values(runUpgrades).filter(v => v >= 3).length >= 3, () => [Math.min(3, Object.values(runUpgrades).filter(v => v >= 3).length), 3]);
+A('var6', 'Builds', 1, 'Eclético', 'Tenha 6 upgrades diferentes na mesma partida.', () => countOf(runUpgrades) >= 6, () => [Math.min(6, countOf(runUpgrades)), 6]);
+A('var10', 'Builds', 2, 'Colecionador de Builds', 'Tenha 10 upgrades diferentes na mesma partida.', () => countOf(runUpgrades) >= 10, () => [Math.min(10, countOf(runUpgrades)), 10]);
+K('syn1', 'Builds', 1, 'Sinergia!', 'Ative uma sinergia entre upgrades.', 'synergies', 1);
+K('syn25', 'Builds', 2, 'Maestro', 'Ative sinergias 25 vezes.', 'synergies', 25);
+K('rr1', 'Builds', 0, 'Segunda Chance', 'Troque a oferta de upgrades uma vez.', 'rerolls', 1);
+K('rr10', 'Builds', 1, 'Indeciso', 'Troque a oferta de upgrades 10 vezes.', 'rerolls', 10);
+A('hearts5', 'Builds', 1, 'Coração Cheio', 'Tenha 5 vidas máximas.', () => state !== 'menu' && maxLives() >= 5);
+K('heart10', 'Builds', 1, 'Coração de Ouro', 'Colete 10 corações.', 'hearts', 10);
+K('pw50', 'Builds', 0, 'Catador', 'Colete 50 power-ups.', 'powersTotal', 50);
+K('pw500', 'Builds', 2, 'Acumulador', 'Colete 500 power-ups.', 'powersTotal', 500);
+A('pwall', 'Builds', 1, 'Colecionador de Poderes', 'Colete os 7 tipos de power-up.', () => POWER_TYPES.every(t => P.powers[t] > 0), () => [POWER_TYPES.filter(t => P.powers[t] > 0).length, 7]);
+K('balls8', 'Builds', 1, 'Chuva de Bolas', 'Tenha 8 bolas em jogo ao mesmo tempo.', 'maxBalls', 8);
+K('shield5', 'Builds', 1, 'Escudeiro', 'Use a proteção Última Chance 5 vezes.', 'shields', 5);
+// Desafios
+const SPN = { crystal_storm: ['Tempestade Domada', 'Tempestade de Cristais'], elite_hunt: ['Caça Concluída', 'Caça aos Elites'], vault_room: ['Sala Esvaziada', 'Sala dos Cofres'], corridor: ['Passagem Livre', 'Corredor'], fortress: ['Fortaleza Caída', 'Fortaleza'], minefield: ['Campo Limpo', 'Campo Minado'], power_rain: ['Banho de Poder', 'Chuva de Poder'] };
+for (const k of SPECIALS) A('sp_' + k, 'Desafios', 1, SPN[k][0], 'Conclua a fase especial ' + SPN[k][1] + '.', () => P.specials[k] > 0);
+A('sp_all', 'Desafios', 3, 'Mestre dos Desafios', 'Conclua as 7 fases especiais.', () => SPECIALS.every(k => P.specials[k] > 0), () => [SPECIALS.filter(k => P.specials[k] > 0).length, 7], { title: 'Mestre dos Desafios' });
+SETN('mod4', 'Desafios', 1, 'Adaptável', 'Conclua fases com 4 modificadores de setor diferentes.', () => P.mods, 4);
+SETN('mod7', 'Desafios', 3, 'Senhor das Condições', 'Conclua fases com os 7 modificadores de setor.', () => P.mods, 7, { title: 'Senhor das Condições' });
+A('clean5', 'Desafios', 1, 'Impecável', 'Conclua 5 fases seguidas sem perder vida.', () => RC.cleanStreak >= 5 || pc('bestClean') >= 5, () => [Math.min(5, Math.max(RC.cleanStreak, pc('bestClean'))), 5]);
+A('clean10', 'Desafios', 2, 'Imaculado', 'Conclua 10 fases seguidas sem perder vida.', () => pc('bestClean') >= 10, () => [Math.min(10, pc('bestClean')), 10], { title: 'Imaculado' });
+K('lowclear', 'Desafios', 1, 'Por um Fio', 'Conclua uma fase com apenas 1 vida.', 'lowClear', 1);
+A('ev3', 'Desafios', 1, 'Estrategista', 'Escolha cada um dos 3 eventos de setor ao menos uma vez.', () => ['risk', 'safe', 'greed'].every(k => P.events[k] > 0), () => [['risk', 'safe', 'greed'].filter(k => P.events[k] > 0).length, 3]);
+A('evr', 'Desafios', 0, 'Corajoso', 'Escolha Pressão Máxima.', () => P.events.risk > 0);
+A('evs', 'Desafios', 0, 'Cauteloso', 'Escolha Caminho Seguro.', () => P.events.safe > 0);
+A('evg', 'Desafios', 0, 'Ganancioso', 'Escolha Saque Rápido.', () => P.events.greed > 0);
+// Segredos
+const SEC = { secret: true, cat: 'Segredos' };
+A('owl', 'Segredos', 1, 'Coruja', 'Comece uma partida entre 2h e 5h da manhã.', () => pc('owl') > 0, null, { secret: true, title: 'Coruja' });
+A('unlucky', 'Segredos', 0, 'Azarado', 'Perca a partida na fase 1 ou 2.', () => pc('unlucky') > 0, null, { secret: true });
+A('rival', 'Segredos', 1, 'Rival', 'Perca 3 vezes para o mesmo chefe.', () => BOSS_ORDER.some(k => (P.bossDeaths[k] || 0) >= 3), null, { secret: true, title: 'Rival' });
+A('zen', 'Segredos', 3, 'Zen', '35 rebatidas perfeitas seguidas.', () => pc('bestStreak') >= 35, null, { secret: true, title: 'Zen' });
+A('swarm', 'Segredos', 3, 'Enxame', 'Tenha 15 bolas em jogo ao mesmo tempo.', () => pc('maxBalls') >= 15, null, { secret: true, title: 'Enxame' });
+A('dust', 'Segredos', 3, 'Poeira Estelar', 'Destrua 100.000 blocos.', () => pc('bricks') >= 100000, null, { secret: true });
+A('phoenix', 'Segredos', 2, 'Fênix', 'Estando com 1 vida, recupere até ter 4 vidas na mesma partida.', () => RC.hadOne && lives >= 4 && state !== 'menu', null, { secret: true, title: 'Fênix' });
+A('slow', 'Segredos', 0, 'Sem Pressa', 'Leve mais de 3 minutos para concluir uma fase.', () => pc('slow3') > 0, null, { secret: true });
+A('perfectionist', 'Segredos', 3, 'Perfeccionista', 'Desbloqueie todas as outras conquistas.', () => ACH.every(a => a.id === 'perfectionist' || P.ach[a.id]), () => [ACH.filter(a => a.id !== 'perfectionist' && P.ach[a.id]).length, ACH.length - 1], { secret: true, title: 'Perfeccionista' });
+
+function achDone() { return ACH.filter(a => P.ach[a.id]).length; }
+function titleName() { const a = ACH.find(x => x.id === P.title && x.title && P.ach[x.id]); return a ? a.title : ''; }
+
+/* ---------- verificação / desbloqueio ---------- */
+function checkAch() {
+  if (!tracking()) return;
+  for (const a of ACH) {
+    if (P.ach[a.id]) continue;
+    let ok = false;
+    try { ok = a.test(); } catch (e) {}
+    if (ok) unlockAch(a);
+  }
+}
+function unlockAch(a) {
+  P.ach[a.id] = Date.now(); profDirty = true; RC.unlocked.push(a.id);
+  if (!P.title && a.title) P.title = a.id;
+  achQueue.push(a); flushProfile();
+  if (!achBusy) nextToast();
+}
+function medalSVG(size, tier, locked) {
+  const col = locked ? '#46527a' : TIER_COL[tier], dark = locked ? '#1c2540' : '#2a1d0b';
+  return '<svg class="ic" viewBox="0 0 32 32" width="' + size + '" height="' + size + '"><path d="M9 1h5l3 11h-6zM23 1h-5l-3 11h6z" fill="' + (locked ? '#2c3858' : '#5a6fa8') + '"/>'
+    + '<circle cx="16" cy="20" r="10.5" fill="' + col + '" stroke="' + (locked ? '#3a476c' : '#fff6') + '" stroke-width="1.2"/><circle cx="16" cy="20" r="7.4" fill="none" stroke="' + dark + '" stroke-opacity=".45" stroke-width="1"/>'
+    + '<path d="' + ICON_PATHS.star + '" transform="translate(9.6 13.6) scale(.53)" fill="' + dark + '" fill-opacity="' + (locked ? '.6' : '.78') + '" fill-rule="evenodd"/></svg>';
+}
+function nextToast() {
+  const a = achQueue.shift(), el = $('achToast');
+  if (!a || !el) { achBusy = false; return; }
+  achBusy = true;
+  el.innerHTML = '<div class="at-medal">' + medalSVG(34, a.tier, false) + '</div><div class="at-tx"><small>CONQUISTA DESBLOQUEADA</small><b>' + a.name + '</b><span>' + (a.desc.length > 52 ? a.desc.slice(0, 50) + '…' : a.desc) + '</span></div>';
+  el.style.setProperty('--tc', TIER_COL[a.tier]);
+  el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
+  sfx('ach'); buzz('ach');
+  setTimeout(() => { el.classList.remove('show'); setTimeout(nextToast, 380); }, 3300);
+}
+
+/* ---------- eventos do jogo ---------- */
+function trackRunStart() { if (!tracking()) return; inc('runs'); const h = new Date().getHours(); if (h >= 2 && h < 5) mark('owl'); checkAch(); flushProfile(); }
+function trackBrick(br) {
+  if (!tracking()) return;
+  inc('bricks');
+  if (br.kind === 'elite') inc('elites'); else if (br.kind === 'crystal') inc('crystals'); else if (br.kind === 'vault') inc('vaults');
+  if (br.explosive) inc('explosives');
+}
+function trackChain(n) { if (tracking()) { mx('maxChain', n); checkAch(); } }
+function trackPower(type) {
+  if (!tracking()) return;
+  P.powers[type] = (P.powers[type] || 0) + 1;
+  if (type === 'heart') inc('hearts'); else inc('powersTotal');
+  profDirty = true; checkAch();
+}
+function trackBoss(kind, noHit, elapsed, livesNow, pressure) {
+  if (!tracking()) return;
+  inc('bossesTotal'); P.bossKills[kind] = (P.bossKills[kind] || 0) + 1;
+  if (noHit) { P.bossNoHit[kind] = (P.bossNoHit[kind] || 0) + 1; inc('bossNoHitTotal'); }
+  if (elapsed < 45000) mark('bossFast');
+  if (livesNow <= 1) mark('bossLast');
+  if (pressure) mark('bossPressure');
+  profDirty = true; checkAch();
+}
+function trackStage(info) {
+  if (!tracking()) return;
+  inc('stages'); inc('starsTotal', info.stars);
+  if (info.stars === 3) { inc('stars3'); RC.starStreak++; if (info.wasBoss) mark('starBoss'); } else RC.starStreak = 0;
+  if (!info.lost) { RC.cleanStreak++; mx('bestClean', RC.cleanStreak); }
+  if (!info.wasBoss) { if (info.elapsed < 15000) mark('speed15'); if (info.elapsed < 10000) mark('speed10'); }
+  if (info.elapsed >= 180000) mark('slow3');
+  if (info.special) P.specials[info.special] = 1;
+  for (const m of info.mods || []) P.mods[m] = 1;
+  if (lives === 1) mark('lowClear');
+  mx('bestLevel', level); mx('bestSector', sector); mx('bestScore', score);
+  profDirty = true; checkAch(); flushProfile();
+}
+function trackLifeLost() { RC.cleanStreak = 0; RC.lostAny = true; if (lives === 1) RC.hadOne = true; }
+function trackUpgrade(id, next, rarity, syn) {
+  if (!tracking()) return;
+  inc('upgrades'); P.picks[id] = (P.picks[id] || 0) + 1;
+  if (rarity === 'Legendary') mark('legend');
+  if (next >= 3) mark('lvl3');
+  if (syn) inc('synergies');
+  profDirty = true; checkAch();
+}
+function trackReroll() { if (tracking()) { inc('rerolls'); checkAch(); } }
+function trackShield() { if (tracking()) { inc('shields'); checkAch(); } }
+function trackEvent(k) { if (tracking()) { P.events[k] = (P.events[k] || 0) + 1; profDirty = true; checkAch(); } }
+function trackOver(cause, bossKind) {
+  if (tracking()) {
+    P.deaths[cause] = (P.deaths[cause] || 0) + 1;
+    if (bossKind) P.bossDeaths[bossKind] = (P.bossDeaths[bossKind] || 0) + 1;
+    inc('totalLevel', level); inc('finished');
+    if (level <= 2) mark('unlucky');
+    mx('bestLevel', level); mx('bestSector', sector); mx('bestScore', score);
+    checkAch();
+  }
+  flushProfile();
+}
+function trackTick(dt) {
+  if (!tracking() || state !== 'playing') return;
+  P.c.playSec = pc('playSec') + dt; profDirty = true;
+  secAcc += dt;
+  if (secAcc < .5) return;
+  secAcc = 0;
+  mx('bestCombo', combo); mx('bestStreak', perfectStreak); mx('maxBalls', balls.filter(b => !b.attached).length);
+  mx('bestLevel', level); mx('bestSector', sector); mx('bestScore', score);
+  checkAch();
+  if ((achClock += .5) >= 10) { achClock = 0; flushProfile(); }
+}
+window.addEventListener('pagehide', () => { flushProfile(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden) flushProfile(); });
+
+/* ---------- salvar / continuar ---------- */
+function saveRun() {
+  if (cheated || godMode) return;
+  try {
+    localStorage.setItem(RUN_KEY, JSON.stringify({ v: 1, ver: GAME_VERSION, score, level, lives, runUpgrades, runUpgradeRarity, runStats, RC, eventMods, skipNextUpgrade, sectorSeq, themeCycle, themeIdx, sector, mods, specialBag, lastSpecial, t: Date.now() }));
+  } catch (e) {}
+}
+function clearRun() { try { localStorage.removeItem(RUN_KEY); } catch (e) {} }
+function peekRun() {
+  try {
+    const s = JSON.parse(localStorage.getItem(RUN_KEY));
+    if (!s || s.v !== 1 || !(s.level >= 1) || !(s.lives >= 1) || !Array.isArray(s.sectorSeq) || !Array.isArray(s.themeCycle) || !s.runStats || !THEMES[s.themeIdx]) return null;
+    return s;
+  } catch (e) { return null; }
+}
+function applySavedRun(s) {
+  score = s.score || 0; level = s.level; lives = s.lives;
+  runUpgrades = s.runUpgrades || {}; runUpgradeRarity = s.runUpgradeRarity || {};
+  runStats = Object.assign({ picks: {}, stages: 0, bosses: [], perfects: 0, maxCombo: 0, rerolls: 0 }, s.runStats);
+  RC = Object.assign(newRC(), s.RC || {}); eventMods = s.eventMods || { bossPressure: 0, rarityBoost: false };
+  skipNextUpgrade = !!s.skipNextUpgrade; sectorSeq = s.sectorSeq; themeCycle = s.themeCycle; themeIdx = s.themeIdx; theme = THEMES[themeIdx];
+  sector = s.sector || 1; mods = Array.isArray(s.mods) ? s.mods : []; specialBag = s.specialBag || []; lastSpecial = s.lastSpecial || '';
+  tutorialOn = false; bgDirty = true;
+}
+function refreshMenu() {
+  const s = peekRun(), cb = $('continueBtn'), st = $('start');
+  if (s) {
+    cb.classList.remove('hidden');
+    $('contInfo').textContent = 'Fase ' + s.level + ' · Setor ' + (s.sector || 1) + ' · ' + s.lives + (s.lives === 1 ? ' vida' : ' vidas') + ' · ' + (s.score || 0).toLocaleString('pt-BR') + ' pts';
+    st.textContent = 'NOVA PARTIDA'; st.className = 'secondary'; st.dataset.armed = '';
+  } else { cb.classList.add('hidden'); st.textContent = 'COMEÇAR JOGO'; st.className = 'primary'; st.dataset.armed = ''; }
+  const t = titleName(); $('menuTitleTag').textContent = t ? '★ ' + t : ''; $('menuTitleTag').style.display = t ? '' : 'none';
+}
+
+/* ---------- tela de conquistas ---------- */
+function openAch() { renderAch(); $('achv').classList.remove('hidden'); sfx('ui'); }
+function closeAch() { $('achv').classList.add('hidden'); sfx('ui'); refreshMenu(); }
+function renderAch() {
+  const done = achDone(), total = ACH.length;
+  let h = '<div class="ach-sum"><b>' + done + ' / ' + total + '</b><div class="bar"><span style="width:' + Math.round(done / total * 100) + '%"></span></div></div>';
+  const titles = ACH.filter(a => a.title && P.ach[a.id]);
+  h += '<div class="ach-sec">TÍTULO EQUIPADO</div><div class="ach-titles">';
+  h += '<button class="tchip' + (!titleName() ? ' on' : '') + '" data-t="">Nenhum</button>';
+  titles.forEach(a => { h += '<button class="tchip' + (P.title === a.id ? ' on' : '') + '" data-t="' + a.id + '" style="--tc:' + TIER_COL[a.tier] + '">★ ' + a.title + '</button>'; });
+  if (!titles.length) h += '<span class="ach-none">Desbloqueie conquistas para ganhar títulos.</span>';
+  h += '</div>';
+  for (const cat of CAT_ORDER) {
+    const list = ACH.filter(a => a.cat === cat); if (!list.length) continue;
+    const d = list.filter(a => P.ach[a.id]).length;
+    h += '<div class="ach-sec">' + cat.toUpperCase() + ' <i>' + d + '/' + list.length + '</i></div>';
+    for (const a of list) {
+      const got = !!P.ach[a.id], hide = a.secret && !got;
+      let pr = '';
+      if (!got && a.prog && !hide) { try { const [c, n] = a.prog(); pr = '<div class="bar sm"><span style="width:' + Math.min(100, Math.round(c / n * 100)) + '%"></span></div><em>' + Math.min(c, n).toLocaleString('pt-BR') + ' / ' + n.toLocaleString('pt-BR') + '</em>'; } catch (e) {} }
+      h += '<div class="ach-row' + (got ? ' got' : '') + '"><div class="ach-m">' + medalSVG(34, a.tier, !got) + '</div><div class="ach-t"><b>' + (hide ? '???' : a.name) + '</b>'
+        + '<p>' + (hide ? 'Conquista secreta' : a.desc) + '</p>' + pr + '</div><span class="ach-tier" style="color:' + (got ? TIER_COL[a.tier] : '#56648e') + '">' + (hide ? '' : TIER_NAME[a.tier]) + '</span></div>';
+    }
+  }
+  const body = $('achBody'); body.innerHTML = h;
+  body.querySelectorAll('.tchip').forEach(b => b.addEventListener('click', () => { P.title = b.dataset.t; profDirty = true; flushProfile(); sfx('ui'); renderAch(); }));
+}
+
+/* ---------- tela de estatísticas ---------- */
+function fmtTime(s) { s = Math.floor(s); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60); return h ? h + 'h ' + String(m).padStart(2, '0') + 'min' : m + 'min'; }
+function openStats() { renderStats(); $('stats').classList.remove('hidden'); sfx('ui'); }
+function closeStats() { $('stats').classList.add('hidden'); sfx('ui'); }
+function renderStats() {
+  const n = v => Number(v || 0).toLocaleString('pt-BR');
+  const runs = pc('runs'), fin = pc('finished');
+  const cell = (l, v) => '<div class="over-cell"><small>' + l + '</small><b>' + v + '</b></div>';
+  let h = '<div class="over-grid st-grid">'
+    + cell('PARTIDAS', n(runs)) + cell('MELHOR PONTUAÇÃO', n(Math.max(best, pc('bestScore')))) + cell('MELHOR FASE', pc('bestLevel') || '—')
+    + cell('FASE MÉDIA', fin ? (pc('totalLevel') / fin).toFixed(1).replace('.', ',') : '—') + cell('TEMPO JOGADO', fmtTime(pc('playSec'))) + cell('MELHOR SETOR', pc('bestSector') || '—')
+    + cell('BLOCOS', n(pc('bricks'))) + cell('PERFEITAS', n(pc('perfects'))) + cell('MELHOR COMBO', '×' + pc('bestCombo'))
+    + cell('SEQ. PERFEITA', pc('bestStreak')) + cell('FASES 3★', n(pc('stars3'))) + cell('CONQUISTAS', achDone() + '/' + ACH.length) + '</div>';
+  h += '<div class="ach-sec">CHEFES</div>';
+  for (const k of BOSS_ORDER) {
+    const df = BOSS_DEFS[k], w = P.bossKills[k] || 0, l = P.bossDeaths[k] || 0, nh = P.bossNoHit[k] || 0;
+    h += '<div class="st-row"><span style="color:' + df.c2 + '">' + iconSVG('core', 14, df.c) + ' ' + df.name + '</span><em>' + w + ' vit. · ' + l + ' der.' + (nh ? ' · ' + nh + ' sem dano' : '') + '</em></div>';
+  }
+  const dEntries = Object.entries(P.deaths).sort((a, b) => b[1] - a[1]), dTot = dEntries.reduce((s, e) => s + e[1], 0);
+  if (dTot) {
+    h += '<div class="ach-sec">COMO VOCÊ PERDE</div>';
+    dEntries.slice(0, 6).forEach(([k, v]) => { h += '<div class="st-bar"><span>' + k + '</span><div class="bar sm"><span style="width:' + Math.round(v / dTot * 100) + '%"></span></div><em>' + v + '</em></div>'; });
+  }
+  const picks = Object.entries(P.picks).sort((a, b) => b[1] - a[1]).slice(0, 8);
+  if (picks.length) {
+    h += '<div class="ach-sec">UPGRADES MAIS ESCOLHIDOS</div><div class="st-picks">';
+    picks.forEach(([id, v]) => { const c = catalog.find(x => x.id === id); if (c) h += '<span class="chip">' + iconSVG(c.icon, 13, '#9ef0c8') + c.name + ' <b>×' + v + '</b></span>'; });
+    h += '</div>';
+  }
+  const pw = POWER_TYPES.filter(t => P.powers[t]);
+  if (pw.length) {
+    h += '<div class="ach-sec">POWER-UPS COLETADOS</div><div class="st-picks">';
+    pw.forEach(t => { h += '<span class="chip">' + iconSVG(DROP_ICON[t] || t, 13, DROP_COL[t] || '#ffd166') + t + ' <b>×' + P.powers[t] + '</b></span>'; });
+    h += '</div>';
+  }
+  $('statsBody').innerHTML = h;
+}
+
+/* ---------- compartilhar resultado ---------- */
+function captureRun(cause, isNew) {
+  lastRun = {
+    score, level, sector: Math.max(1, sector), cause, isNew, title: titleName(), build: getBuildTitle(),
+    bosses: runStats.bosses.slice(), maxCombo: runStats.maxCombo, perfects: runStats.perfects, route: sectorSeq.slice(0, Math.max(1, sector)),
+    ups: Object.entries(runUpgrades).map(([id, v]) => ({ id, v, r: runUpgradeRarity[id] || 'Common' })), ach: RC.unlocked.length, themeIdx, cheated
+  };
+  shareFile = null;
+  buildShareImage(lastRun).then(blob => { if (blob) { try { shareFile = new File([blob], 'breakpoint-resultado.png', { type: 'image/png' }); } catch (e) { shareFile = blob; } } }).catch(() => {});
+}
+function buildShareImage(r) {
+  return new Promise(res => {
+    try {
+      const cv = document.createElement('canvas'); cv.width = 1080; cv.height = 1350;
+      const c = cv.getContext('2d'), th = THEMES[r.themeIdx] || THEMES[0], F = 'system-ui,-apple-system,"Segoe UI",sans-serif';
+      const rr = (x, y, w, h, rad) => { c.beginPath(); c.moveTo(x + rad, y); c.arcTo(x + w, y, x + w, y + h, rad); c.arcTo(x + w, y + h, x, y + h, rad); c.arcTo(x, y + h, x, y, rad); c.arcTo(x, y, x + w, y, rad); c.closePath(); };
+      const txt = (s, x, y, size, col, wt = 800, al = 'center', ls = 0) => { c.font = wt + ' ' + size + 'px ' + F; c.fillStyle = col; c.textAlign = al; if ('letterSpacing' in c) c.letterSpacing = ls + 'px'; c.fillText(s, x, y); if ('letterSpacing' in c) c.letterSpacing = '0px'; };
+      const g = c.createLinearGradient(0, 0, 0, 1350); g.addColorStop(0, th.bg[0]); g.addColorStop(.55, th.bg[1]); g.addColorStop(1, th.bg[2]); c.fillStyle = g; c.fillRect(0, 0, 1080, 1350);
+      c.strokeStyle = th.accent + '16'; c.lineWidth = 1; for (let x = 0; x <= 1080; x += 60) { c.beginPath(); c.moveTo(x, 0); c.lineTo(x, 1350); c.stroke(); } for (let y = 0; y <= 1350; y += 60) { c.beginPath(); c.moveTo(0, y); c.lineTo(1080, y); c.stroke(); }
+      const rg = c.createRadialGradient(540, 360, 40, 540, 360, 620); rg.addColorStop(0, th.accent + '30'); rg.addColorStop(1, 'transparent'); c.fillStyle = rg; c.fillRect(0, 0, 1080, 1350);
+      c.strokeStyle = th.accent + '88'; c.lineWidth = 3; rr(30, 30, 1020, 1290, 36); c.stroke();
+      txt('BREAKPOINT', 540, 130, 76, '#ffffff', 900, 'center', 14);
+      txt('CHAIN REACTION ROGUELITE', 540, 176, 24, th.accent, 800, 'center', 7);
+      if (r.title) txt('★ ' + r.title + ' ★', 540, 232, 34, '#ffd56a', 800);
+      txt('PONTUAÇÃO', 540, 330, 30, '#8fa3d0', 800, 'center', 8);
+      const sg = c.createLinearGradient(0, 360, 0, 480); sg.addColorStop(0, '#ffffff'); sg.addColorStop(1, '#bcd0ff');
+      c.shadowColor = th.accent; c.shadowBlur = 36; txt(r.score.toLocaleString('pt-BR'), 540, 470, r.score >= 1e6 ? 120 : 160, sg, 900); c.shadowBlur = 0;
+      if (r.isNew) txt('★ NOVO RECORDE ★', 540, 530, 34, '#ffd56a', 900, 'center', 5);
+      const cells = [['FASE', r.level], ['SETOR', r.sector], ['CHEFES', r.bosses.length], ['COMBO MÁX', '×' + r.maxCombo], ['PERFEITAS', r.perfects], ['CONQUISTAS', '+' + r.ach]];
+      cells.forEach((cl, i) => {
+        const x = 60 + (i % 3) * 330, y = 570 + Math.floor(i / 3) * 150;
+        c.fillStyle = '#0c1430cc'; rr(x, y, 310, 130, 22); c.fill(); c.strokeStyle = '#3d5488'; c.lineWidth = 2; rr(x, y, 310, 130, 22); c.stroke();
+        txt(cl[0], x + 155, y + 44, 24, '#8fa3d0', 800, 'center', 4); txt(String(cl[1]), x + 155, y + 104, 56, '#ffffff', 900);
+      });
+      let y = 905;
+      txt('ROTA', 90, y, 22, '#7f92c0', 800, 'left', 5);
+      let x = 90; y += 20;
+      const chip = (label, col) => { c.font = '800 26px ' + F; const w = c.measureText(label).width + 40; if (x + w > 990) { x = 90; y += 56; } c.fillStyle = '#0c1430dd'; rr(x, y, w, 44, 22); c.fill(); c.strokeStyle = col; c.lineWidth = 2; rr(x, y, w, 44, 22); c.stroke(); txt(label, x + w / 2, y + 31, 26, col, 800); x += w + 12; };
+      r.route.forEach(i => chip(THEMES[i].name, THEMES[i].accent));
+      if (r.bosses.length) { y += 66; x = 90; txt('CHEFES DERROTADOS', 90, y, 22, '#7f92c0', 800, 'left', 5); y += 20; r.bosses.slice(0, 8).forEach(k => chip(BOSS_DEFS[k].name.split(' ')[0], BOSS_DEFS[k].c)); }
+      y = Math.max(y + 92, 1100);
+      txt(r.build, 540, y, 38, '#ffffff', 900, 'center', 4);
+      const ups = r.ups.slice(0, 12), sz = 66, gap = 14, tot = ups.length * sz + (ups.length - 1) * gap; let ux = 540 - tot / 2;
+      ups.forEach(u => {
+        const cat = catalog.find(q => q.id === u.id), col = u.r === 'Legendary' ? '#ffd56a' : u.r === 'Rare' ? '#7db8ff' : u.r === 'Uncommon' ? '#5dffb0' : '#c5d0e4';
+        c.fillStyle = '#10193acc'; rr(ux, y + 28, sz, sz, 16); c.fill(); c.strokeStyle = col; c.lineWidth = 2; rr(ux, y + 28, sz, sz, 16); c.stroke();
+        if (cat) drawIcon(c, cat.icon, ux + sz / 2, y + 28 + sz / 2 - 3, 36, col);
+        for (let p = 0; p < 3; p++) { c.fillStyle = p < u.v ? col : '#33406a'; c.beginPath(); c.arc(ux + sz / 2 - 12 + p * 12, y + 28 + sz - 8, 3.2, 0, 7); c.fill(); }
+        ux += sz + gap;
+      });
+      const url = /^https?:/.test(location.protocol) ? location.host + location.pathname.replace(/index\.html$/, '') : '';
+      txt('v' + GAME_VERSION + (url ? ' · ' + url : ''), 540, 1296, 22, '#6f82b5', 700, 'center', 2);
+      if (r.cheated) txt('RUN COM DEBUG', 540, 1262, 22, '#ff7a8a', 800, 'center', 3);
+      cv.toBlob(b => res(b), 'image/png');
+    } catch (e) { res(null); }
+  });
+}
+async function shareResult() {
+  if (!lastRun) return;
+  const msg = $('shareMsg');
+  if (!shareFile) { const b = await buildShareImage(lastRun); if (b) { try { shareFile = new File([b], 'breakpoint-resultado.png', { type: 'image/png' }); } catch (e) { shareFile = b; } } }
+  if (!shareFile) { msg.textContent = 'Não foi possível gerar a imagem.'; return; }
+  const text = 'BREAKPOINT · ' + lastRun.score.toLocaleString('pt-BR') + ' pontos · fase ' + lastRun.level;
+  const url = /^https?:/.test(location.protocol) ? location.origin + location.pathname : undefined;
+  try {
+    if (navigator.canShare && navigator.canShare({ files: [shareFile] })) { await navigator.share({ files: [shareFile], text, url }); msg.textContent = ''; return; }
+  } catch (e) { if (e && e.name === 'AbortError') return; }
+  try {
+    const a = document.createElement('a'); a.href = URL.createObjectURL(shareFile); a.download = 'breakpoint-resultado.png'; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000); msg.textContent = 'Imagem salva no aparelho.';
+  } catch (e) { msg.textContent = 'Seu navegador não permite compartilhar.'; }
+}
+
 /* ---- bricks.js ---- */
 function addScore(n, x, y) {
   const permCombo = [0, .10, .20, .35][lv('combo')] || 0;
@@ -3228,7 +3738,7 @@ function damageBrick(br, dmg, pts, ctxo) {
 }
 function killBrick(br, pts, ctxo) {
   if (!br.alive) return;           // guarda: nunca morre duas vezes
-  br.alive = false;
+  br.alive = false; trackBrick(br);
   const { x: cx, y: cy } = bc(br);
   addScore(pts === undefined ? 10 : pts, cx, cy);
   maybeDrop(br);
@@ -3361,7 +3871,7 @@ function explodeAt(x, y, source) {
       }
     }
   }
-  sfx('explode');
+  sfx('explode'); trackChain(processed);
   if (processed > 1) buzz('chain');
   setHint(processed > 1 ? '<span class="power">CADEIA ×' + processed + '!</span>' : '<span class="power">EXPLOSÃO!</span>');
   setTimeout(() => { if (state === 'playing' && !anyPowerActive()) restoreDefaultHint(); }, 900);
@@ -3441,6 +3951,7 @@ function hitBrickPiercing(b, br) {
 
 /* ---- powerups.js ---- */
 function catchDrop(d) {
+  trackPower(d.type);
   sfx('power'); buzz(d.type === 'heart' ? 'heart' : 'power');
   if (d.type === 'wide') {
     wideUntil = gameNow() + 10000;
@@ -3704,7 +4215,18 @@ canvas.addEventListener('pointercancel', () => { pointerDown = false; });
 
 window.addEventListener('pointerup', () => { moveLeft = moveRight = false; });
 
-$('start').addEventListener('click', () => { unlockAudio(); newGame(); });
+$('start').addEventListener('click', () => {
+  unlockAudio();
+  const st = $('start');
+  if (peekRun() && st.dataset.armed !== '1') { st.dataset.armed = '1'; st.textContent = 'TOQUE DE NOVO · APAGA A RUN SALVA'; sfx('ui'); setTimeout(() => { if (st.dataset.armed === '1') refreshMenu(); }, 3000); return; }
+  clearRun(); newGame();
+});
+$('continueBtn').addEventListener('click', () => { unlockAudio(); const s = peekRun(); if (s) newGame(s); else refreshMenu(); });
+['achMenu', 'achSettings'].forEach(id => $(id).addEventListener('click', openAch));
+['statsMenu', 'statsSettings'].forEach(id => $(id).addEventListener('click', openStats));
+$('achClose').addEventListener('click', closeAch);
+$('statsClose').addEventListener('click', closeStats);
+$('shareBtn').addEventListener('click', shareResult);
 $('again').addEventListener('click', () => { unlockAudio(); newGame(); });
 $('resumeSettings').addEventListener('click', closeSettings);
 $('restartSettings').addEventListener('click', () => { ui.settings.classList.add('hidden'); newGame(); });
@@ -3895,6 +4417,7 @@ function loop(now) {
   const dt = Math.min(.025, (now - (last || now)) / 1000);
   last = now;
   update(dbgOpen ? 0 : dt * timeScale);
+  trackTick(dbgOpen ? 0 : dt);
   dbgFrame(dt);
   Music.update();
   if ((++frameN & 31) === 0) { const v = measureInset(); if (v !== topInset) resize(); }
@@ -3905,7 +4428,7 @@ function loop(now) {
 best = getBest();
 ui.best.textContent = best;
 loadSettings();
-buildLegend(); updateBrand();
+buildLegend(); updateBrand(); refreshMenu();
 
 resize();
 aimX = 0; aimY = -1;
