@@ -224,6 +224,30 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none}
 .st-bar{display:grid;grid-template-columns:96px 1fr 28px;gap:8px;align-items:center;font-size:11px;color:#c5d0ef;text-align:left;margin:4px 0}.st-bar .bar{margin:0}.st-bar em{font-style:normal;color:#8fa3d0;text-align:right}
 .st-picks{display:flex;flex-wrap:wrap;gap:5px}.st-picks .chip{color:#c5d0ef}.st-picks .chip b{color:#9ef0c8}
 .st-grid .over-cell{text-align:center}
+
+/* ===== v3.12: habilidade ativa + bolas especiais ===== */
+.ability-btn{position:fixed;z-index:4;right:14px;bottom:calc(16px + env(safe-area-inset-bottom));width:58px;height:58px;border-radius:50%;border:2px solid #5a6f9e;background:radial-gradient(circle at 35% 30%,#2a3b6c,#121c36);color:#fff;display:grid;place-items:center;touch-action:none;box-shadow:0 4px 16px #0008,inset 0 1px 0 #ffffff22;-webkit-tap-highlight-color:transparent;padding:0}
+.ability-btn::before{content:'';position:absolute;inset:-5px;border-radius:50%;background:conic-gradient(#5ceeff calc(var(--p,1)*360deg),#25314f 0);-webkit-mask:radial-gradient(circle,transparent 29px,#000 30px);mask:radial-gradient(circle,transparent 29px,#000 30px);opacity:.9}
+.ability-btn.ready{border-color:#7ef6ff;box-shadow:0 0 22px #35d9ff88,0 4px 16px #0008;animation:abPulse 1.4s ease-in-out infinite}
+.ability-btn:not(.ready) svg{opacity:.4}
+.ability-btn:active{transform:scale(.93)}
+.ability-btn .ab-cd{position:absolute;font-size:18px;font-weight:900;color:#fff;text-shadow:0 1px 4px #000}
+@keyframes abPulse{50%{box-shadow:0 0 34px #35d9ffcc,0 4px 16px #0008}}
+body.has-ability .hint{max-width:calc(100vw - 150px)}
+.card .warn{color:#ffb454!important;font-size:10.5px!important;font-weight:800;letter-spacing:.3px;margin-top:5px!important}
+.card .slot-tag{font-size:8px;letter-spacing:1.4px;font-weight:900;color:#7ef6ff;margin-left:6px}
+.gl-bar{position:sticky;top:0;z-index:6;margin:-26px -20px 8px;padding:12px 14px 10px;display:flex;background:linear-gradient(180deg,#14203f 70%,#14203f00);border-radius:24px 24px 0 0}
+@media(min-width:520px){.gl-bar{margin:-26px -22px 8px}}
+@media(max-height:570px){.gl-bar{margin:-14px -14px 6px}}
+.gl-back{padding:8px 14px 8px 10px;border-radius:999px;border:1px solid #4a64a0;background:#0c1228ee;color:#c5d0ef;font-size:12px;font-weight:900;letter-spacing:1px;touch-action:manipulation;box-shadow:0 4px 14px #0006}
+.gl-back:active{transform:scale(.96)}
+.dev-note{font-size:11px;color:#8fa3d0;text-align:left;margin:4px 0 8px}
+.btn-row.two{grid-template-columns:1fr 1fr}.btn-row.two .secondary{font-size:11px}
+#balOut{width:100%;margin-top:8px;background:#0a1024;color:#c5d0ef;border:1px solid #2a3a62;border-radius:10px;font-size:10px;padding:8px;user-select:text;-webkit-user-select:text}
+.secondary.danger{border-color:#ff7a8a88;color:#ffb0bb}
+.reset-card{border:1px solid #ff7a8a66;background:#2a1220aa;border-radius:14px;padding:12px;text-align:left}.reset-card b{color:#ffb0bb;font-size:13px}.reset-card p{font-size:11px;color:#c5a0b0;margin:6px 0 8px}
+.reset-card.final{border-color:#ff7a8acc}
+.secondary.danger:disabled{opacity:.5}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#090d20">
@@ -246,6 +270,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none}
 <div class="ach-toast" id="achToast"></div>
 <div class="brand" id="brand">BREAKPOINT • CHAIN REACTION</div>
 <div class="combo-hud" id="comboHud"><b id="comboValue">×2</b><small id="comboName">COMBO</small></div>
+<button class="ability-btn hidden" id="abilityBtn" aria-label="Habilidade"></button>
 <div class="controls">
   <div class="hint" id="hint">Arraste para mirar<br><span class="go">TOQUE PARA LANÇAR</span></div>
 </div>
@@ -339,6 +364,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none}
 
 <div class="overlay hidden" id="achv" style="z-index:30">
   <div class="panel gl">
+    <div class="gl-bar"><button class="gl-back" id="achBack">‹ VOLTAR</button></div>
     <div class="eyebrow">MEDALHAS E TÍTULOS</div>
     <h1>CONQUISTAS</h1>
     <div id="achBody"></div>
@@ -347,6 +373,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none}
 </div>
 <div class="overlay hidden" id="stats" style="z-index:30">
   <div class="panel gl">
+    <div class="gl-bar"><button class="gl-back" id="statsBack">‹ VOLTAR</button></div>
     <div class="eyebrow">SEU HISTÓRICO · SÓ NESTE APARELHO</div>
     <h1>ESTATÍSTICAS</h1>
     <div id="statsBody"></div>
@@ -355,6 +382,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none}
 </div>
 <div class="overlay hidden" id="glossary" style="z-index:30">
   <div class="panel gl">
+    <div class="gl-bar"><button class="gl-back" id="glBack">‹ VOLTAR</button></div>
     <div class="eyebrow">GUIA RÁPIDO</div>
     <h1>GLOSSÁRIO</h1>
     <div id="glBody"></div>
@@ -400,6 +428,12 @@ const ICON_PATHS = {
   chrono: _ring(12, 12, 10.2, 8) + 'M11 6.2h2v5.8h4.6v2H11z',
   bomb: _circ(11, 14, 7.6) + _circ(8.6, 11.6, 1.4) + 'M15.6 6.8l2.6-2.6 1.5 1.5-2.6 2.6z' + _star(20.2, 3.8, 2.8, 1, 4),
   heart: _heart,
+  flame: 'M12.4 1.5c.6 3.6 6.1 6.3 6.1 12.2a6.5 6.5 0 0 1-13 0c0-2.8 1.4-4.5 2.7-6 .3 1.6 1 2.6 2 3 .5-2.9-.4-5.6 2.2-9.2z' + _circ(12, 16.2, 2.6),
+  frost: 'M10.9 1.5h2.2v21h-2.2zM1.5 10.9h21v2.2h-21zM3.6 5.2l1.6-1.6 16 16-1.6 1.6zM18.8 3.6l1.6 1.6-16 16-1.6-1.6z' + _circ(12, 12, 3),
+  ghost: 'M12 2a8 8 0 0 0-8 8v12l3-2.4 2.5 2.4L12 20l2.5 2 2.5-2.4 3 2.4V10a8 8 0 0 0-8-8z' + _circ(9, 10, 1.7) + _circ(15, 10, 1.7),
+  pulse: _ring(12, 12, 10.8, 9.2) + _ring(12, 12, 6.8, 5.2) + _circ(12, 12, 2.3),
+  laser: _rect(10.4, 1.5, 3.2, 13.5) + 'M5.5 17.5h13l-2.2 5H7.7z' + _star(12, 1.8, 2.6, 1, 4),
+  rescue: _rect(3.5, 18.2, 17, 3.4) + 'M12 2.5l5.4 6.6h-3.7v6.6h-3.4V9.1H6.6z',
   refresh: _ring(12, 12, 9, 6.6) + 'M16 1.5l6 5.2-6.8 2.2z',
   shard: 'M12 1.5l8 10.5-8 10.5-8-10.5z' + 'M12 6.5l3.8 5.5-3.8 5.5-3.8-5.5z',
   shield: 'M12 1.8l8.6 3v6.4c0 5.2-3.7 9.4-8.6 11-4.9-1.6-8.6-5.8-8.6-11V4.8z' + 'M12 6l4.6 1.6v3.6c0 2.8-1.8 5.1-4.6 6.3-2.8-1.2-4.6-3.5-4.6-6.3V7.6z',
@@ -508,7 +542,25 @@ const catalog = [
     effect: 'Não atrai bombas. Sinergia com Reciclador.' },
   { id: 'lens', name: 'Lente do Núcleo', rarities: ['Uncommon', 'Rare', 'Legendary'], icon: 'lens',
     desc: ['Núcleo do chefe com área de acerto +2.', 'Área de acerto do núcleo +4.', 'Área de acerto do núcleo +6 e crítico solta power-up mais fácil.'],
-    effect: 'Ajuda a acertar o núcleo dos chefes.' }
+    effect: 'Ajuda a acertar o núcleo dos chefes.' },
+  { id: 'fire', slot: 'ball', name: 'Bola de Fogo', rarities: ['Uncommon', 'Rare', 'Legendary'], icon: 'flame',
+    desc: ['Acertos têm 14% de chance de incendiar o bloco: 1 de dano a cada 1,2s por 2,5s.', 'Chance de 24%: 1 de dano a cada 1,1s por 3,5s.', 'Chance de 34%: 1 de dano por segundo durante 4s, e o fogo salta para um bloco vizinho.'],
+    effect: 'Bola especial: a bola vira fogo até o fim da partida. Substitui outra bola especial.' },
+  { id: 'frost', slot: 'ball', name: 'Bola de Gelo', rarities: ['Uncommon', 'Rare', 'Legendary'], icon: 'frost',
+    desc: ['22% de chance de congelar o bloco; o próximo acerto nele quebra o gelo e causa +1 de dano.', '34% de chance; o gelo dura mais e chefes atingidos ficam mais lentos.', '46% de chance; o gelo contagia um vizinho e a quebra causa +2 de dano.'],
+    effect: 'Bola especial: a bola vira gelo até o fim da partida. Substitui outra bola especial.' },
+  { id: 'phantom', slot: 'ball', name: 'Bola Fantasma', rarities: ['Uncommon', 'Rare', 'Legendary'], icon: 'ghost',
+    desc: ['A cada 6 acertos, a bola atravessa o próximo bloco sem quicar.', 'A cada 5 acertos, a bola atravessa o próximo bloco.', 'A cada 4 acertos, atravessa o próximo bloco e causa +1 de dano nele.'],
+    effect: 'Bola especial: a bola vira fantasma até o fim da partida. Substitui outra bola especial.' },
+  { id: 'pulse', slot: 'ability', name: 'Pulso Cinético', rarities: ['Uncommon', 'Rare', 'Legendary'], icon: 'pulse',
+    desc: ['Botão: onda que destrói bombas e fragmentos num raio de 190px. Recarga 15s.', 'Raio de 260px. Recarga 12s.', 'Raio de 340px e a onda também ganha 25 pts por bomba. Recarga 9s.'],
+    effect: 'Habilidade ativa: toque no botão redondo. Cada rebatida perfeita reduz 1s da recarga. Substitui outra habilidade.' },
+  { id: 'laser', slot: 'ability', name: 'Laser da Plataforma', rarities: ['Uncommon', 'Rare', 'Legendary'], icon: 'laser',
+    desc: ['Botão: raio vertical que causa 2 de dano na coluna de blocos. Recarga 15s.', 'Raio com 3 de dano. Recarga 12s.', 'Raio com 4 de dano. Recarga 9s.'],
+    effect: 'Habilidade ativa: toque no botão redondo. Cada rebatida perfeita reduz 1s da recarga. Substitui outra habilidade.' },
+  { id: 'rescue', slot: 'ability', name: 'Campo de Resgate', rarities: ['Uncommon', 'Rare', 'Legendary'], icon: 'rescue',
+    desc: ['Botão: por 2s, bolas descendo são guiadas ao centro da plataforma. Recarga 18s.', 'Dura 2,8s. Recarga 15s.', 'Dura 3,6s. Recarga 12s.'],
+    effect: 'Habilidade ativa: toque no botão redondo. Cada rebatida perfeita reduz 1s da recarga. Substitui outra habilidade.' }
 ];
 const rarityNames = { Common: 'COMUM', Uncommon: 'INCOMUM', Rare: 'RARO', Legendary: 'LENDÁRIO' };
 
@@ -611,7 +663,7 @@ let perfectStreak = 0, comboTier = 0, timeScale = 1, godMode = false, cheated = 
 let runStats = { picks: {}, stages: 0, bosses: [], perfects: 0, maxCombo: 0, rerolls: 0 }, deathCause = 'bola', hudLivesKey = '', hudLivesPrev = 3;
 let curSpecial = '', sectorBanner = null, fervor = 0, resumeCd = 0, lastSpecial = '', specialBag = [], deathBossKind = '';
 let a11y = { shake: false, flash: false, contrast: false };
-const GAME_VERSION = '3.11';
+const GAME_VERSION = '3.12';
 let paddleFlash = 0, regenTimer = 0, tierFlash = 0, bgDirty = true, musicVol = 0.6, windPhase = 0;
 
 const paddle = { x: 0, y: 0, w: 104, h: 13, baseW: 104, speed: 420 };
@@ -625,6 +677,10 @@ const rarityMultTable = { Common: 1, Uncommon: 1.1, Rare: 1.2, Legendary: 1.35 }
 /* ---- rules.js ---- */
 function getBuildTitle() {
   const total = catalog.reduce((a, c) => a + lv(c.id), 0);
+  if (lv('fire') >= 2) return 'SENHOR DAS CHAMAS';
+  if (lv('frost') >= 2) return 'MESTRE DO GELO';
+  if (lv('phantom') >= 2) return 'ESPECTRO';
+  if (lv('laser') >= 2) return 'ATIRADOR DE ELITE';
   if (has('demolisher', 'core') && has('conductor', 'core')) return 'ARQUITETO DA RUÍNA';
   if (has('echo', 'multi')) return 'CÓRREGO DE BOLAS';
   if (has('demolisher', 'core')) return 'MESTRE DAS EXPLOSÕES';
@@ -657,6 +713,9 @@ function activeSynergies() {
   if (has('echo', 'multi')) syn.push('Eco+Multiball');
   if (has('reflex', 'combo')) syn.push('Reflexo+Combos');
   if (lv('vital') >= 1 && lv('last') >= 1) syn.push('Coração+Escudo');
+  if (has('fire', 'conductor')) syn.push('Fogo+Condutor');
+  if (has('fire', 'demolisher')) syn.push('Fogo+Demolidor');
+  if (has('frost', 'star')) syn.push('Gelo+Estrela');
   return syn;
 }
 function rollMods() {
@@ -687,7 +746,7 @@ const VIB = {
   launch: 12, perfect: 8, power: 15, brick: 10, boom: 18, chain: [20, 40, 20], tier: [14, 20, 14], tier3: [16, 22, 16, 22, 30],
   heart: [12, 30, 12, 30, 24], shield: [25, 40, 25], lose: [70, 50, 70], over: [120, 60, 120, 60, 220],
   bossIn: [30, 60, 30], bossCrit: 26, bossHit: 8, bossPhase: [30, 40, 30, 40, 60], bossDie: [40, 50, 40, 50, 40, 50, 220],
-  bomb: [90, 40, 40], legend: [20, 30, 40, 30, 70], stars: [12, 40, 12, 40, 26], ach: [14, 30, 14, 30, 22], ui: 10, tick: 6
+  bomb: [90, 40, 40], legend: [20, 30, 40, 30, 70], stars: [12, 40, 12, 40, 26], ach: [14, 30, 14, 30, 22], ability: [18, 30, 24], ui: 10, tick: 6
 };
 let hapticLabel = null;
 function iosTick() {
@@ -847,6 +906,9 @@ function sfx(name) {
     case 'combo': beep(640 + combo * 20, .07, 'sine', 0.26); break;
     case 'comboBig': beep(720, .1, 'sine', 0.3); beep(880, .12, 'triangle', 0.22, 100); break;
     case 'ui': beep(480, .07, 'sine', 0.22); break;
+    case 'laser': beep(1200, .22, 'sawtooth', 0.3, -900); beep(420, .18, 'square', 0.2, -200); break;
+    case 'pulse': beep(220, .3, 'sine', 0.36, 520); beep(660, .22, 'triangle', 0.2, 300); break;
+    case 'rescue': beep(520, .2, 'sine', 0.28, 260); setTimeout(() => beep(780, .22, 'sine', 0.24), 110); break;
     case 'ach': [784, 988, 1319].forEach((f, i) => setTimeout(() => beep(f, .16, 'triangle', 0.24), i * 90)); break;
     case 'shield': beep(740, .15, 'sine', 0.3, 180); break;
     case 'boss': beep(200, .14, 'square', 0.32); break;
@@ -901,6 +963,15 @@ function sfx(name) {
 const Music = (() => {
   let timer = null, step = 0, bar = 0, nextT = 0, intensity = 0, target = 0, master = null, noiseBuf = null, duck = 1;
   const PROG = [0, 5, 3, 4];
+  /* identidade musical de cada setor: progressão, motivo (melodia de 16 passos, graus relativos ao acorde), timbres e andamento */
+  const SECT = [
+    { prog: [0, 5, 3, 4], motif: [0, null, 2, null, 4, null, 2, null, 0, null, 2, 4, 5, null, 4, 2], lead: 'triangle', bass: 'sawtooth', bpm: 0, arp: [0, 1, 2, 1, 2, 1, 0, 2], bassEvery: 2 },                    // ÓRBITA: espacial, brilhante
+    { prog: [0, 0, 3, 6], motif: [0, null, null, 0, null, 2, null, null, 4, null, null, 3, null, 2, null, null], lead: 'sawtooth', bass: 'sawtooth', bpm: -4, arp: [0, 2, 0, 2, 1, 2, 0, 1], bassEvery: 2, stab: true },   // MAGMA: pesado, sincopado
+    { prog: [0, 1, 0, 5], motif: [4, null, null, null, null, null, 2, null, null, null, 1, null, null, null, null, null], lead: 'sine', bass: 'sine', bpm: -10, arp: [0, 2, 1, 2, 0, 2, 1, 2], bassEvery: 4, echo: true }, // ABISMO: lento, flutuante, eco
+    { prog: [0, 4, 5, 3], motif: [4, 6, 4, null, 2, 4, null, 6, 7, null, 6, 4, null, 2, 4, null], lead: 'triangle', bass: 'triangle', bpm: 2, arp: [0, 2, 1, 2, 2, 1, 2, 0], bassEvery: 2, echo: true, hi: true }, // CRISTALINO: cintilante
+    { prog: [0, 4, 5, 4], motif: [0, null, 4, 4, null, 2, null, 4, 5, null, 4, null, 2, 2, null, 0], lead: 'square', bass: 'square', bpm: 6, arp: [0, 1, 2, 0, 1, 2, 1, 2], bassEvery: 2, gallop: true },  // SOLAR: heróico, galopante
+    { prog: [0, 1, 6, 0], motif: [null, null, 0, null, null, null, null, 1, null, null, null, 0, null, null, 6, null], lead: 'sawtooth', bass: 'sawtooth', bpm: -6, arp: [0, 2, 1, 0, 2, 1, 2, 0], bassEvery: 4, glitch: true } // VAZIO: seco, esparso, glitch
+  ];
   const mtof = n => 440 * Math.pow(2, (n - 69) / 12);
   function ensure() {
     if (!audioCtx) return false;
@@ -961,21 +1032,30 @@ const Music = (() => {
     const th = theme, sc = SCALES[th.scale] || SCALES.minor, root = th.root;
     const s = step % 16, I = Math.round(intensity);
     if (s === 0) bar++;
-    const d = PROG[bar % 4];
+    const M = SECT[themeIdx % SECT.length] || SECT[0];
+    const d = M.prog[bar % 4];
     const chord = [degNote(sc, d), degNote(sc, d + 2), degNote(sc, d + 4)];
     const stepDur = 60 / bpm() / 4;
     if (s === 0) for (const c of chord) tone(t, mtof(root + c), stepDur * 16 * .98, 'triangle', .1, 1500, .25);
     if (s % 4 === 0 && I < 3) tone(t, mtof(root + chord[(s / 4) % 3] + 12), stepDur * 3, 'triangle', .13, 2600, .004);
-    if (I >= 1 && (I === 1 ? s % 4 === 0 : s % 2 === 0)) {
+    const bEvery = M.bassEvery || 2;
+    if (I >= 1 && (I === 1 ? s % 4 === 0 : s % bEvery === 0 || (M.gallop && s % 4 === 3))) {
       const oct = (s % 8 === 6) ? 12 : 0;
-      tone(t, mtof(root + chord[0] - 12 + oct), stepDur * 1.8, bw(0), .22, boss && boss.kind === 'abyss' ? 700 : 1000);
+      tone(t, mtof(root + chord[0] - 12 + oct), stepDur * (bEvery >= 4 ? 3.4 : 1.8), boss ? bw(0) : M.bass, .22, boss && boss.kind === 'abyss' ? 700 : 1000);
+    }
+    if (M.stab && I >= 2 && (s === 3 || s === 11)) for (const c of chord) tone(t, mtof(root + c), stepDur * 1.3, 'sawtooth', .05, 1800, .003);
+    if (I >= 2 && M.motif[s] !== null && M.motif[s] !== undefined) {
+      const f = mtof(root + degNote(sc, d + M.motif[s]) + (M.hi ? 24 : 12)), ln = M.lead === 'sine' ? stepDur * 3.2 : stepDur * 1.7;
+      tone(t, f, ln, boss ? bw(1) : M.lead, M.lead === 'square' ? .05 : .075, M.lead === 'sawtooth' ? 2200 : 3800, .006);
+      if (M.echo) tone(t + stepDur * 3, f, ln, M.lead, .028, 2600, .01);
+      if (M.glitch && s % 5 === 2) noise(t + stepDur * .5, .025, .07, 5200, 'bandpass');
     }
     if (I >= 2) {
       if (s % 4 === 0) kick(t);
       if (s % 2 === 1) noise(t, .04, .09, 7000, 'highpass');
     }
     if (I >= 3 && (I >= 4 || s % 2 === 0)) {
-      const pat = [0, 1, 2, 1, 2, 1, 0, 2][s % 8];
+      const pat = M.arp[s % 8];
       tone(t, mtof(root + chord[pat] + 12), stepDur * 1.1, bw(1), .075, 3200);
     }
     if (I >= 4) {
@@ -991,7 +1071,7 @@ const Music = (() => {
   }
   const BOSS_WAVE = { raider: ['sawtooth', 'square'], forge: ['sawtooth', 'sawtooth'], abyss: ['sine', 'triangle'], warden: ['triangle', 'triangle'], sun: ['square', 'square'], void: ['sawtooth', 'sawtooth'] };
   const bw = i => (boss && BOSS_WAVE[boss.kind] ? BOSS_WAVE[boss.kind][i] : (i ? 'square' : 'sawtooth'));
-  function bpm() { return Math.min(152, 106 + (sector - 1) * 4 + Math.round(intensity) * 5 + (boss ? 6 : 0)); }
+  function bpm() { const M = SECT[themeIdx % SECT.length] || SECT[0]; return Math.min(152, 106 + (sector - 1) * 4 + M.bpm + Math.round(intensity) * 5 + (boss ? 6 : 0)); }
   function tick() {
     if (!audioCtx || !master) return;
     if (musicVol <= .001) { nextT = audioCtx.currentTime + .1; return; }
@@ -1094,6 +1174,7 @@ function sparksAt(el, color, n = 16) {
 }
 function applyUpgrade(c, next, rarity, bossReward) {
   const synBefore = activeSynergies().length;
+  if (c.slot) for (const o of catalog) if (o.slot === c.slot && o.id !== c.id && lv(o.id) > 0) { delete runUpgrades[o.id]; delete runUpgradeRarity[o.id]; }
   runUpgrades[c.id] = next;
   if (c.id === 'vital') lives = next >= 3 ? maxLives() : Math.min(maxLives(), lives + 1);
   const prev = runUpgradeRarity[c.id];
@@ -1133,21 +1214,29 @@ function showUpgrades(bossReward = false, rerolled = false) {
     : 'Sinergias ativam quando combinações de itens se encontram.';
   ui.cards.innerHTML = '';
   const chosen = [];
+  const wOf = c => {
+    if (!c.slot) return 1;
+    const held = catalog.find(o => o.slot === c.slot && lv(o.id) > 0);
+    return !held ? 1.3 : (held.id === c.id ? 1.3 : (lv(held.id) >= 2 ? .35 : .8));
+  };
   while (chosen.length < Math.min(3, eligible.length)) {
-    const c = eligible[Math.floor(Math.random() * eligible.length)];
-    if (!chosen.includes(c)) chosen.push(c);
+    const pool = eligible.filter(c => !chosen.includes(c)), tot = pool.reduce((a, c) => a + wOf(c), 0);
+    let r = Math.random() * tot, c = pool[pool.length - 1];
+    for (const x of pool) { r -= wOf(x); if (r <= 0) { c = x; break; } }
+    chosen.push(c);
   }
   revealTimers.forEach(clearTimeout); revealTimers = [];
   const rolled = chosen.map(c => ({ c, rarity: rollRarity(c) })).sort((a, b) => rarityRank[a.rarity] - rarityRank[b.rarity]);
   rolled.forEach(({ c, rarity }, i) => {
     const next = lv(c.id) + 1;
+    const holder = c.slot ? catalog.find(o => o.slot === c.slot && o.id !== c.id && lv(o.id) > 0) : null;
     const desc = c.desc[Math.min(next - 1, c.desc.length - 1)];
     const bonusNote = rarity === 'Common' ? '' : ' · Bônus ' + rarityNames[rarity];
     const accent = rarity === 'Legendary' ? '#ffd56a' : rarity === 'Rare' ? '#7db8ff' : rarity === 'Uncommon' ? '#5dffb0' : '#8a9cc4';
     const card = document.createElement('button');
     card.className = 'card locked r-' + rarity;
     card.style.borderColor = accent + '99';
-    card.innerHTML = '<div class="badge">' + iconSVG(c.icon, 24, 'currentColor') + '</div><div class="rarity ' + rarity + '">' + rarityNames[rarity] + bonusNote + '</div><h3>' + c.name + '</h3><div class="upgradelevel">NÍVEL ' + next + ' / 3</div><div class="bar"><span style="width:' + (next / 3 * 100) + '%"></span></div><p>' + desc + '</p><p class="tip">' + c.effect + '</p>';
+    card.innerHTML = '<div class="badge">' + iconSVG(c.icon, 24, 'currentColor') + '</div><div class="rarity ' + rarity + '">' + rarityNames[rarity] + bonusNote + '</div><h3>' + c.name + (c.slot ? '<span class="slot-tag">' + (c.slot === 'ball' ? 'BOLA' : 'HABILIDADE') + '</span>' : '') + '</h3><div class="upgradelevel">NÍVEL ' + next + ' / 3</div><div class="bar"><span style="width:' + (next / 3 * 100) + '%"></span></div><p>' + desc + '</p><p class="tip">' + c.effect + '</p>' + (holder ? '<p class="warn">Substitui: ' + holder.name + ' (Nv.' + lv(holder.id) + ')</p>' : '');
     card.addEventListener('click', () => {
       if (pickedUpgrade || card.classList.contains('locked')) return;
       pickedUpgrade = true;
@@ -1382,9 +1471,18 @@ function glossaryHTML() {
   GL_BLOCKS.forEach(([c, n, d]) => { h += row('<span class="gl-dot" style="background:' + c + ';box-shadow:0 0 10px ' + c + '88"></span>', n, d); });
   h += sec('CHEFES · um por setor');
   BOSS_ORDER.forEach((k, i) => { const df = BOSS_DEFS[k]; h += row(iconSVG('core', 22, df.c), '<span style="color:' + df.c2 + '">' + df.name + '</span> <small>' + THEMES[i].name + '</small>', BOSS_TIPS[k]); });
+  h += sec('BOLAS ESPECIAIS · uma por partida');
+  h += row(iconSVG('flame', 22, '#ff8a3c'), 'Bola de Fogo', 'Chance de incendiar o bloco atingido: ele perde 1 de vida a cada instante enquanto queima. No nível 3 o fogo salta para um vizinho. Também queima chefes.');
+  h += row(iconSVG('frost', 22, '#9fe8ff'), 'Bola de Gelo', 'Chance de congelar o bloco: o próximo acerto quebra o gelo e causa dano extra. Chefes atingidos ficam mais lentos.');
+  h += row(iconSVG('ghost', 22, '#cdbcff'), 'Bola Fantasma', 'De tempos em tempos a bola atravessa um bloco sem quicar (um anel aparece em volta dela). Ótima para manter a bola no teto.');
+  h += sec('HABILIDADES ATIVAS · botão redondo');
+  h += row(iconSVG('pulse', 22, '#8fe9ff'), 'Pulso Cinético', 'Uma onda destrói bombas e fragmentos perto da plataforma.');
+  h += row(iconSVG('laser', 22, '#ff6a8a'), 'Laser da Plataforma', 'Dispara um raio vertical que fere todos os blocos da coluna (e o chefe, se estiver alinhado).');
+  h += row(iconSVG('rescue', 22, '#9ef0c8'), 'Campo de Resgate', 'Por alguns segundos, as bolas que descem são guiadas para o centro da plataforma.');
   h += sec('MECÂNICAS');
   h += row(iconSVG('target', 22, '#7ef6ff'), 'Rebatida perfeita', 'Acerte o centro da plataforma: pontos crescem na sequência e a cada 5 seguidas você ganha +4 hits de sobrecarga. 4 por fase = 1 estrela.');
   h += row(iconSVG('combo', 22, '#ffb454'), 'Combo', 'Quebre blocos em sequência sem deixar o tempo acabar: +4,5% de pontos por degrau (até +45%) e mais chance de power-up a cada nível do combo.');
+  h += row(iconSVG('refresh', 22, '#7ef6ff'), 'Bolas e habilidades', 'Valem só para a partida atual e ocupam um espaço cada: pegar outra do mesmo tipo substitui a anterior. Cada rebatida perfeita acelera a recarga da habilidade em 1s.');
   h += row(iconSVG('star', 22, '#ffd56a'), 'Estrelas da fase', 'Tempo abaixo da meta, 4+ perfeitas e nenhuma vida perdida. Cada uma vale uma estrela.');
   h += sec('FASES ESPECIAIS');
   SPECIALS.forEach(k => { const si = SPECIAL_INFO[k]; h += row(iconSVG('sparkle', 22, si.c), '<span style="color:' + si.c + '">' + si.t + '</span>', si.s); });
@@ -1819,6 +1917,7 @@ function draw() {
       }
     }
 
+    drawBrickElem(br, x, y, w, h);
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
@@ -2022,19 +2121,22 @@ function draw() {
     for (let i = 0; i < b.trail.length; i++) {
       const t = b.trail[i];
       ctx.globalAlpha = (i + 1) / b.trail.length * .23;
-      ctx.fillStyle = comboTier ? TIERS[comboTier].color : '#55eaff';
+      ctx.fillStyle = BALL_COL[curBall()] || (comboTier ? TIERS[comboTier].color : '#55eaff');
       ctx.beginPath(); ctx.arc(t.x, t.y, b.r * (i + 1) / b.trail.length, 0, Math.PI * 2); ctx.fill();
     }
     ctx.globalAlpha = 1;
     const gOn = gameNow() < grenadeUntil, pOn = gameNow() < pierceUntil, oOn = overchargeHits > 0;
     ctx.shadowBlur = gOn || pOn || oOn ? 26 : 20;
     // prioridade visual: granada (âmbar) > estrela > sobrecarga > normal
-    ctx.shadowColor = gOn ? '#ffb020' : pOn ? '#ffe66d' : oOn ? '#b794ff' : (comboTier ? TIERS[comboTier].color : '#67edff');
-    ctx.fillStyle = gOn ? '#ffc44a' : pOn ? '#ffe66d' : oOn ? '#d4b8ff' : '#fff';
+    const bcol = BALL_COL[curBall()];
+    ctx.shadowColor = gOn ? '#ffb020' : pOn ? '#ffe66d' : oOn ? '#b794ff' : (bcol || (comboTier ? TIERS[comboTier].color : '#67edff'));
+    ctx.fillStyle = gOn ? '#ffc44a' : pOn ? '#ffe66d' : oOn ? '#d4b8ff' : (bcol || '#fff');
+    if (b.ghostOn) { ctx.save(); ctx.globalAlpha = .55 + .3 * Math.sin(animT * 16); ctx.strokeStyle = '#cdbcff'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(b.x, b.y, b.r + 4, 0, Math.PI * 2); ctx.stroke(); ctx.restore(); }
     ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2); ctx.fill();
     ctx.shadowBlur = 0;
   }
 
+  drawElemFx();
   drawTierOverlay();
   if (sectorBanner) drawSectorBanner();
   if (announce && announce.life > 0) {
@@ -2108,7 +2210,7 @@ function onPerfect(b) {
   floatText(b.x, paddle.y - 32, perfectStreak > 1 ? 'PERFEITO ×' + perfectStreak : 'PERFEITO', '#7ef6ff', 12 + Math.min(perfectStreak, 6));
   explosions.push({ x: b.x, y: paddle.y, r: 24 + Math.min(perfectStreak, 8) * 3, life: .3, max: .3, color: '#7ef6ff' });
   burst(b.x, paddle.y, '#b8fbff', 6 + Math.min(perfectStreak, 8));
-  sfx('perfect'); buzz('perfect');
+  sfx('perfect'); buzz('perfect'); perfectCooldown();
   if (lv('reflex') >= 3) registerCombo(b.x, paddle.y - 46);
   if (lv('fervor')) { fervor = lv('fervor'); floatText(b.x, paddle.y - 52, 'FERVOR ×' + fervor, '#ffb454', 11); }
   if (perfectStreak % 5 === 0) { overchargeHits = Math.min(12, overchargeHits + 4); announce = { title: 'PRECISÃO ×' + perfectStreak, sub: '+4 hits de sobrecarga', life: 1.3, max: 1.3, color: '#7ef6ff' }; }
@@ -2185,7 +2287,7 @@ function enterReady(kind) {
 
 /* ========== LEVEL BUILD (elites / cristal / cofre) ========== */
 function buildLevel() {
-  saveRun();
+  saveRun(); resetElems();
   aimX = 0; aimY = -1; wideUntil = 0; pierceUntil = 0; grenadeUntil = 0; overchargeHits = 0; chronoUntil = 0;
   paddle.baseW = clamp(W * .25, 82, 118) * (1 + [0, .08, .16, .25][lv('magnet')]) * (1 + (rarityMult('magnet') - 1) * .6);
   // sinergia Cronista + Magnético: plataforma um pouco maior sob cronos (base já conta magnet)
@@ -3062,7 +3164,7 @@ function updateBoss(dt) {
   const sector = boss.sector || 1;
   const speedMul = (boss.stage === 1 ? 1 : boss.stage === 2 ? 1.12 : 1.28)
     * (sector === 1 ? 0.88 : sector === 2 ? 0.95 : 1)
-    * d.speed * chronoFactor();
+    * d.speed * chronoFactor() * chillFactor();
   const moveSpeed = (115 + level * 4) * speedMul;
   boss.x += boss.dir * moveSpeed * dt;
   if (boss.x <= 8) { boss.x = 8; boss.dir = 1; }
@@ -3071,7 +3173,7 @@ function updateBoss(dt) {
   const bob = Math.sin(boss.phase * d.bob[0]) * d.bob[1] + (boss.stage >= 2 ? Math.sin(boss.phase * 2.8) * 4 : 0);
   boss.y = Math.max(135 + topInset, Math.min((boss.baseY || H * .2), paddle.y - 180)) + bob;
   boss.flash = Math.max(0, boss.flash - dt);
-  if (!entering) boss.attackTimer -= dt * chronoFactor();   // Cronos atrasa os ataques
+  if (!entering) boss.attackTimer -= dt * chronoFactor() * (chillFactor() < 1 ? .8 : 1);   // Cronos atrasa os ataques
   updateBossShield(dt);
   if (BOSS_UPDATE[boss.kind] && !entering) { BOSS_UPDATE[boss.kind](boss, dt); if (state !== 'playing' || !boss) return; }
   if (boss.attackTimer <= 0 && !entering) bossAttack();
@@ -3241,6 +3343,7 @@ function hitBoss(b, px, py) {
     boss.damageReadyAt = now + 160;
     damageBoss(dmg, coreHit, b.x, b.y);
     if (!boss) return true;               // derrotado
+    elemOnBossHit(b);
   }
   // laterais são sólidas; na vertical a bola ATRAVESSA o corpo (alcança o núcleo)
   if (sideEntry && !piercing) {
@@ -3261,11 +3364,11 @@ const POWER_TYPES = ['wide', 'multi', 'pierce', 'grenade', 'overcharge', 'chrono
 let P = loadProfile(), RC = newRC(), achQueue = [], achBusy = false, profDirty = false, achClock = 0, secAcc = 0, lastRun = null, shareFile = null;
 
 function newRC() { return { cleanStreak: 0, starStreak: 0, lostAny: false, hadOne: false, owl: false, unlocked: [] }; }
-function blankProfile() { return { c: {}, ach: {}, title: '', bossKills: {}, bossNoHit: {}, bossDeaths: {}, specials: {}, mods: {}, picks: {}, powers: {}, deaths: {}, events: {}, migrated: false }; }
+function blankProfile() { return { c: {}, ach: {}, title: '', bossKills: {}, bossNoHit: {}, bossDeaths: {}, specials: {}, mods: {}, picks: {}, powers: {}, deaths: {}, events: {}, slotsUsed: {}, migrated: false }; }
 function loadProfile() {
   let p = blankProfile();
   try { const s = JSON.parse(localStorage.getItem(PROFILE_KEY)); if (s && typeof s === 'object') p = Object.assign(p, s); } catch (e) {}
-  for (const k of ['c', 'ach', 'bossKills', 'bossNoHit', 'bossDeaths', 'specials', 'mods', 'picks', 'powers', 'deaths', 'events']) if (!p[k] || typeof p[k] !== 'object') p[k] = {};
+  for (const k of ['c', 'ach', 'bossKills', 'bossNoHit', 'bossDeaths', 'specials', 'mods', 'picks', 'powers', 'deaths', 'events', 'slotsUsed']) if (!p[k] || typeof p[k] !== 'object') p[k] = {};
   if (!p.migrated) {
     try {
       const st = JSON.parse(localStorage.getItem('breakpointStats'));
@@ -3392,6 +3495,16 @@ A('ev3', 'Desafios', 1, 'Estrategista', 'Escolha cada um dos 3 eventos de setor 
 A('evr', 'Desafios', 0, 'Corajoso', 'Escolha Pressão Máxima.', () => P.events.risk > 0);
 A('evs', 'Desafios', 0, 'Cauteloso', 'Escolha Caminho Seguro.', () => P.events.safe > 0);
 A('evg', 'Desafios', 0, 'Ganancioso', 'Escolha Saque Rápido.', () => P.events.greed > 0);
+K('ign100', 'Builds', 1, 'Faísca', 'Incendeie 100 blocos.', 'ignites', 100);
+K('burn100', 'Builds', 2, 'Incinerador', 'Destrua 100 blocos apenas com o fogo.', 'burnKills', 100, { title: 'Incinerador' });
+K('frz200', 'Builds', 2, 'Câmara Fria', 'Congele 200 blocos.', 'freezes', 200);
+K('shat50', 'Builds', 1, 'Quebra-Gelo', 'Estilhace 50 blocos congelados.', 'shatters', 50);
+K('ghost100', 'Builds', 1, 'Assombração', 'Atravesse 100 blocos com a bola fantasma.', 'ghostPass', 100);
+K('ab25', 'Builds', 0, 'Gatilho', 'Use habilidades ativas 25 vezes.', 'abilityUses', 25);
+K('ab250', 'Builds', 2, 'Reflexos de Aço', 'Use habilidades ativas 250 vezes.', 'abilityUses', 250);
+K('pulse50', 'Builds', 1, 'Varredura', 'Destrua 50 bombas com o Pulso Cinético.', 'pulseKills', 50);
+K('laserboss', 'Builds', 2, 'Raio Certeiro', 'Acerte um chefe com o Laser 10 vezes.', 'laserBoss', 10);
+SETN('arsenal', 'Builds', 3, 'Arsenal Completo', 'Já usou as 3 bolas e as 3 habilidades especiais (cada uma em alguma partida).', () => P.slotsUsed, 6, { title: 'Arsenal Completo' });
 // Segredos
 const SEC = { secret: true, cat: 'Segredos' };
 A('owl', 'Segredos', 1, 'Coruja', 'Comece uma partida entre 2h e 5h da manhã.', () => pc('owl') > 0, null, { secret: true, title: 'Coruja' });
@@ -3475,15 +3588,18 @@ function trackStage(info) {
   for (const m of info.mods || []) P.mods[m] = 1;
   if (lives === 1) mark('lowClear');
   mx('bestLevel', level); mx('bestSector', sector); mx('bestScore', score);
+  balStage(info);
   profDirty = true; checkAch(); flushProfile();
 }
-function trackLifeLost() { RC.cleanStreak = 0; RC.lostAny = true; if (lives === 1) RC.hadOne = true; }
+function trackElem(k, n = 1) { if (tracking() && n > 0) { inc(k, n); checkAch(); } }
+function trackLifeLost() { stage.ll = (stage.ll || 0) + 1; RC.cleanStreak = 0; RC.lostAny = true; if (lives === 1) RC.hadOne = true; }
 function trackUpgrade(id, next, rarity, syn) {
   if (!tracking()) return;
   inc('upgrades'); P.picks[id] = (P.picks[id] || 0) + 1;
   if (rarity === 'Legendary') mark('legend');
   if (next >= 3) mark('lvl3');
   if (syn) inc('synergies');
+  const cc = catalog.find(x => x.id === id); if (cc && cc.slot) P.slotsUsed[id] = 1;
   profDirty = true; checkAch();
 }
 function trackReroll() { if (tracking()) { inc('rerolls'); checkAch(); } }
@@ -3496,6 +3612,7 @@ function trackOver(cause, bossKind) {
     inc('totalLevel', level); inc('finished');
     if (level <= 2) mark('unlucky');
     mx('bestLevel', level); mx('bestSector', sector); mx('bestScore', score);
+    balDeath(cause, bossKind);
     checkAch();
   }
   flushProfile();
@@ -3611,7 +3728,9 @@ function renderStats() {
     pw.forEach(t => { h += '<span class="chip">' + iconSVG(DROP_ICON[t] || t, 13, DROP_COL[t] || '#ffd166') + t + ' <b>×' + P.powers[t] + '</b></span>'; });
     h += '</div>';
   }
+  h += renderStatsDev();
   $('statsBody').innerHTML = h;
+  bindStatsDev();
 }
 
 /* ---------- compartilhar resultado ---------- */
@@ -3685,6 +3804,143 @@ async function shareResult() {
     const a = document.createElement('a'); a.href = URL.createObjectURL(shareFile); a.download = 'breakpoint-resultado.png'; document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 4000); msg.textContent = 'Imagem salva no aparelho.';
   } catch (e) { msg.textContent = 'Seu navegador não permite compartilhar.'; }
+}
+
+/* ========== RELATÓRIO DE EQUILÍBRIO (só local; nada é enviado nem muda o jogo sozinho) ========== */
+const BAL_KEY = 'breakpointBalance';
+let BAL = loadBal();
+function loadBal() { try { const b = JSON.parse(localStorage.getItem(BAL_KEY)); if (b && Array.isArray(b.st) && Array.isArray(b.rn)) { if (!Array.isArray(b.dt)) b.dt = []; return b; } } catch (e) {} return { v: 1, st: [], dt: [], rn: [] }; }
+function flushBal() { try { localStorage.setItem(BAL_KEY, JSON.stringify(BAL)); } catch (e) {} }
+const capArr = (a, n) => { while (a.length > n) a.shift(); };
+function upLevels() { return Object.values(runUpgrades).reduce((a, b) => a + b, 0); }
+function balStage(info) {
+  const k = info.wasBoss ? 'boss:' + (runStats.bosses[runStats.bosses.length - 1] || '?') : (info.special || 'n');
+  BAL.st.push({ l: level, s: sector, k, m: (info.mods || []).join('+'), e: +(info.elapsed / 1000).toFixed(1), st: info.stars, ll: stage.ll || 0, pf: stage.perfects, mc: stage.maxCombo, hp: lives, u: upLevels(), b: curBall(), a: curAbility(), sc: score, v: GAME_VERSION });
+  capArr(BAL.st, 800); flushBal();
+}
+function balDeath(cause, bossKind) {
+  const left = bricks.filter(b => b.alive).length;
+  BAL.dt.push({ l: level, s: sector, c: cause, bk: bossKind || '', e: +((gameNow() - stageStartTime) / 1000).toFixed(1), left, u: upLevels(), b: curBall(), a: curAbility(), sc: score, v: GAME_VERSION });
+  const ups = {}; for (const [id, v] of Object.entries(runUpgrades)) ups[id] = v;
+  BAL.rn.push({ l: level, s: sector, sc: score, ups, t: Date.now(), v: GAME_VERSION });
+  capArr(BAL.dt, 200); capArr(BAL.rn, 200); flushBal();
+}
+function balanceReport() {
+  const avg = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : 0;
+  const med = a => { if (!a.length) return 0; const s = a.slice().sort((x, y) => x - y), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
+  const f1 = v => v.toFixed(1).replace('.', ','), pct = v => Math.round(v * 100) + '%';
+  const out = [], flags = [];
+  const runs = BAL.rn, lv_ = runs.map(r => r.l);
+  out.push('BREAKPOINT · RELATÓRIO DE EQUILÍBRIO · v' + GAME_VERSION);
+  out.push('Partidas: ' + runs.length + ' · fases registradas: ' + BAL.st.length + ' · mortes registradas: ' + BAL.dt.length);
+  if (runs.length) out.push('Fase final: média ' + f1(avg(lv_)) + ' · mediana ' + f1(med(lv_)) + ' · melhor ' + Math.max(...lv_) + ' · pontos médios ' + Math.round(avg(runs.map(r => r.sc))).toLocaleString('pt-BR'));
+  const dc = {}; BAL.dt.forEach(d => { dc[d.c] = (dc[d.c] || 0) + 1; });
+  if (BAL.dt.length) out.push('Causa das mortes: ' + Object.entries(dc).sort((a, b) => b[1] - a[1]).map(([k, v]) => k + ' ' + v + ' (' + pct(v / BAL.dt.length) + ')').join(' · '));
+  // por fase (fases comuns e especiais; chefes ficam à parte)
+  const normal = BAL.st.filter(r => !r.k.startsWith('boss:'));
+  out.push(''); out.push('POR FASE (tempo em s · % com vida perdida · % 3★ · mortes)');
+  const maxL = Math.min(40, Math.max(0, ...BAL.st.map(r => r.l)));
+  const byL = {};
+  for (let l = 1; l <= maxL; l++) {
+    const rs = BAL.st.filter(r => r.l === l && !r.k.startsWith('boss:'));
+    if (!rs.length) continue;
+    byL[l] = { n: rs.length, t: avg(rs.map(r => r.e)), tm: med(rs.map(r => r.e)), ll: rs.filter(r => r.ll > 0).length / rs.length, s3: rs.filter(r => r.st === 3).length / rs.length, d: BAL.dt.filter(d => d.l === l).length };
+  }
+  for (const l of Object.keys(byL).map(Number)) {
+    const r = byL[l], nb = [byL[l - 1], byL[l + 1]].filter(Boolean).map(x => x.t), base = nb.length ? avg(nb) : 0;
+    const fl = [];
+    if (r.n >= 3 && base && r.t < base * .6) fl.push('RÁPIDA DEMAIS?');
+    if (r.n >= 3 && base && r.t > base * 1.6) fl.push('LENTA?');
+    if (r.n >= 3 && r.ll >= .5) fl.push('DIFÍCIL?');
+    if (r.n >= 5 && r.ll === 0 && r.s3 >= .6) fl.push('FÁCIL?');
+    out.push('F' + String(l).padStart(2, '0') + ' n=' + r.n + ' · ' + f1(r.t) + 's (med ' + f1(r.tm) + ') · perda ' + pct(r.ll) + ' · 3★ ' + pct(r.s3) + ' · mortes ' + r.d + (fl.length ? ' ← ' + fl.join(', ') : ''));
+    if (fl.length) flags.push('Fase ' + l + ': ' + fl.join(', '));
+  }
+  // chefes
+  const bosses = BAL.st.filter(r => r.k.startsWith('boss:'));
+  if (bosses.length || BAL.dt.some(d => d.bk)) {
+    out.push(''); out.push('CHEFES (vitórias · tempo médio · sem perder vida · derrotas)');
+    for (const k of BOSS_ORDER) {
+      const rs = bosses.filter(r => r.k === 'boss:' + k), dd = BAL.dt.filter(d => d.bk === k).length;
+      if (!rs.length && !dd) continue;
+      const rate = rs.length + dd ? rs.length / (rs.length + dd) : 0;
+      const fl = []; if (rs.length + dd >= 3 && rate < .35) fl.push('MUITO DIFÍCIL?'); if (rs.length >= 3 && rs.filter(r => r.ll === 0).length / rs.length > .8 && avg(rs.map(r => r.e)) < 30) fl.push('FÁCIL/RÁPIDO?');
+      out.push(BOSS_DEFS[k].name + ': ' + rs.length + ' vit · ' + (rs.length ? f1(avg(rs.map(r => r.e))) + 's' : '—') + ' · sem dano ' + rs.filter(r => r.ll === 0).length + ' · derrotas ' + dd + (fl.length ? ' ← ' + fl.join(', ') : ''));
+      if (fl.length) flags.push(BOSS_DEFS[k].name + ': ' + fl.join(', '));
+    }
+  }
+  // especiais e modificadores
+  const sp = {}; BAL.st.forEach(r => { if (SPECIALS.includes(r.k)) (sp[r.k] = sp[r.k] || []).push(r); });
+  if (Object.keys(sp).length) {
+    out.push(''); out.push('FASES ESPECIAIS (n · tempo · perda · 3★) — comparar com ' + f1(avg(normal.filter(r => r.k === 'n').map(r => r.e))) + 's das comuns');
+    for (const [k, rs] of Object.entries(sp)) {
+      const t = avg(rs.map(r => r.e)), ll = rs.filter(r => r.ll > 0).length / rs.length, fl = [];
+      if (rs.length >= 3 && t < 12) fl.push('RÁPIDA DEMAIS?'); if (rs.length >= 3 && ll >= .5) fl.push('DIFÍCIL?');
+      out.push(SPECIAL_INFO[k].t + ': n=' + rs.length + ' · ' + f1(t) + 's · perda ' + pct(ll) + ' · 3★ ' + pct(rs.filter(r => r.st === 3).length / rs.length) + (fl.length ? ' ← ' + fl.join(', ') : ''));
+      if (fl.length) flags.push(SPECIAL_INFO[k].t + ': ' + fl.join(', '));
+    }
+  }
+  const md = {}; BAL.st.forEach(r => { if (r.m) r.m.split('+').forEach(m => (md[m] = md[m] || []).push(r)); });
+  if (Object.keys(md).length) {
+    out.push(''); out.push('MODIFICADORES DE SETOR (n · tempo · perda)');
+    for (const [m, rs] of Object.entries(md)) out.push((MODS[m] ? MODS[m].name : m) + ': n=' + rs.length + ' · ' + f1(avg(rs.map(r => r.e))) + 's · perda ' + pct(rs.filter(r => r.ll > 0).length / rs.length));
+  }
+  // upgrades x fase final
+  if (runs.length >= 3) {
+    out.push(''); out.push('UPGRADES (partidas com o upgrade · fase final média vs geral ' + f1(avg(lv_)) + ')');
+    const rows = [];
+    for (const c of catalog) {
+      const w = runs.filter(r => r.ups && r.ups[c.id] > 0); if (w.length < 2) continue;
+      const a = avg(w.map(r => r.l)); rows.push([c.name, w.length, a, a - avg(lv_)]);
+    }
+    rows.sort((a, b) => b[3] - a[3]).forEach(r => out.push(r[0] + ': n=' + r[1] + ' · fase ' + f1(r[2]) + ' (' + (r[3] >= 0 ? '+' : '') + f1(r[3]) + ')'));
+    const top = rows.filter(r => r[1] >= 4 && r[3] >= 3).map(r => r[0]); if (top.length) flags.push('Upgrades com resultado muito acima da média: ' + top.join(', '));
+  }
+  const bl = {}; BAL.st.forEach(r => { const k = r.b || r.a ? (r.b || '-') + '/' + (r.a || '-') : ''; if (k) (bl[k] = bl[k] || []).push(r); });
+  if (Object.keys(bl).length) {
+    out.push(''); out.push('BOLA/HABILIDADE ATIVA (n fases · tempo · perda)');
+    for (const [k, rs] of Object.entries(bl)) out.push(k + ': n=' + rs.length + ' · ' + f1(avg(rs.map(r => r.e))) + 's · perda ' + pct(rs.filter(r => r.ll > 0).length / rs.length));
+  }
+  out.push(''); out.push('PONTOS DE ATENÇÃO'); out.push(flags.length ? flags.map(f => '• ' + f).join('\n') : '• Nada fora do padrão com os dados atuais (ainda poucos dados?).');
+  out.push(''); out.push('Obs.: sinais (←) são só pistas; nada muda no jogo sem a sua aprovação.');
+  return out.join('\n');
+}
+function balanceRaw() { return JSON.stringify({ v: GAME_VERSION, st: BAL.st.slice(-150), dt: BAL.dt.slice(-60), rn: BAL.rn.slice(-50) }); }
+async function copyText(txt) {
+  try { await navigator.clipboard.writeText(txt); return true; } catch (e) {}
+  const ta = $('balOut'); if (!ta) return false;
+  ta.style.display = 'block'; ta.value = txt; ta.focus(); ta.select();
+  try { return document.execCommand('copy'); } catch (e) { return false; }
+}
+function resetAllProgress() {
+  for (const k of [PROFILE_KEY, RUN_KEY, BAL_KEY, 'breakpointStats', 'breakpointBest', 'brickBreakerBest', 'breakpointTutored']) { try { localStorage.removeItem(k); } catch (e) {} }
+  P = blankProfile(); profDirty = false; BAL = { v: 1, st: [], dt: [], rn: [] }; bestDirty = false; best = 0;
+  setTimeout(() => location.reload(), 150);
+}
+function renderStatsDev() {
+  let h = '<div class="ach-sec">RELATÓRIO DE EQUILÍBRIO</div><p class="dev-note">Números da sua jogabilidade, guardados só neste aparelho. Copie e cole no chat para eu analisar. Nada é enviado nem muda o jogo sozinho.</p>'
+    + '<div class="btn-row two"><button class="secondary" id="balCopy">COPIAR RELATÓRIO</button><button class="secondary" id="balRaw">COPIAR DADOS BRUTOS</button></div>'
+    + '<div class="share-msg" id="balMsg"></div><textarea id="balOut" readonly rows="6" style="display:none"></textarea>'
+    + '<div class="ach-sec">DADOS DO JOGO</div><div id="resetBox"></div>';
+  return h;
+}
+function bindStatsDev() {
+  const msg = $('balMsg');
+  $('balCopy').addEventListener('click', async () => { msg.textContent = (await copyText(balanceReport())) ? 'Relatório copiado.' : 'Selecione o texto abaixo e copie.'; });
+  $('balRaw').addEventListener('click', async () => { msg.textContent = (await copyText(balanceRaw())) ? 'Dados copiados.' : 'Selecione o texto abaixo e copie.'; });
+  renderReset(0);
+}
+function renderReset(step) {
+  const b = $('resetBox'); if (!b) return;
+  if (step === 0) { b.innerHTML = '<button class="secondary danger" id="rsStart">ZERAR PROGRESSO</button>'; $('rsStart').addEventListener('click', () => renderReset(1)); return; }
+  if (step === 1) {
+    b.innerHTML = '<div class="reset-card"><b>Zerar todo o progresso?</b><p>Apaga conquistas, títulos, estatísticas, recorde, a run salva e o relatório de equilíbrio deste aparelho. As configurações de som ficam.</p><div class="btn-row two"><button class="secondary" id="rsNo">CANCELAR</button><button class="secondary danger" id="rsYes">CONTINUAR</button></div></div>';
+    $('rsNo').addEventListener('click', () => renderReset(0)); $('rsYes').addEventListener('click', () => renderReset(2)); return;
+  }
+  b.innerHTML = '<div class="reset-card final"><b>ÚLTIMA CONFIRMAÇÃO</b><p>Isso não pode ser desfeito.</p><div class="btn-row two"><button class="secondary" id="rsNo2">CANCELAR</button><button class="secondary danger" id="rsGo" disabled>APAGAR TUDO (3)</button></div></div>';
+  $('rsNo2').addEventListener('click', () => renderReset(0));
+  let n = 3; const go = $('rsGo'); go.addEventListener('click', () => { if (!go.disabled) resetAllProgress(); });
+  const iv = setInterval(() => { if (!document.body.contains(go)) { clearInterval(iv); return; } n--; if (n <= 0) { clearInterval(iv); go.disabled = false; go.textContent = 'APAGAR TUDO'; } else go.textContent = 'APAGAR TUDO (' + n + ')'; }, 1000);
 }
 
 /* ---- bricks.js ---- */
@@ -3829,6 +4085,7 @@ function electricStrike(x, y) {
     burst(c.x, c.y, '#79f7ff', 10);
     explosions.push({ x: (x + c.x) / 2, y: (y + c.y) / 2, r: Math.hypot(c.x - x, c.y - y), life: .2, max: .2, color: '#79f7ff' });
     const killed = damageBrick(br, 1, 10);
+    if (!killed && has('fire', 'conductor')) igniteBrick(br);
     if (killed && has('conductor', 'core') && Math.random() < 0.28 && br.kind !== 'vault') miniExplode(c.x, c.y, br.w * 1.1);
   }
 }
@@ -3868,6 +4125,7 @@ function explodeAt(x, y, source) {
         const wasExp = br.explosive;
         const killed = damageBrick(br, dmgNow, 10, { queue, gen: ev.generation });
         burst(c.x, c.y, wasExp ? '#ff8a32' : br.color, killed ? 10 : 4);
+        if (!killed && lv('fire') && has('fire', 'demolisher') && Math.random() < .6) igniteBrick(br);
       }
     }
   }
@@ -3906,6 +4164,7 @@ function applyHitDamage(br) {
     if (has('catalyst', 'conductor') && Math.random() < 0.18) electricStrike(br.x + br.w / 2, br.y + br.h / 2);
   }
   if (br.kind === 'elite' && lv('hunter') > 0) dmg += lv('hunter') >= 3 ? 2 : 1;
+  if (br.frozen > 0) dmg += shatterBonus(br);
   if (fervor > 0) { dmg += 1; fervor--; }
   br.hp -= dmg;
   br.flash = .13;
@@ -3914,7 +4173,7 @@ function applyHitDamage(br) {
 function hitBrick(b, br) {
   if (!br.alive) return false;
   const { x: cx, y: cy } = bc(br);
-  applyHitDamage(br);
+  applyHitDamage(br); elemOnHit(b, br);
   addScore(br.hp > 0 ? 5 : 10, cx, cy);
   registerCombo(cx, cy);
   burst(b.x, b.y, br.color, br.hp > 0 ? 3 : 8);
@@ -3939,7 +4198,7 @@ function hitBrickPiercing(b, br) {
   if (!br.alive || (br.pierceHitAt && now - br.pierceHitAt < 150)) return;
   br.pierceHitAt = now;
   const { x: cx, y: cy } = bc(br);
-  applyHitDamage(br);
+  applyHitDamage(br); elemOnHit(b, br);
   addScore(br.hp > 0 ? 5 : 10, cx, cy);
   registerCombo(cx, cy);
   burst(b.x, b.y, '#ffe66d', br.hp > 0 ? 3 : 8);
@@ -4034,6 +4293,221 @@ function catchDrop(d) {
 }
 
 
+/* ---- elem.js ---- */
+/* ========== BOLAS ESPECIAIS (fogo · gelo · fantasma) e HABILIDADES ATIVAS (pulso · laser · resgate) ==========
+   São upgrades comuns: duram só a run. Um de cada "slot" por vez (escolher outro substitui o atual). */
+const BALL_IDS = ['fire', 'frost', 'phantom'], ABIL_IDS = ['pulse', 'laser', 'rescue'];
+const BALL_COL = { fire: '#ff8a3c', frost: '#9fe8ff', phantom: '#cdbcff' };
+const FIRE_CH = [0, .14, .24, .34], FIRE_DUR = [0, 2.5, 3.5, 4], FIRE_INT = [0, 1.2, 1.1, 1.0], FIRE_MAX = [0, 5, 7, 10];
+const FROST_CH = [0, .22, .34, .46], FROST_DUR = [0, 4, 5.5, 7], FROST_CHILL = [0, 1.8, 2.6, 3.4], FROST_SLOW = [1, .78, .64, .52];
+const GHOST_N = [0, 6, 5, 4];
+const PULSE_R = [0, 190, 260, 340], PULSE_CD = [0, 15, 12, 9], LASER_DMG = [0, 2, 3, 4], LASER_BOSS = [0, 1, 2, 3], LASER_CD = [0, 15, 12, 9], RESC_DUR = [0, 2, 2.8, 3.6], RESC_CD = [0, 18, 15, 12];
+let abilityReadyAt = 0, abilityCdTotal = 1, rescueUntil = 0, laserFx = null, pulseFx = null, bossBurnCd = 0, chillUntil = 0, abBtnId = '';
+
+const curBall = () => BALL_IDS.find(i => lv(i) > 0) || '';
+const curAbility = () => ABIL_IDS.find(i => lv(i) > 0) || '';
+function resetElems() { abilityReadyAt = 0; rescueUntil = 0; laserFx = null; pulseFx = null; bossBurnCd = 0; chillUntil = 0; }
+function chillFactor() { return gameNow() < chillUntil ? FROST_SLOW[lv('frost')] : 1; }
+
+/* ---------- efeitos nos blocos ---------- */
+function burningCount() { let n = 0; for (const b of bricks) if (b.alive && b.burn) n++; return n; }
+function nearBrick(br, pred, reach = 1.7) {
+  const c = bc(br); let best = null, bd = 1e9;
+  for (const o of bricks) {
+    if (o === br || !o.alive || !pred(o)) continue;
+    const oc = bc(o), d = Math.hypot(oc.x - c.x, oc.y - c.y);
+    if (d < br.w * reach && d < bd) { bd = d; best = o; }
+  }
+  return best;
+}
+function igniteBrick(br) {
+  const l = lv('fire');
+  if (!l || !br.alive || br.kind === 'vault') return false;
+  if (br.burn) { br.burn.t = Math.max(br.burn.t, FIRE_DUR[l]); return false; }
+  if (burningCount() >= FIRE_MAX[l]) return false;
+  br.burn = { t: FIRE_DUR[l], k: FIRE_INT[l] };
+  const c = bc(br); burst(c.x, c.y, '#ff8a3c', 5); trackElem('ignites');
+  return true;
+}
+function freezeBrick(br, spread = true) {
+  const l = lv('frost');
+  if (!l || !br.alive || br.kind === 'vault') return false;
+  const was = br.frozen > 0;
+  br.frozen = FROST_DUR[l];
+  if (!was) { const c = bc(br); burst(c.x, c.y, '#bff4ff', 6); trackElem('freezes'); }
+  if (spread && l >= 3) { const n = nearBrick(br, o => !(o.frozen > 0) && o.kind !== 'vault'); if (n) freezeBrick(n, false); }
+  return true;
+}
+/* chamado quando a bola acerta um bloco (depois do dano) */
+function elemOnHit(b, br) {
+  const t = curBall(); if (!t) return;
+  const l = lv(t), rm = rarityMult(t);
+  if (t === 'phantom') {
+    b.gh = (b.gh || 0) + 1;
+    if (b.gh >= GHOST_N[l]) b.ghostOn = true;
+    return;
+  }
+  if (br.hp <= 0 || !br.alive) return;
+  if (t === 'fire') { if (Math.random() < Math.min(.8, FIRE_CH[l] * rm)) igniteBrick(br); }
+  else if (t === 'frost') {
+    let ch = FROST_CH[l] * rm;
+    if (gameNow() < pierceUntil && lv('star')) ch *= 1.5;      // sinergia Gelo+Estrela
+    if (Math.random() < Math.min(.85, ch)) freezeBrick(br);
+  }
+}
+/* dano extra ao quebrar gelo (chamado em applyHitDamage) */
+function shatterBonus(br) {
+  if (!(br.frozen > 0)) return 0;
+  br.frozen = 0;
+  const c = bc(br); burst(c.x, c.y, '#e6fbff', 10); floatText(c.x, c.y - 14, 'ESTILHAÇO', '#bff4ff', 11); sfx('hit');
+  trackElem('shatters');
+  return lv('frost') >= 3 ? 2 : 1;
+}
+/* fantasma: a bola atravessa o próximo bloco */
+function ghostPass(b, br) {
+  b.ghostOn = false; b.gh = 0;
+  if (lv('phantom') >= 3) br.hp -= 1;
+  hitBrickPiercing(b, br);
+  const c = bc(br); burst(c.x, c.y, '#cdbcff', 6); trackElem('ghostPass');
+}
+
+/* ---------- chefe ---------- */
+function elemOnBossHit(b) {
+  if (!boss) return;
+  const t = curBall(); if (!t || t === 'phantom') return;
+  const l = lv(t), rm = rarityMult(t), now = gameNow();
+  if (t === 'fire' && !boss.burn && now > bossBurnCd && Math.random() < Math.min(.7, FIRE_CH[l] * rm * 1.5)) {
+    boss.burn = { t: FIRE_DUR[l], k: FIRE_INT[l] }; bossBurnCd = now + 6000;
+    floatText(b.x, b.y - 16, 'QUEIMANDO', '#ff8a3c', 11); trackElem('ignites');
+  } else if (t === 'frost' && Math.random() < Math.min(.8, FROST_CH[l] * rm * 1.4)) {
+    if (now >= chillUntil) floatText(b.x, b.y - 16, 'CONGELADO', '#bff4ff', 11);
+    chillUntil = now + FROST_CHILL[l] * 1000;
+  }
+}
+
+/* ---------- atualização por frame (só jogando) ---------- */
+function updateElems(dt) {
+  const lf = lv('fire');
+  for (const br of bricks) {
+    if (!br.alive) { if (br.burn) br.burn = null; if (br.frozen) br.frozen = 0; continue; }
+    if (br.frozen > 0) br.frozen -= dt;
+    if (br.burn) {
+      br.burn.t -= dt; br.burn.k -= dt;
+      if (particles.length < 380 && Math.random() < dt * 14) { const c = bc(br); particles.push({ x: c.x + rand(-br.w / 3, br.w / 3), y: br.y + 2, vx: rand(-10, 10), vy: rand(-70, -35), life: rand(.25, .5), max: .5, r: rand(1.2, 2.4), color: Math.random() < .5 ? '#ff9a3c' : '#ffd24a' }); }
+      if (br.burn.k <= 0 && lf) {
+        br.burn.k += FIRE_INT[lf];
+        const killed = damageBrick(br, 1, 10);
+        if (killed) trackElem('burnKills');
+        else if (br.alive && lf >= 3 && Math.random() < .3) { const n = nearBrick(br, o => !o.burn && o.kind !== 'vault'); if (n) igniteBrick(n); }
+        if (!br.alive) continue;
+      }
+      if (br.burn && br.burn.t <= 0) br.burn = null;
+    }
+  }
+  if (boss && boss.burn && lf) {
+    boss.burn.t -= dt; boss.burn.k -= dt;
+    if (boss.burn.k <= 0) { boss.burn.k += FIRE_INT[lf]; damageBoss(1, false, boss.x + boss.w / 2, boss.y + boss.h * .6); }
+    if (boss && boss.burn && boss.burn.t <= 0) boss.burn = null;
+  }
+  if (laserFx) { laserFx.t += dt; if (laserFx.t > .4) laserFx = null; }
+  if (pulseFx) { pulseFx.t += dt; if (pulseFx.t > .5) pulseFx = null; }
+  const ft = curBall() === 'fire';
+  if (ft && particles.length < 380) for (const b of balls) if (!b.attached && Math.random() < dt * 40) particles.push({ x: b.x, y: b.y, vx: rand(-14, 14), vy: rand(-8, 22), life: rand(.18, .38), max: .38, r: rand(1.4, 2.6), color: Math.random() < .5 ? '#ff7a2c' : '#ffd24a' });
+}
+/* resgate: puxa a bola que desce para o centro da plataforma (chamado por sub-passo da bola) */
+function rescuePull(b, sub) {
+  if (gameNow() >= rescueUntil || b.vy <= 0 || b.y < paddle.y - 340) return;
+  b.x += (paddle.x + paddle.w / 2 - b.x) * Math.min(1, sub * 2.0);
+}
+
+/* ---------- habilidades ativas ---------- */
+function abilityCd(id) { const base = { pulse: PULSE_CD, laser: LASER_CD, rescue: RESC_CD }[id][lv(id)]; return base / Math.min(1.35, rarityMult(id)); }
+function useAbility() {
+  const id = curAbility();
+  if (!id || state !== 'playing' || gameNow() < abilityReadyAt || resumeCd > 0) return;
+  const l = lv(id), rm = Math.min(1.35, rarityMult(id)), cx = paddle.x + paddle.w / 2;
+  abilityCdTotal = abilityCd(id); abilityReadyAt = gameNow() + abilityCdTotal * 1000;
+  if (id === 'pulse') {
+    const R = PULSE_R[l] * rm; let n = 0;
+    for (const d of drops) if (d.type === 'bomb' && !d.dead && Math.hypot(d.x - cx, d.y - paddle.y) <= R) {
+      d.dead = true; n++; burst(d.x, d.y, '#8fe9ff', 10);
+      if (l >= 3) { addScore(25, d.x, d.y); floatText(d.x, d.y - 10, '+25', '#8fe9ff', 11); }
+    }
+    pulseFx = { x: cx, y: paddle.y + paddle.h / 2, r: R, t: 0 };
+    sfx('pulse'); shake = Math.min(8, shake + 2); trackElem('pulseKills', n);
+  } else if (id === 'laser') {
+    const dmg = Math.round(LASER_DMG[l] * rm);
+    for (const br of bricks) if (br.alive && cx >= br.x - 3 && cx <= br.x + br.w + 3) { damageBrick(br, dmg, 10); const c = bc(br); burst(c.x, c.y, '#ff6a8a', 6); }
+    if (boss && !bossShieldOn() && cx >= boss.x && cx <= boss.x + boss.w) { damageBoss(LASER_BOSS[l], false, cx, boss.y + boss.h); trackElem('laserBoss'); }
+    laserFx = { x: cx, t: 0 }; sfx('laser'); shake = Math.min(8, shake + 3);
+  } else if (id === 'rescue') {
+    rescueUntil = gameNow() + RESC_DUR[l] * rm * 1000;
+    sfx('rescue'); burst(cx, paddle.y, '#9ef0c8', 14);
+  }
+  buzz('ability'); trackElem('abilityUses');
+}
+function perfectCooldown() { if (abilityReadyAt > gameNow()) abilityReadyAt -= 1000; }
+function updateAbilityBtn() {
+  const id = curAbility(), btn = $('abilityBtn');
+  const show = !!id && (state === 'playing' || state === 'ready' || state === 'transition');
+  btn.classList.toggle('hidden', !show);
+  document.body.classList.toggle('has-ability', show);
+  if (!show) return;
+  if (abBtnId !== id) { abBtnId = id; btn.innerHTML = iconSVG(id, 26, '#ffffff') + '<span class="ab-cd"></span>'; btn.dataset.id = id; }
+  const rem = abilityReadyAt - gameNow(), ready = rem <= 0 && state === 'playing';
+  btn.classList.toggle('ready', rem <= 0);
+  btn.style.setProperty('--p', rem <= 0 ? 1 : Math.max(0, 1 - rem / (abilityCdTotal * 1000)));
+  btn.querySelector('.ab-cd').textContent = rem > 0 ? Math.ceil(rem / 1000) : '';
+  btn.disabled = !ready && rem <= 0;
+}
+
+/* ---------- desenho ---------- */
+function drawBrickElem(br, x, y, w, h) {
+  if (br.frozen > 0) {
+    ctx.save(); roundedRect(x, y, w, h, 6); ctx.clip();
+    ctx.fillStyle = 'rgba(170,235,255,.42)'; ctx.fillRect(x, y, w, h);
+    ctx.strokeStyle = 'rgba(255,255,255,.7)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x + w * .2, y); ctx.lineTo(x + w * .35, y + h * .55); ctx.lineTo(x + w * .28, y + h); ctx.moveTo(x + w * .7, y); ctx.lineTo(x + w * .6, y + h * .45); ctx.lineTo(x + w * .78, y + h); ctx.stroke();
+    ctx.restore();
+    ctx.strokeStyle = '#d6f8ff'; ctx.lineWidth = 1.6; roundedRect(x + .8, y + .8, w - 1.6, h - 1.6, 5.5); ctx.stroke();
+  }
+  if (br.burn) {
+    ctx.save(); roundedRect(x, y, w, h, 6); ctx.clip();
+    const fl = .22 + .1 * Math.sin(animT * 14 + x);
+    ctx.fillStyle = 'rgba(255,110,30,' + fl.toFixed(2) + ')'; ctx.fillRect(x, y, w, h);
+    ctx.fillStyle = 'rgba(255,214,90,.55)';
+    for (let i = 0; i < 4; i++) {
+      const fx = x + w * (.14 + i * .24), ph = animT * 9 + i * 1.7, fh = h * (.35 + .25 * Math.abs(Math.sin(ph)));
+      ctx.beginPath(); ctx.moveTo(fx - 3, y + h); ctx.quadraticCurveTo(fx, y + h - fh, fx + 3, y + h); ctx.fill();
+    }
+    ctx.restore();
+    ctx.strokeStyle = 'rgba(255,150,50,.95)'; ctx.lineWidth = 1.6; roundedRect(x + .8, y + .8, w - 1.6, h - 1.6, 5.5); ctx.stroke();
+  }
+}
+function drawElemFx() {
+  const now = gameNow();
+  if (laserFx) {
+    const k = laserFx.t / .4, top = 100 + topInset, wd = 14 * (1 - k) + 3;
+    const g = ctx.createLinearGradient(laserFx.x - wd, 0, laserFx.x + wd, 0);
+    g.addColorStop(0, 'rgba(255,90,130,0)'); g.addColorStop(.5, 'rgba(255,220,235,' + (1 - k).toFixed(2) + ')'); g.addColorStop(1, 'rgba(255,90,130,0)');
+    ctx.save(); ctx.fillStyle = g; ctx.shadowBlur = 24; ctx.shadowColor = '#ff6a8a'; ctx.fillRect(laserFx.x - wd, top, wd * 2, paddle.y - top); ctx.restore();
+  }
+  if (pulseFx) {
+    const k = pulseFx.t / .5, r = pulseFx.r * (1 - Math.pow(1 - k, 3));
+    ctx.save(); ctx.globalAlpha = 1 - k; ctx.strokeStyle = '#8fe9ff'; ctx.lineWidth = 7 * (1 - k) + 1.5; ctx.shadowBlur = 20; ctx.shadowColor = '#8fe9ff';
+    ctx.beginPath(); ctx.arc(pulseFx.x, pulseFx.y, r, Math.PI, 2 * Math.PI); ctx.stroke(); ctx.restore();
+  }
+  if (now < rescueUntil) {
+    const cx = paddle.x + paddle.w / 2, a = Math.min(1, (rescueUntil - now) / 400);
+    ctx.save(); ctx.globalAlpha = a * .55; ctx.strokeStyle = '#9ef0c8'; ctx.lineWidth = 1.6; ctx.setLineDash([6, 8]); ctx.lineDashOffset = -animT * 40;
+    ctx.beginPath(); ctx.moveTo(cx - paddle.w * 1.8, paddle.y - 320); ctx.lineTo(cx - paddle.w * .5, paddle.y); ctx.moveTo(cx + paddle.w * 1.8, paddle.y - 320); ctx.lineTo(cx + paddle.w * .5, paddle.y); ctx.stroke();
+    ctx.setLineDash([]); ctx.globalAlpha = a * .8; ctx.shadowBlur = 18; ctx.shadowColor = '#9ef0c8'; ctx.strokeStyle = '#9ef0c8'; ctx.lineWidth = 2;
+    roundedRect(paddle.x - 3, paddle.y - 3, paddle.w + 6, paddle.h + 6, 9); ctx.stroke(); ctx.restore();
+  }
+  if (boss && boss.burn) { ctx.save(); ctx.globalAlpha = .5 + .3 * Math.sin(animT * 12); ctx.strokeStyle = '#ff8a3c'; ctx.lineWidth = 2.5; ctx.shadowBlur = 16; ctx.shadowColor = '#ff8a3c'; roundedRect(boss.x - 2, boss.y - 2, boss.w + 4, boss.h + 4, 12); ctx.stroke(); ctx.restore(); }
+  if (boss && now < chillUntil) { ctx.save(); ctx.globalAlpha = .55; ctx.strokeStyle = '#bff4ff'; ctx.lineWidth = 2.5; ctx.shadowBlur = 14; ctx.shadowColor = '#bff4ff'; roundedRect(boss.x - 2, boss.y - 2, boss.w + 4, boss.h + 4, 12); ctx.stroke(); ctx.restore(); }
+}
+
 /* ---- update.js ---- */
 function update(dt) {
   if (state === 'settings' || state === 'event' || state === 'upgrade') return;
@@ -4075,6 +4549,7 @@ function update(dt) {
       if (comboTimer <= 0) { combo = 0; comboTier = 0; updateHud(); }
     }
     if (boss) updateBoss(dt);
+    updateElems(dt);
 
     for (const b of balls) {
       if (state !== 'playing') break;
@@ -4087,6 +4562,7 @@ function update(dt) {
         const px = b.x, py = b.y;
         if (hasMod('wind')) b.vx += Math.sin(windPhase) * 95 * sub;
         b.x += b.vx * sub; b.y += b.vy * sub;
+        if (rescueUntil) rescuePull(b, sub);
         if (b.x - b.r < 0) { b.x = b.r; b.vx = Math.abs(b.vx); sfx('wall'); }
         else if (b.x + b.r > W) { b.x = W - b.r; b.vx = -Math.abs(b.vx); sfx('wall'); }
         if (b.y - b.r < 100 + topInset) { b.y = 100 + topInset + b.r; b.vy = Math.abs(b.vy); sfx('wall'); }
@@ -4111,6 +4587,7 @@ function update(dt) {
             const dx = b.x - cx, dy = b.y - cy;
             if (dx * dx + dy * dy <= b.r * b.r) {
               if (piercing) hitBrickPiercing(b, br);
+              else if (b.ghostOn) ghostPass(b, br);
               else if (hitBrick(b, br)) { hit = true; break; }
             }
           }
@@ -4215,6 +4692,9 @@ canvas.addEventListener('pointercancel', () => { pointerDown = false; });
 
 window.addEventListener('pointerup', () => { moveLeft = moveRight = false; });
 
+const _ab = $('abilityBtn');
+_ab.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); useAbility(); });
+_ab.addEventListener('click', e => e.stopPropagation());
 $('start').addEventListener('click', () => {
   unlockAudio();
   const st = $('start');
@@ -4225,6 +4705,9 @@ $('continueBtn').addEventListener('click', () => { unlockAudio(); const s = peek
 ['achMenu', 'achSettings'].forEach(id => $(id).addEventListener('click', openAch));
 ['statsMenu', 'statsSettings'].forEach(id => $(id).addEventListener('click', openStats));
 $('achClose').addEventListener('click', closeAch);
+$('achBack').addEventListener('click', closeAch);
+$('statsBack').addEventListener('click', closeStats);
+$('glBack').addEventListener('click', closeGlossary);
 $('statsClose').addEventListener('click', closeStats);
 $('shareBtn').addEventListener('click', shareResult);
 $('again').addEventListener('click', () => { unlockAudio(); newGame(); });
@@ -4272,6 +4755,7 @@ window.addEventListener('keydown', e => {
     if (state === 'settings') closeSettings();
     else openSettings();
   }
+  if ((e.key === 'e' || e.key === 'E' || e.key === 'Shift') && state === 'playing') { e.preventDefault(); useAbility(); }
   if ((e.key === ' ' || e.key === 'Enter') && state === 'ready') { e.preventDefault(); launch(); }
 });
 document.addEventListener('pointerdown', unlockAudio, { passive: true });
@@ -4417,7 +4901,7 @@ function loop(now) {
   const dt = Math.min(.025, (now - (last || now)) / 1000);
   last = now;
   update(dbgOpen ? 0 : dt * timeScale);
-  trackTick(dbgOpen ? 0 : dt);
+  trackTick(dbgOpen ? 0 : dt); updateAbilityBtn();
   dbgFrame(dt);
   Music.update();
   if ((++frameN & 31) === 0) { const v = measureInset(); if (v !== topInset) resize(); }
