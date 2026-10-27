@@ -236,10 +236,10 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none}
 body.has-ability .hint{max-width:calc(100vw - 150px)}
 .card .warn{color:#ffb454!important;font-size:10.5px!important;font-weight:800;letter-spacing:.3px;margin-top:5px!important}
 .card .slot-tag{font-size:8px;letter-spacing:1.4px;font-weight:900;color:#7ef6ff;margin-left:6px}
-.gl-bar{position:sticky;top:0;z-index:6;margin:-26px -20px 8px;padding:12px 14px 10px;display:flex;background:linear-gradient(180deg,#14203f 70%,#14203f00);border-radius:24px 24px 0 0}
-@media(min-width:520px){.gl-bar{margin:-26px -22px 8px}}
-@media(max-height:570px){.gl-bar{margin:-14px -14px 6px}}
-.gl-back{padding:8px 14px 8px 10px;border-radius:999px;border:1px solid #4a64a0;background:#0c1228ee;color:#c5d0ef;font-size:12px;font-weight:900;letter-spacing:1px;touch-action:manipulation;box-shadow:0 4px 14px #0006}
+.gl-bar{position:sticky;top:0;z-index:6;width:max-content;height:38px;margin:-6px 0 0;padding:0;pointer-events:none}.gl-bar+*{margin-top:6px}
+
+
+.gl-back{pointer-events:auto;position:relative;padding:8px 14px 8px 10px;border-radius:999px;border:1px solid #4a64a0;background:#0c1228ee;color:#c5d0ef;font-size:12px;font-weight:900;letter-spacing:1px;touch-action:manipulation;box-shadow:none}
 .gl-back:active{transform:scale(.96)}
 .dev-note{font-size:11px;color:#8fa3d0;text-align:left;margin:4px 0 8px}
 .btn-row.two{grid-template-columns:1fr 1fr}.btn-row.two .secondary{font-size:11px}
@@ -544,10 +544,10 @@ const catalog = [
     desc: ['Núcleo do chefe com área de acerto +2.', 'Área de acerto do núcleo +4.', 'Área de acerto do núcleo +6 e crítico solta power-up mais fácil.'],
     effect: 'Ajuda a acertar o núcleo dos chefes.' },
   { id: 'fire', slot: 'ball', name: 'Bola de Fogo', rarities: ['Uncommon', 'Rare', 'Legendary'], icon: 'flame',
-    desc: ['Acertos têm 14% de chance de incendiar o bloco: 1 de dano a cada 1,2s por 2,5s.', 'Chance de 24%: 1 de dano a cada 1,1s por 3,5s.', 'Chance de 34%: 1 de dano por segundo durante 4s, e o fogo salta para um bloco vizinho.'],
+    desc: ['Acertos têm 19% de chance de incendiar o bloco (garantido a cada 6): 1 de dano a cada 1,2s por 2,5s.', 'Chance de 31% (garantido a cada 5): 1 de dano a cada 1,1s por 3,5s.', 'Chance de 43% (garantido a cada 4): 1 de dano por segundo durante 4s, e o fogo salta para vizinhos.'],
     effect: 'Bola especial: a bola vira fogo até o fim da partida. Substitui outra bola especial.' },
   { id: 'frost', slot: 'ball', name: 'Bola de Gelo', rarities: ['Uncommon', 'Rare', 'Legendary'], icon: 'frost',
-    desc: ['22% de chance de congelar o bloco; o próximo acerto nele quebra o gelo e causa +1 de dano.', '34% de chance; o gelo dura mais e chefes atingidos ficam mais lentos.', '46% de chance; o gelo contagia um vizinho e a quebra causa +2 de dano.'],
+    desc: ['22% de chance de congelar (garantido a cada 7). Bloco congelado que quebra explode em estilhaços que ferem e congelam os vizinhos.', '34% de chance (garantido a cada 6); explosão maior e mais forte, e chefes atingidos ficam mais lentos.', '46% de chance (garantido a cada 5); o gelo contagia um vizinho e a explosão é ainda maior.'],
     effect: 'Bola especial: a bola vira gelo até o fim da partida. Substitui outra bola especial.' },
   { id: 'phantom', slot: 'ball', name: 'Bola Fantasma', rarities: ['Uncommon', 'Rare', 'Legendary'], icon: 'ghost',
     desc: ['A cada 6 acertos, a bola atravessa o próximo bloco sem quicar.', 'A cada 5 acertos, a bola atravessa o próximo bloco.', 'A cada 4 acertos, atravessa o próximo bloco e causa +1 de dano nele.'],
@@ -556,10 +556,10 @@ const catalog = [
     desc: ['Botão: onda que destrói bombas e fragmentos num raio de 190px. Recarga 15s.', 'Raio de 260px. Recarga 12s.', 'Raio de 340px e a onda também ganha 25 pts por bomba. Recarga 9s.'],
     effect: 'Habilidade ativa: toque no botão redondo. Cada rebatida perfeita reduz 1s da recarga. Substitui outra habilidade.' },
   { id: 'laser', slot: 'ability', name: 'Laser da Plataforma', rarities: ['Uncommon', 'Rare', 'Legendary'], icon: 'laser',
-    desc: ['Botão: raio vertical que causa 2 de dano na coluna de blocos. Recarga 15s.', 'Raio com 3 de dano. Recarga 12s.', 'Raio com 4 de dano. Recarga 9s.'],
+    desc: ['Botão: raio vertical que causa 1 de dano na coluna de blocos. Recarga 15s.', 'Raio com 1 de dano (2 em raridade Lendária). Recarga 12s.', 'Raio com 2 de dano. Recarga 9s.'],
     effect: 'Habilidade ativa: toque no botão redondo. Cada rebatida perfeita reduz 1s da recarga. Substitui outra habilidade.' },
   { id: 'rescue', slot: 'ability', name: 'Campo de Resgate', rarities: ['Uncommon', 'Rare', 'Legendary'], icon: 'rescue',
-    desc: ['Botão: por 2s, bolas descendo são guiadas ao centro da plataforma. Recarga 18s.', 'Dura 2,8s. Recarga 15s.', 'Dura 3,6s. Recarga 12s.'],
+    desc: ['Botão: por 2s, bolas descendo são puxadas com força ao centro da plataforma. Recarga 18s.', 'Dura 2,8s. Recarga 15s.', 'Dura 3,6s. Recarga 12s.'],
     effect: 'Habilidade ativa: toque no botão redondo. Cada rebatida perfeita reduz 1s da recarga. Substitui outra habilidade.' }
 ];
 const rarityNames = { Common: 'COMUM', Uncommon: 'INCOMUM', Rare: 'RARO', Legendary: 'LENDÁRIO' };
@@ -663,7 +663,7 @@ let perfectStreak = 0, comboTier = 0, timeScale = 1, godMode = false, cheated = 
 let runStats = { picks: {}, stages: 0, bosses: [], perfects: 0, maxCombo: 0, rerolls: 0 }, deathCause = 'bola', hudLivesKey = '', hudLivesPrev = 3;
 let curSpecial = '', sectorBanner = null, fervor = 0, resumeCd = 0, lastSpecial = '', specialBag = [], deathBossKind = '';
 let a11y = { shake: false, flash: false, contrast: false };
-const GAME_VERSION = '3.12';
+const GAME_VERSION = '3.14';
 let paddleFlash = 0, regenTimer = 0, tierFlash = 0, bgDirty = true, musicVol = 0.6, windPhase = 0;
 
 const paddle = { x: 0, y: 0, w: 104, h: 13, baseW: 104, speed: 420 };
@@ -1473,7 +1473,7 @@ function glossaryHTML() {
   BOSS_ORDER.forEach((k, i) => { const df = BOSS_DEFS[k]; h += row(iconSVG('core', 22, df.c), '<span style="color:' + df.c2 + '">' + df.name + '</span> <small>' + THEMES[i].name + '</small>', BOSS_TIPS[k]); });
   h += sec('BOLAS ESPECIAIS · uma por partida');
   h += row(iconSVG('flame', 22, '#ff8a3c'), 'Bola de Fogo', 'Chance de incendiar o bloco atingido: ele perde 1 de vida a cada instante enquanto queima. No nível 3 o fogo salta para um vizinho. Também queima chefes.');
-  h += row(iconSVG('frost', 22, '#9fe8ff'), 'Bola de Gelo', 'Chance de congelar o bloco: o próximo acerto quebra o gelo e causa dano extra. Chefes atingidos ficam mais lentos.');
+  h += row(iconSVG('frost', 22, '#9fe8ff'), 'Bola de Gelo', 'Chance de congelar o bloco. Bloco congelado que quebra explode em estilhaços que ferem e congelam os vizinhos. Chefes atingidos ficam mais lentos.');
   h += row(iconSVG('ghost', 22, '#cdbcff'), 'Bola Fantasma', 'De tempos em tempos a bola atravessa um bloco sem quicar (um anel aparece em volta dela). Ótima para manter a bola no teto.');
   h += sec('HABILIDADES ATIVAS · botão redondo');
   h += row(iconSVG('pulse', 22, '#8fe9ff'), 'Pulso Cinético', 'Uma onda destrói bombas e fragmentos perto da plataforma.');
@@ -3917,17 +3917,21 @@ function resetAllProgress() {
   P = blankProfile(); profDirty = false; BAL = { v: 1, st: [], dt: [], rn: [] }; bestDirty = false; best = 0;
   setTimeout(() => location.reload(), 150);
 }
+function devUnlocked() { try { return !!localStorage.getItem('breakpointDev') || dbgOpen; } catch (e) { return dbgOpen; } }
 function renderStatsDev() {
-  let h = '<div class="ach-sec">RELATÓRIO DE EQUILÍBRIO</div><p class="dev-note">Números da sua jogabilidade, guardados só neste aparelho. Copie e cole no chat para eu analisar. Nada é enviado nem muda o jogo sozinho.</p>'
+  const dev = devUnlocked();
+  let h = (dev ? '<div class="ach-sec">RELATÓRIO DE EQUILÍBRIO</div><p class="dev-note">Números da sua jogabilidade, guardados só neste aparelho. Copie e cole no chat para eu analisar. Nada é enviado nem muda o jogo sozinho.</p>'
     + '<div class="btn-row two"><button class="secondary" id="balCopy">COPIAR RELATÓRIO</button><button class="secondary" id="balRaw">COPIAR DADOS BRUTOS</button></div>'
-    + '<div class="share-msg" id="balMsg"></div><textarea id="balOut" readonly rows="6" style="display:none"></textarea>'
+    + '<div class="share-msg" id="balMsg"></div><textarea id="balOut" readonly rows="6" style="display:none"></textarea>' : '')
     + '<div class="ach-sec">DADOS DO JOGO</div><div id="resetBox"></div>';
   return h;
 }
 function bindStatsDev() {
   const msg = $('balMsg');
+  if ($('balCopy')) {
   $('balCopy').addEventListener('click', async () => { msg.textContent = (await copyText(balanceReport())) ? 'Relatório copiado.' : 'Selecione o texto abaixo e copie.'; });
   $('balRaw').addEventListener('click', async () => { msg.textContent = (await copyText(balanceRaw())) ? 'Dados copiados.' : 'Selecione o texto abaixo e copie.'; });
+  }
   renderReset(0);
 }
 function renderReset(step) {
@@ -4000,6 +4004,7 @@ function killBrick(br, pts, ctxo) {
   maybeDrop(br);
   shake = Math.min(10, shake + 1.1);
   if (br.kind === 'crystal') crystalPop(br);
+  if ((br.shat || br.frozen > 0) && lv('frost')) shardBurst(br);
   if (br.kind === 'elite') {
     const bonus = [0, 15, 30, 45][lv('hunter')] || 0;
     floatText(cx, cy - 16, 'ELITE!', '#c9a4ff', 14);
@@ -4298,10 +4303,10 @@ function catchDrop(d) {
    São upgrades comuns: duram só a run. Um de cada "slot" por vez (escolher outro substitui o atual). */
 const BALL_IDS = ['fire', 'frost', 'phantom'], ABIL_IDS = ['pulse', 'laser', 'rescue'];
 const BALL_COL = { fire: '#ff8a3c', frost: '#9fe8ff', phantom: '#cdbcff' };
-const FIRE_CH = [0, .14, .24, .34], FIRE_DUR = [0, 2.5, 3.5, 4], FIRE_INT = [0, 1.2, 1.1, 1.0], FIRE_MAX = [0, 5, 7, 10];
+const FIRE_CH = [0, .19, .31, .43], FIRE_DUR = [0, 2.5, 3.5, 4], FIRE_INT = [0, 1.2, 1.1, 1.0], FIRE_MAX = [0, 5, 7, 10];
 const FROST_CH = [0, .22, .34, .46], FROST_DUR = [0, 4, 5.5, 7], FROST_CHILL = [0, 1.8, 2.6, 3.4], FROST_SLOW = [1, .78, .64, .52];
 const GHOST_N = [0, 6, 5, 4];
-const PULSE_R = [0, 190, 260, 340], PULSE_CD = [0, 15, 12, 9], LASER_DMG = [0, 2, 3, 4], LASER_BOSS = [0, 1, 2, 3], LASER_CD = [0, 15, 12, 9], RESC_DUR = [0, 2, 2.8, 3.6], RESC_CD = [0, 18, 15, 12];
+const PULSE_R = [0, 190, 260, 340], PULSE_CD = [0, 15, 12, 9], LASER_DMG = [0, 1, 1, 2], LASER_BOSS = [0, 1, 2, 3], LASER_CD = [0, 15, 12, 9], RESC_DUR = [0, 2, 2.8, 3.6], RESC_CD = [0, 18, 15, 12];
 let abilityReadyAt = 0, abilityCdTotal = 1, rescueUntil = 0, laserFx = null, pulseFx = null, bossBurnCd = 0, chillUntil = 0, abBtnId = '';
 
 const curBall = () => BALL_IDS.find(i => lv(i) > 0) || '';
@@ -4347,21 +4352,36 @@ function elemOnHit(b, br) {
     if (b.gh >= GHOST_N[l]) b.ghostOn = true;
     return;
   }
-  if (br.hp <= 0 || !br.alive) return;
-  if (t === 'fire') { if (Math.random() < Math.min(.8, FIRE_CH[l] * rm)) igniteBrick(br); }
-  else if (t === 'frost') {
-    let ch = FROST_CH[l] * rm;
-    if (gameNow() < pierceUntil && lv('star')) ch *= 1.5;      // sinergia Gelo+Estrela
-    if (Math.random() < Math.min(.85, ch)) freezeBrick(br);
+  /* toda batida rola a chance (como a fantasma); se a batida quebra o bloco, o efeito pula para o vizinho mais próximo */
+  const dying = br.hp <= 0 || !br.alive;
+  const target = () => dying ? nearBrick(br, o => o.kind !== 'vault' && (t === 'fire' ? !o.burn : !(o.frozen > 0))) : br;
+  b.ep = (b.ep || 0) + 1;
+  let ch = t === 'fire' ? Math.min(.8, FIRE_CH[l] * rm) : Math.min(.85, FROST_CH[l] * rm * (gameNow() < pierceUntil && lv('star') ? 1.5 : 1));   // Gelo+Estrela
+  if (Math.random() < ch || b.ep >= PITY[t][l]) {
+    const n = target();
+    if (n && (t === 'fire' ? igniteBrick(n) : freezeBrick(n))) b.ep = 0;
   }
 }
 /* dano extra ao quebrar gelo (chamado em applyHitDamage) */
 function shatterBonus(br) {
   if (!(br.frozen > 0)) return 0;
-  br.frozen = 0;
+  br.frozen = 0; br.shat = true;
   const c = bc(br); burst(c.x, c.y, '#e6fbff', 10); floatText(c.x, c.y - 14, 'ESTILHAÇO', '#bff4ff', 11); sfx('hit');
   trackElem('shatters');
   return lv('frost') >= 3 ? 2 : 1;
+}
+/* bloco congelado que quebra explode em estilhaços e fere os vizinhos (se o vizinho também estiver congelado, encadeia) */
+const SHARD_R = [0, 1.9, 2.2, 2.5], SHARD_DMG = [0, 1, 2, 2];
+const PITY = { fire: [0, 6, 5, 4], frost: [0, 7, 6, 5] };   // garantia: a cada N batidas sem efeito, a próxima aplica
+function shardBurst(br) {
+  const l = lv('frost'); if (!l) return;
+  br.shat = false; br.frozen = 0;
+  const c = bc(br);
+  explosions.push({ x: c.x, y: c.y, r: br.w * SHARD_R[l], life: .34, max: .34, color: '#bff4ff' });
+  burst(c.x, c.y, '#e6fbff', 16); sfx('break'); shake = Math.min(10, shake + 1.2);
+  areaDamage(c.x, c.y, br.w * SHARD_R[l], SHARD_DMG[l], 8);
+  for (const o of bricks) if (o.alive && o.kind !== 'vault' && !(o.frozen > 0) && Math.hypot(bc(o).x - c.x, bc(o).y - c.y) <= br.w * SHARD_R[l]) freezeBrick(o, false);
+  trackElem('shards');
 }
 /* fantasma: a bola atravessa o próximo bloco */
 function ghostPass(b, br) {
@@ -4416,8 +4436,8 @@ function updateElems(dt) {
 }
 /* resgate: puxa a bola que desce para o centro da plataforma (chamado por sub-passo da bola) */
 function rescuePull(b, sub) {
-  if (gameNow() >= rescueUntil || b.vy <= 0 || b.y < paddle.y - 340) return;
-  b.x += (paddle.x + paddle.w / 2 - b.x) * Math.min(1, sub * 2.0);
+  if (gameNow() >= rescueUntil || b.vy <= 0 || b.y < paddle.y - 760) return;
+  b.x += (paddle.x + paddle.w / 2 - b.x) * Math.min(.6, sub * (12 + 8 * lv('rescue')));
 }
 
 /* ---------- habilidades ativas ---------- */
@@ -4436,7 +4456,7 @@ function useAbility() {
     pulseFx = { x: cx, y: paddle.y + paddle.h / 2, r: R, t: 0 };
     sfx('pulse'); shake = Math.min(8, shake + 2); trackElem('pulseKills', n);
   } else if (id === 'laser') {
-    const dmg = Math.round(LASER_DMG[l] * rm);
+    const dmg = Math.max(1, Math.floor(LASER_DMG[l] * rm + .2));
     for (const br of bricks) if (br.alive && cx >= br.x - 3 && cx <= br.x + br.w + 3) { damageBrick(br, dmg, 10); const c = bc(br); burst(c.x, c.y, '#ff6a8a', 6); }
     if (boss && !bossShieldOn() && cx >= boss.x && cx <= boss.x + boss.w) { damageBoss(LASER_BOSS[l], false, cx, boss.y + boss.h); trackElem('laserBoss'); }
     laserFx = { x: cx, t: 0 }; sfx('laser'); shake = Math.min(8, shake + 3);
@@ -4836,6 +4856,7 @@ function dbgAction(a) {
 function dbgToggle(on) {
   if (on === undefined) on = !dbgOpen;
   dbgOpen = on;
+  if (on) { try { localStorage.setItem('breakpointDev', '1'); } catch (e) {} }
   if (!dbgEl) {
     dbgEl = document.createElement('div'); dbgEl.id = 'dbg'; dbgEl.style.display = 'none';
     dbgEl.addEventListener('click', e => { const b = e.target.closest('button'); if (b && b.dataset.a) dbgAction(b.dataset.a); });
