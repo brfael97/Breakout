@@ -547,7 +547,7 @@ const catalog = [
     desc: ['Acertos têm 19% de chance de incendiar o bloco (garantido a cada 6): 1 de dano a cada 1,2s por 2,5s.', 'Chance de 31% (garantido a cada 5): 1 de dano a cada 1,1s por 3,5s.', 'Chance de 43% (garantido a cada 4): 1 de dano por segundo durante 4s, e o fogo salta para vizinhos.'],
     effect: 'Bola especial: a bola vira fogo até o fim da partida. Substitui outra bola especial.' },
   { id: 'frost', slot: 'ball', name: 'Bola de Gelo', rarities: ['Uncommon', 'Rare', 'Legendary'], icon: 'frost',
-    desc: ['22% de chance de congelar (garantido a cada 7). Bloco congelado que quebra explode em estilhaços que ferem e congelam os vizinhos.', '34% de chance (garantido a cada 6); explosão maior e mais forte, e chefes atingidos ficam mais lentos.', '46% de chance (garantido a cada 5); o gelo contagia um vizinho e a explosão é ainda maior.'],
+    desc: ['22% de chance de congelar (garantido a cada 7). Bloco congelado que quebra explode em estilhaços que ferem os vizinhos.', '34% de chance (garantido a cada 6); explosão um pouco maior, e chefes atingidos ficam mais lentos.', '46% de chance (garantido a cada 5); o gelo contagia um vizinho e a explosão é maior.'],
     effect: 'Bola especial: a bola vira gelo até o fim da partida. Substitui outra bola especial.' },
   { id: 'phantom', slot: 'ball', name: 'Bola Fantasma', rarities: ['Uncommon', 'Rare', 'Legendary'], icon: 'ghost',
     desc: ['A cada 6 acertos, a bola atravessa o próximo bloco sem quicar.', 'A cada 5 acertos, a bola atravessa o próximo bloco.', 'A cada 4 acertos, atravessa o próximo bloco e causa +1 de dano nele.'],
@@ -559,7 +559,7 @@ const catalog = [
     desc: ['Botão: raio vertical que causa 1 de dano na coluna de blocos. Recarga 15s.', 'Raio com 1 de dano (2 em raridade Lendária). Recarga 12s.', 'Raio com 2 de dano. Recarga 9s.'],
     effect: 'Habilidade ativa: toque no botão redondo. Cada rebatida perfeita reduz 1s da recarga. Substitui outra habilidade.' },
   { id: 'rescue', slot: 'ability', name: 'Campo de Resgate', rarities: ['Uncommon', 'Rare', 'Legendary'], icon: 'rescue',
-    desc: ['Botão: por 2s, bolas descendo são puxadas com força ao centro da plataforma. Recarga 18s.', 'Dura 2,8s. Recarga 15s.', 'Dura 3,6s. Recarga 12s.'],
+    desc: ['Botão: por 2s, bolas descendo curvam suavemente em direção à plataforma. Recarga 18s.', 'Dura 2,8s. Recarga 15s.', 'Dura 3,6s. Recarga 12s.'],
     effect: 'Habilidade ativa: toque no botão redondo. Cada rebatida perfeita reduz 1s da recarga. Substitui outra habilidade.' }
 ];
 const rarityNames = { Common: 'COMUM', Uncommon: 'INCOMUM', Rare: 'RARO', Legendary: 'LENDÁRIO' };
@@ -663,7 +663,7 @@ let perfectStreak = 0, comboTier = 0, timeScale = 1, godMode = false, cheated = 
 let runStats = { picks: {}, stages: 0, bosses: [], perfects: 0, maxCombo: 0, rerolls: 0 }, deathCause = 'bola', hudLivesKey = '', hudLivesPrev = 3;
 let curSpecial = '', sectorBanner = null, fervor = 0, resumeCd = 0, lastSpecial = '', specialBag = [], deathBossKind = '';
 let a11y = { shake: false, flash: false, contrast: false };
-const GAME_VERSION = '3.14';
+const GAME_VERSION = '3.15';
 let paddleFlash = 0, regenTimer = 0, tierFlash = 0, bgDirty = true, musicVol = 0.6, windPhase = 0;
 
 const paddle = { x: 0, y: 0, w: 104, h: 13, baseW: 104, speed: 420 };
@@ -1473,12 +1473,12 @@ function glossaryHTML() {
   BOSS_ORDER.forEach((k, i) => { const df = BOSS_DEFS[k]; h += row(iconSVG('core', 22, df.c), '<span style="color:' + df.c2 + '">' + df.name + '</span> <small>' + THEMES[i].name + '</small>', BOSS_TIPS[k]); });
   h += sec('BOLAS ESPECIAIS · uma por partida');
   h += row(iconSVG('flame', 22, '#ff8a3c'), 'Bola de Fogo', 'Chance de incendiar o bloco atingido: ele perde 1 de vida a cada instante enquanto queima. No nível 3 o fogo salta para um vizinho. Também queima chefes.');
-  h += row(iconSVG('frost', 22, '#9fe8ff'), 'Bola de Gelo', 'Chance de congelar o bloco. Bloco congelado que quebra explode em estilhaços que ferem e congelam os vizinhos. Chefes atingidos ficam mais lentos.');
+  h += row(iconSVG('frost', 22, '#9fe8ff'), 'Bola de Gelo', 'Chance de congelar o bloco. Bloco congelado que quebra explode em estilhaços que ferem os vizinhos (sem reação em cadeia). Chefes atingidos ficam mais lentos.');
   h += row(iconSVG('ghost', 22, '#cdbcff'), 'Bola Fantasma', 'De tempos em tempos a bola atravessa um bloco sem quicar (um anel aparece em volta dela). Ótima para manter a bola no teto.');
   h += sec('HABILIDADES ATIVAS · botão redondo');
   h += row(iconSVG('pulse', 22, '#8fe9ff'), 'Pulso Cinético', 'Uma onda destrói bombas e fragmentos perto da plataforma.');
   h += row(iconSVG('laser', 22, '#ff6a8a'), 'Laser da Plataforma', 'Dispara um raio vertical que fere todos os blocos da coluna (e o chefe, se estiver alinhado).');
-  h += row(iconSVG('rescue', 22, '#9ef0c8'), 'Campo de Resgate', 'Por alguns segundos, as bolas que descem são guiadas para o centro da plataforma.');
+  h += row(iconSVG('rescue', 22, '#9ef0c8'), 'Campo de Resgate', 'Por alguns segundos, as bolas que descem curvam suavemente em direção à plataforma.');
   h += sec('MECÂNICAS');
   h += row(iconSVG('target', 22, '#7ef6ff'), 'Rebatida perfeita', 'Acerte o centro da plataforma: pontos crescem na sequência e a cada 5 seguidas você ganha +4 hits de sobrecarga. 4 por fase = 1 estrela.');
   h += row(iconSVG('combo', 22, '#ffb454'), 'Combo', 'Quebre blocos em sequência sem deixar o tempo acabar: +4,5% de pontos por degrau (até +45%) e mais chance de power-up a cada nível do combo.');
@@ -4371,7 +4371,8 @@ function shatterBonus(br) {
   return lv('frost') >= 3 ? 2 : 1;
 }
 /* bloco congelado que quebra explode em estilhaços e fere os vizinhos (se o vizinho também estiver congelado, encadeia) */
-const SHARD_R = [0, 1.9, 2.2, 2.5], SHARD_DMG = [0, 1, 2, 2];
+const SHARD_R = [0, 1.5, 1.5, 1.6], SHARD_N = [0, 2, 2, 3];   // alcance e nº máx. de blocos feridos por estilhaço
+let shardDepth = 0;
 const PITY = { fire: [0, 6, 5, 4], frost: [0, 7, 6, 5] };   // garantia: a cada N batidas sem efeito, a próxima aplica
 function shardBurst(br) {
   const l = lv('frost'); if (!l) return;
@@ -4379,9 +4380,13 @@ function shardBurst(br) {
   const c = bc(br);
   explosions.push({ x: c.x, y: c.y, r: br.w * SHARD_R[l], life: .34, max: .34, color: '#bff4ff' });
   burst(c.x, c.y, '#e6fbff', 16); sfx('break'); shake = Math.min(10, shake + 1.2);
-  areaDamage(c.x, c.y, br.w * SHARD_R[l], SHARD_DMG[l], 8);
-  for (const o of bricks) if (o.alive && o.kind !== 'vault' && !(o.frozen > 0) && Math.hypot(bc(o).x - c.x, bc(o).y - c.y) <= br.w * SHARD_R[l]) freezeBrick(o, false);
   trackElem('shards');
+  if (shardDepth >= 1) return;      // trava de cadeia: explosões seguidas além do limite só fazem o efeito visual
+  shardDepth++;
+  const near = bricks.filter(o => o.alive && o !== br && o.kind !== 'vault' && Math.hypot(bc(o).x - c.x, bc(o).y - c.y) <= br.w * SHARD_R[l])
+    .sort((p, q) => Math.hypot(bc(p).x - c.x, bc(p).y - c.y) - Math.hypot(bc(q).x - c.x, bc(q).y - c.y)).slice(0, SHARD_N[l]);
+  for (const o of near) damageBrick(o, 1, 8);
+  shardDepth--;
 }
 /* fantasma: a bola atravessa o próximo bloco */
 function ghostPass(b, br) {
@@ -4436,8 +4441,13 @@ function updateElems(dt) {
 }
 /* resgate: puxa a bola que desce para o centro da plataforma (chamado por sub-passo da bola) */
 function rescuePull(b, sub) {
-  if (gameNow() >= rescueUntil || b.vy <= 0 || b.y < paddle.y - 760) return;
-  b.x += (paddle.x + paddle.w / 2 - b.x) * Math.min(.6, sub * (12 + 8 * lv('rescue')));
+  if (gameNow() >= rescueUntil || b.vy <= 0 || b.y < paddle.y - 760 || b.y > paddle.y) return;
+  /* guia suave: curva a trajetória para chegar ao centro da plataforma (gira a velocidade, sem teleportar) */
+  const sp = Math.hypot(b.vx, b.vy), t = Math.max(.12, (paddle.y - b.y) / b.vy);
+  const want = clamp((paddle.x + paddle.w / 2 - b.x) / t, -sp * .8, sp * .8);
+  b.vx += (want - b.vx) * Math.min(1, sub * (3.2 + 1.6 * lv('rescue')));
+  const vy = Math.sqrt(Math.max(sp * sp - b.vx * b.vx, (sp * .55) ** 2));
+  const k = sp / Math.hypot(b.vx, vy); b.vx *= k; b.vy = vy * k;
 }
 
 /* ---------- habilidades ativas ---------- */
