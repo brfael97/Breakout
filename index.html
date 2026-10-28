@@ -559,7 +559,7 @@ const catalog = [
     desc: ['Botão: raio vertical que causa 1 de dano na coluna de blocos. Recarga 15s.', 'Raio com 1 de dano (2 em raridade Lendária). Recarga 12s.', 'Raio com 2 de dano. Recarga 9s.'],
     effect: 'Habilidade ativa: toque no botão redondo. Cada rebatida perfeita reduz 1s da recarga. Substitui outra habilidade.' },
   { id: 'rescue', slot: 'ability', name: 'Campo de Resgate', rarities: ['Uncommon', 'Rare', 'Legendary'], icon: 'rescue',
-    desc: ['Botão: por 2s, bolas descendo curvam suavemente em direção à plataforma. Recarga 18s.', 'Dura 2,8s. Recarga 15s.', 'Dura 3,6s. Recarga 12s.'],
+    desc: ['Botão: por 2s, bolas que descem perto da plataforma são levemente guiadas até ela. Recarga 18s.', 'Dura 2,8s, guia com mais força e de mais longe. Recarga 15s.', 'Dura 3,6s, leva a bola ao centro da plataforma. Recarga 12s.'],
     effect: 'Habilidade ativa: toque no botão redondo. Cada rebatida perfeita reduz 1s da recarga. Substitui outra habilidade.' }
 ];
 const rarityNames = { Common: 'COMUM', Uncommon: 'INCOMUM', Rare: 'RARO', Legendary: 'LENDÁRIO' };
@@ -663,7 +663,7 @@ let perfectStreak = 0, comboTier = 0, timeScale = 1, godMode = false, cheated = 
 let runStats = { picks: {}, stages: 0, bosses: [], perfects: 0, maxCombo: 0, rerolls: 0 }, deathCause = 'bola', hudLivesKey = '', hudLivesPrev = 3;
 let curSpecial = '', sectorBanner = null, fervor = 0, resumeCd = 0, lastSpecial = '', specialBag = [], deathBossKind = '';
 let a11y = { shake: false, flash: false, contrast: false };
-const GAME_VERSION = '3.15';
+const GAME_VERSION = '3.16';
 let paddleFlash = 0, regenTimer = 0, tierFlash = 0, bgDirty = true, musicVol = 0.6, windPhase = 0;
 
 const paddle = { x: 0, y: 0, w: 104, h: 13, baseW: 104, speed: 420 };
@@ -4325,6 +4325,15 @@ function nearBrick(br, pred, reach = 1.7) {
   }
   return best;
 }
+/* sorteia um bloco qualquer ao redor (cima, baixo, lados, diagonais) — o espalhar do fogo e do gelo usam a mesma regra */
+function randomAround(br, pred, reach = 1.55) {
+  const c = bc(br), list = [];
+  for (const o of bricks) {
+    if (o === br || !o.alive || !pred(o)) continue;
+    const oc = bc(o); if (Math.hypot(oc.x - c.x, oc.y - c.y) < br.w * reach) list.push(o);
+  }
+  return list.length ? list[Math.floor(Math.random() * list.length)] : null;
+}
 function igniteBrick(br) {
   const l = lv('fire');
   if (!l || !br.alive || br.kind === 'vault') return false;
@@ -4340,7 +4349,7 @@ function freezeBrick(br, spread = true) {
   const was = br.frozen > 0;
   br.frozen = FROST_DUR[l];
   if (!was) { const c = bc(br); burst(c.x, c.y, '#bff4ff', 6); trackElem('freezes'); }
-  if (spread && l >= 3) { const n = nearBrick(br, o => !(o.frozen > 0) && o.kind !== 'vault'); if (n) freezeBrick(n, false); }
+  if (spread && l >= 3) { const n = randomAround(br, o => !(o.frozen > 0) && o.kind !== 'vault'); if (n) freezeBrick(n, false); }
   return true;
 }
 /* chamado quando a bola acerta um bloco (depois do dano) */
@@ -4423,7 +4432,7 @@ function updateElems(dt) {
         br.burn.k += FIRE_INT[lf];
         const killed = damageBrick(br, 1, 10);
         if (killed) trackElem('burnKills');
-        else if (br.alive && lf >= 3 && Math.random() < .3) { const n = nearBrick(br, o => !o.burn && o.kind !== 'vault'); if (n) igniteBrick(n); }
+        else if (br.alive && lf >= 3 && Math.random() < .3) { const n = randomAround(br, o => !o.burn && o.kind !== 'vault'); if (n) igniteBrick(n); }
         if (!br.alive) continue;
       }
       if (br.burn && br.burn.t <= 0) br.burn = null;
@@ -4440,12 +4449,15 @@ function updateElems(dt) {
   if (ft && particles.length < 380) for (const b of balls) if (!b.attached && Math.random() < dt * 40) particles.push({ x: b.x, y: b.y, vx: rand(-14, 14), vy: rand(-8, 22), life: rand(.18, .38), max: .38, r: rand(1.4, 2.6), color: Math.random() < .5 ? '#ff7a2c' : '#ffd24a' });
 }
 /* resgate: puxa a bola que desce para o centro da plataforma (chamado por sub-passo da bola) */
+const RESC_RANGE = [0, 170, 240, 380], RESC_STR = [0, .4, .6, 1], RESC_GAIN = [0, 2, 2.8, 4.8];
 function rescuePull(b, sub) {
-  if (gameNow() >= rescueUntil || b.vy <= 0 || b.y < paddle.y - 760 || b.y > paddle.y) return;
-  /* guia suave: curva a trajetória para chegar ao centro da plataforma (gira a velocidade, sem teleportar) */
+  const l = lv('rescue');
+  if (gameNow() >= rescueUntil || b.vy <= 0 || b.y < paddle.y - RESC_RANGE[l] || b.y > paddle.y) return;
+  /* guia suave: curva a trajetória em direção à plataforma (força e alcance crescem com o nível; no 1 só ajuda, no 3 leva ao centro) */
   const sp = Math.hypot(b.vx, b.vy), t = Math.max(.12, (paddle.y - b.y) / b.vy);
-  const want = clamp((paddle.x + paddle.w / 2 - b.x) / t, -sp * .8, sp * .8);
-  b.vx += (want - b.vx) * Math.min(1, sub * (3.2 + 1.6 * lv('rescue')));
+  const aim = b.x + (paddle.x + paddle.w / 2 - b.x) * RESC_STR[l];
+  const want = clamp((aim - b.x) / t, -sp * .8, sp * .8);
+  b.vx += (want - b.vx) * Math.min(1, sub * RESC_GAIN[l]);
   const vy = Math.sqrt(Math.max(sp * sp - b.vx * b.vx, (sp * .55) ** 2));
   const k = sp / Math.hypot(b.vx, vy); b.vx *= k; b.vy = vy * k;
 }
