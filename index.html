@@ -335,7 +335,7 @@ body.has-ability .hint{max-width:calc(100vw - 150px)}
     <button class="primary" id="resumeSettings">CONTINUAR</button>
     <div class="btn-row"><button class="secondary" id="glSettings">GLOSSÁRIO</button><button class="secondary" id="achSettings">CONQUISTAS</button><button class="secondary" id="statsSettings">ESTATÍSTICAS</button></div>
     <button class="secondary" id="restartSettings">NOVA PARTIDA</button>
-    <p class="tip">Atalhos: P ou Esc abrem/fecham as configurações · <span id="verTag"></span></p>
+    <p class="tip">Teclado: ← → ou A D movem · Espaço lança · E ou Shift usam a habilidade · P ou Esc abrem as configurações · <span id="verTag"></span></p>
   </div>
 </div>
 
@@ -673,7 +673,7 @@ let perfectStreak = 0, comboTier = 0, timeScale = 1, godMode = false, cheated = 
 let runStats = { picks: {}, stages: 0, bosses: [], perfects: 0, maxCombo: 0, rerolls: 0 }, deathCause = 'bola', hudLivesKey = '', hudLivesPrev = 3;
 let curSpecial = '', sectorBanner = null, fervor = 0, resumeCd = 0, lastSpecial = '', specialBag = [], deathBossKind = '';
 let a11y = { shake: false, flash: false, contrast: false };
-const GAME_VERSION = '3.19';
+const GAME_VERSION = '3.20';
 let paddleFlash = 0, regenTimer = 0, tierFlash = 0, bgDirty = true, musicVol = 0.6, windPhase = 0;
 
 const paddle = { x: 0, y: 0, w: 104, h: 13, baseW: 104, speed: 420 };
@@ -1241,7 +1241,7 @@ function showUpgrades(bossReward = false, rerolled = false) {
     const next = lv(c.id) + 1;
     const holder = c.slot ? catalog.find(o => o.slot === c.slot && o.id !== c.id && lv(o.id) > 0) : null;
     const desc = c.desc[Math.min(next - 1, c.desc.length - 1)];
-    const bonusNote = rarity === 'Common' ? '' : ' · Bônus ' + rarityNames[rarity];
+    const bonusNote = rarity === 'Common' ? '' : ' · +' + Math.round((rarityMultTable[rarity] - 1) * 100) + '%';
     const accent = rarity === 'Legendary' ? '#ffd56a' : rarity === 'Rare' ? '#7db8ff' : rarity === 'Uncommon' ? '#5dffb0' : '#8a9cc4';
     const card = document.createElement('button');
     card.className = 'card locked r-' + rarity;
