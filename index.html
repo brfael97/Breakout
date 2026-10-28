@@ -663,7 +663,7 @@ let perfectStreak = 0, comboTier = 0, timeScale = 1, godMode = false, cheated = 
 let runStats = { picks: {}, stages: 0, bosses: [], perfects: 0, maxCombo: 0, rerolls: 0 }, deathCause = 'bola', hudLivesKey = '', hudLivesPrev = 3;
 let curSpecial = '', sectorBanner = null, fervor = 0, resumeCd = 0, lastSpecial = '', specialBag = [], deathBossKind = '';
 let a11y = { shake: false, flash: false, contrast: false };
-const GAME_VERSION = '3.17';
+const GAME_VERSION = '3.18';
 let paddleFlash = 0, regenTimer = 0, tierFlash = 0, bgDirty = true, musicVol = 0.6, windPhase = 0;
 
 const paddle = { x: 0, y: 0, w: 104, h: 13, baseW: 104, speed: 420 };
@@ -2449,6 +2449,7 @@ function loseBall() {
   if (state !== 'playing') return;
   drops = []; pierceUntil = 0; wideUntil = 0; grenadeUntil = 0; overchargeHits = 0; chronoUntil = 0;
   combo = 0; comboTimer = 0; fervor = 0;
+  clearElemStatus();
   paddle.w = paddle.baseW;
   const shieldLimit = lv('last') >= 3 ? 2 : (lv('last') > 0 ? 1 : 0);
   if (shieldUses < shieldLimit) {
@@ -4312,6 +4313,8 @@ let abilityReadyAt = 0, abilityCdTotal = 1, rescueUntil = 0, laserFx = null, pul
 const curBall = () => BALL_IDS.find(i => lv(i) > 0) || '';
 const curAbility = () => ABIL_IDS.find(i => lv(i) > 0) || '';
 function resetElems() { abilityReadyAt = 0; rescueUntil = 0; laserFx = null; pulseFx = null; bossBurnCd = 0; chillUntil = 0; }
+/* perder uma vida recomeça a tentativa: fogo e gelo (blocos e chefe) se apagam, como os power-ups e o combo */
+function clearElemStatus() { for (const b of bricks) { b.burn = null; b.frozen = 0; b.shat = false; } if (boss) boss.burn = null; chillUntil = 0; bossBurnCd = 0; }
 function chillFactor() { return gameNow() < chillUntil ? FROST_SLOW[lv('frost')] : 1; }
 
 /* ---------- efeitos nos blocos ---------- */
