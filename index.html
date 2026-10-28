@@ -248,6 +248,13 @@ body.has-ability .hint{max-width:calc(100vw - 150px)}
 .reset-card{border:1px solid #ff7a8a66;background:#2a1220aa;border-radius:14px;padding:12px;text-align:left}.reset-card b{color:#ffb0bb;font-size:13px}.reset-card p{font-size:11px;color:#c5a0b0;margin:6px 0 8px}
 .reset-card.final{border-color:#ff7a8acc}
 .secondary.danger:disabled{opacity:.5}
+
+/* palco: o jogo ocupa uma coluna vertical centralizada (telas largas/desktop); no celular em pé ocupa tudo */
+#stage{position:fixed;top:0;bottom:0;left:50%;width:var(--sw,100%);margin-left:calc(var(--sw,100%)/-2);transform:translateZ(0);overflow:hidden}
+#stage.wide{box-shadow:0 0 0 1px #24345e,0 0 80px #000c}
+#rotateMsg{position:fixed;inset:0;z-index:500;display:none;align-items:center;justify-content:center;text-align:center;background:#080b1c;color:#c5d0ef}
+#rotateMsg.on{display:flex}
+#rotateMsg b{display:block;font-size:18px;letter-spacing:3px;color:#5ceeff;margin-bottom:8px}#rotateMsg span{font-size:13px;color:#8fa3d0}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#090d20">
@@ -259,6 +266,7 @@ body.has-ability .hint{max-width:calc(100vw - 150px)}
 <link rel="icon" href="icon-192.png">
 </head>
 <body>
+<div id="stage">
 <canvas id="game"></canvas>
 <div class="hud">
   <div class="stat"><small>PONTOS</small><b id="score">0</b></div>
@@ -389,6 +397,8 @@ body.has-ability .hint{max-width:calc(100vw - 150px)}
     <button class="primary" id="glClose">FECHAR</button>
   </div>
 </div>
+</div>
+<div id="rotateMsg"><div><b>GIRE O APARELHO</b><span>O BREAKPOINT é jogado na vertical.</span></div></div>
 
 <script>
 'use strict';
@@ -663,7 +673,7 @@ let perfectStreak = 0, comboTier = 0, timeScale = 1, godMode = false, cheated = 
 let runStats = { picks: {}, stages: 0, bosses: [], perfects: 0, maxCombo: 0, rerolls: 0 }, deathCause = 'bola', hudLivesKey = '', hudLivesPrev = 3;
 let curSpecial = '', sectorBanner = null, fervor = 0, resumeCd = 0, lastSpecial = '', specialBag = [], deathBossKind = '';
 let a11y = { shake: false, flash: false, contrast: false };
-const GAME_VERSION = '3.18';
+const GAME_VERSION = '3.19';
 let paddleFlash = 0, regenTimer = 0, tierFlash = 0, bgDirty = true, musicVol = 0.6, windPhase = 0;
 
 const paddle = { x: 0, y: 0, w: 104, h: 13, baseW: 104, speed: 420 };
@@ -1800,14 +1810,23 @@ function measureInset() {
   } catch (e) {}
   return 0;
 }
+let rotLock = false;
 function resize() {
-  const ow = W, oh = H;
+  const ow = W, oh = H, oldPy = paddle.y, oldTi = topInset;
+  const wasLock = rotLock;
+  rotLock = innerHeight < 500 && innerWidth > innerHeight;          // celular deitado: pede para girar (o jogo é vertical)
+  const rm = document.getElementById('rotateMsg'); if (rm) rm.classList.toggle('on', rotLock);
+  if (rotLock && W) return;                                         // mantém as medidas da vertical até girar de volta
   topInset = measureInset();
   document.documentElement.style.setProperty('--ti', topInset + 'px');
   let pr = document.getElementById('vhProbe');
   if (!pr) { pr = document.createElement('div'); pr.id = 'vhProbe'; pr.style.cssText = 'position:fixed;left:0;top:0;width:1px;height:100%;visibility:hidden;pointer-events:none'; document.body.appendChild(pr); }
   const ph = Math.round(pr.getBoundingClientRect().height);
-  W = innerWidth; H = (ph > 300 && ph < innerHeight) ? ph : innerHeight;
+  H = (ph > 300 && ph < innerHeight) ? ph : innerHeight;
+  const wide = innerWidth / H > .66;                                // tela larga: coluna vertical centralizada
+  W = wide ? Math.min(innerWidth, Math.max(340, Math.round(H * .62))) : innerWidth;
+  const st = document.getElementById('stage');
+  if (st) { st.style.setProperty('--sw', W + 'px'); st.classList.toggle('wide', wide && W < innerWidth); }
   document.documentElement.style.setProperty('--vh', H + 'px');
   const vt = document.getElementById('verTag'); if (vt) vt.textContent = 'v' + GAME_VERSION + ' · ' + W + '×' + H + '/' + innerHeight;
   dpr = Math.min(devicePixelRatio || 1, 2);
@@ -1819,11 +1838,12 @@ function resize() {
   paddle.w = gameNow() < wideUntil ? paddle.baseW * 1.55 : paddle.baseW;
   paddle.x = clamp(Number.isFinite(paddle.x) ? paddle.x : W / 2 - paddle.w / 2, 8, W - paddle.w - 8);
   if (ow && oh && ow > 0 && oh > 0) {
-    const sx = W / ow, sy = H / oh;
-    for (const b of balls) { b.x *= sx; b.y *= sy; }
-    for (const d of drops) { d.x *= sx; d.y *= sy; }
-    for (const br of bricks) { br.x *= sx; br.w *= sx; br.y *= sy; }
-    if (boss) { boss.x *= sx; boss.y *= sy; boss.w *= sx; boss.baseY *= sy; }
+    /* x e larguras acompanham a nova largura; y NÃO é esticado (senão os blocos achatam): blocos ficam presos ao topo, bola e drops à plataforma */
+    const sx = W / ow, dP = Number.isFinite(oldPy) ? paddle.y - oldPy : 0, dT = topInset - oldTi;
+    for (const b of balls) { b.x *= sx; b.y += dP; }
+    for (const d of drops) { d.x *= sx; d.y += dP; }
+    for (const br of bricks) { br.x *= sx; br.w *= sx; br.y += dT; }
+    if (boss) { boss.x *= sx; boss.w *= sx; boss.y += dT; boss.baseY += dT; }
   } else paddle.x = W / 2 - paddle.w / 2;
   createStars(); bgDirty = true; draw();
 }
@@ -4805,6 +4825,7 @@ window.addEventListener('keydown', e => {
 });
 document.addEventListener('pointerdown', unlockAudio, { passive: true });
 window.addEventListener('resize', resize);
+window.addEventListener('orientationchange', () => { setTimeout(resize, 120); setTimeout(resize, 450); });
 document.addEventListener('contextmenu', e => e.preventDefault());
 document.addEventListener('gesturestart', e => e.preventDefault());
 
@@ -4946,8 +4967,9 @@ let frameN = 0;
 function loop(now) {
   const dt = Math.min(.025, (now - (last || now)) / 1000);
   last = now;
-  update(dbgOpen ? 0 : dt * timeScale);
-  trackTick(dbgOpen ? 0 : dt); updateAbilityBtn();
+  const frozen = dbgOpen || rotLock;                 // debug aberto ou celular deitado: o jogo fica parado
+  update(frozen ? 0 : dt * timeScale);
+  trackTick(frozen ? 0 : dt); updateAbilityBtn();
   dbgFrame(dt);
   Music.update();
   if ((++frameN & 31) === 0) { const v = measureInset(); if (v !== topInset) resize(); }

@@ -1,5 +1,5 @@
 /* Service worker do BREAKPOINT: rede primeiro (sempre a versão mais nova quando online), cache como reserva offline. */
-const CACHE = 'breakpoint-v3.18';
+const CACHE = 'breakpoint-v3.19';
 const CORE = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'icon-180.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).catch(() => {}).then(() => self.skipWaiting()));
