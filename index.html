@@ -673,7 +673,7 @@ let perfectStreak = 0, comboTier = 0, timeScale = 1, godMode = false, cheated = 
 let runStats = { picks: {}, stages: 0, bosses: [], perfects: 0, maxCombo: 0, rerolls: 0 }, deathCause = 'bola', hudLivesKey = '', hudLivesPrev = 3;
 let curSpecial = '', sectorBanner = null, fervor = 0, resumeCd = 0, lastSpecial = '', specialBag = [], deathBossKind = '';
 let a11y = { shake: false, flash: false, contrast: false };
-const GAME_VERSION = '3.20';
+const GAME_VERSION = '3.21';
 let paddleFlash = 0, regenTimer = 0, tierFlash = 0, bgDirty = true, musicVol = 0.6, windPhase = 0;
 
 const paddle = { x: 0, y: 0, w: 104, h: 13, baseW: 104, speed: 420 };
@@ -3929,16 +3929,19 @@ function balanceReport() {
 function balanceRaw() { return JSON.stringify({ v: GAME_VERSION, st: BAL.st.slice(-150), dt: BAL.dt.slice(-60), rn: BAL.rn.slice(-50) }); }
 async function copyText(txt) {
   try { await navigator.clipboard.writeText(txt); return true; } catch (e) {}
-  const ta = $('balOut'); if (!ta) return false;
+  let ta = $('balOut'), tmp = false;
+  if (!ta) { ta = document.createElement('textarea'); ta.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0'; document.body.appendChild(ta); tmp = true; }
   ta.style.display = 'block'; ta.value = txt; ta.focus(); ta.select();
-  try { return document.execCommand('copy'); } catch (e) { return false; }
+  let ok = false; try { ok = document.execCommand('copy'); } catch (e) {}
+  if (tmp) ta.remove();
+  return ok;
 }
 function resetAllProgress() {
   for (const k of [PROFILE_KEY, RUN_KEY, BAL_KEY, 'breakpointStats', 'breakpointBest', 'brickBreakerBest', 'breakpointTutored']) { try { localStorage.removeItem(k); } catch (e) {} }
   P = blankProfile(); profDirty = false; BAL = { v: 1, st: [], dt: [], rn: [] }; bestDirty = false; best = 0;
   setTimeout(() => location.reload(), 150);
 }
-function devUnlocked() { try { return !!localStorage.getItem('breakpointDev') || dbgOpen; } catch (e) { return dbgOpen; } }
+function devUnlocked() { return !!dbgOpen; }   // só aparece com o painel de debug aberto
 function renderStatsDev() {
   const dev = devUnlocked();
   let h = (dev ? '<div class="ach-sec">RELATÓRIO DE EQUILÍBRIO</div><p class="dev-note">Números da sua jogabilidade, guardados só neste aparelho. Copie e cole no chat para eu analisar. Nada é enviado nem muda o jogo sozinho.</p>'
@@ -4874,6 +4877,7 @@ function dbgRender() {
     + '<h4>SETOR / TEMA / MODIFICADOR</h4>' + sel('dbgTheme', THEMES.map((t, i) => [i, t.name])) + sel('dbgMod', [['', '(nenhum)']].concat(MOD_IDS.map(m => [m, MODS[m].name]))) + btn('settheme', 'Aplicar')
     + '<h4>COMBO / VELOCIDADE</h4>' + [5, 10, 15, 25].map(n => btn('combo:' + n, '×' + n)).join('') + [.25, .5, 1, 1.5].map(n => btn('ts:' + n, n + 'x', timeScale === n ? 'class="on"' : '')).join('')
     + '<h4>ESTATÍSTICAS (runs reais)</h4><div style="white-space:pre-wrap;color:#9ef0c8;line-height:1.5">' + dbgStatsText() + '</div>'
+    + '<h4>RELATÓRIO DE EQUILÍBRIO (jogadas reais, sem debug)</h4>' + btn('balcopy', 'Copiar relatório') + btn('balraw', 'Copiar dados brutos') + '<div id="dbgBalMsg" style="color:#9ef0c8;font-size:11px;margin-top:4px"></div>'
     + btn('resetstats', 'Zerar stats') + btn('resetbest', 'Zerar recorde + tutorial');
   const us = $('dbgUp'); if (us) us.value = dbgEl._up || catalog[0].id;
 }
@@ -4882,6 +4886,11 @@ function dbgAction(a) {
   if (a === 'info') { dbgInfoOn = !dbgInfoOn; dbgInfoEl.style.display = dbgInfoOn ? 'block' : 'none'; return dbgRender(); }
   if (a === 'resetstats') { try { localStorage.removeItem('breakpointStats'); } catch (e) {} return dbgRender(); }
   if (a === 'resetbest') { try { ['breakpointBest', 'brickBreakerBest', 'breakpointTutored'].forEach(k => localStorage.removeItem(k)); } catch (e) {} best = 0; updateHud(); return; }
+  if (a === 'balcopy' || a === 'balraw') {
+    const m = $('dbgBalMsg');
+    copyText(a === 'balcopy' ? balanceReport() : balanceRaw()).then(ok => { if (m) m.textContent = ok ? 'Copiado! Cole no chat.' : 'Não consegui copiar automaticamente; abra Estatísticas pelo menu e selecione o texto.'; });
+    return;
+  }
   dbgMark();
   if (a === 'god') godMode = !godMode;
   else if (a === 'life') { lives = Math.min(maxLives(), lives + 1); updateHud(); }
@@ -4902,7 +4911,7 @@ function dbgAction(a) {
 function dbgToggle(on) {
   if (on === undefined) on = !dbgOpen;
   dbgOpen = on;
-  if (on) { try { localStorage.setItem('breakpointDev', '1'); } catch (e) {} }
+  if (on) { try { localStorage.removeItem('breakpointDev'); } catch (e) {} }   // (versões antigas gravavam um lembrete que deixava o relatório visível para sempre)
   if (!dbgEl) {
     dbgEl = document.createElement('div'); dbgEl.id = 'dbg'; dbgEl.style.display = 'none';
     dbgEl.addEventListener('click', e => { const b = e.target.closest('button'); if (b && b.dataset.a) dbgAction(b.dataset.a); });
