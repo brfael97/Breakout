@@ -673,7 +673,7 @@ let perfectStreak = 0, comboTier = 0, timeScale = 1, godMode = false, cheated = 
 let runStats = { picks: {}, stages: 0, bosses: [], perfects: 0, maxCombo: 0, rerolls: 0 }, deathCause = 'bola', hudLivesKey = '', hudLivesPrev = 3;
 let curSpecial = '', sectorBanner = null, fervor = 0, resumeCd = 0, lastSpecial = '', specialBag = [], deathBossKind = '';
 let a11y = { shake: false, flash: false, contrast: false };
-const GAME_VERSION = '3.21';
+const GAME_VERSION = '3.22';
 let paddleFlash = 0, regenTimer = 0, tierFlash = 0, bgDirty = true, musicVol = 0.6, windPhase = 0;
 
 const paddle = { x: 0, y: 0, w: 104, h: 13, baseW: 104, speed: 420 };
@@ -4732,8 +4732,23 @@ function pointFromEvent(e) {
   return { x: src.clientX - r.left, y: src.clientY - r.top };
 }
 
+/* Só UM dedo comanda a plataforma (o primeiro que tocou). Um segundo dedo (ex.: o polegar do botão da habilidade) nunca a move.
+   Além disso, toques perto do botão da habilidade viram "botão" (ou nada) e não movem a plataforma: errar o botão não faz mais a plataforma pular. */
+let padPtr = null;
+const AB_HIT = 46, AB_GUARD = 84;       // raio (px) que ainda conta como o botão / raio em que o toque é ignorado para a plataforma
+function abilityZone(e) {
+  if (e.pointerType === 'mouse') return 0;
+  const bt = $('abilityBtn'); if (!bt || bt.classList.contains('hidden')) return 0;
+  const r = bt.getBoundingClientRect(), d = Math.hypot(e.clientX - (r.left + r.width / 2), e.clientY - (r.top + r.height / 2));
+  return d <= AB_HIT ? 2 : d <= AB_GUARD ? 1 : 0;
+}
 canvas.addEventListener('pointerdown', e => {
+  if (padPtr !== null && !pointerDown) padPtr = null;              // trava de segurança: nunca fica preso a um dedo que já saiu
+  if (padPtr !== null && padPtr !== e.pointerId) return;           // segundo dedo: ignora
+  const z = abilityZone(e);
+  if (z && state === 'playing') { if (z === 2) useAbility(); return; }
   if (state === 'menu' || state === 'over' || state === 'upgrade' || state === 'transition' || state === 'settings' || state === 'event' || state === 'summary') return;
+  padPtr = e.pointerId;
   if (resumeCd > 0 && state === 'playing') { const p0 = pointFromEvent(e); paddle.x = clamp(p0.x - paddle.w / 2, 5, W - paddle.w - 5); pointerDown = true; return; }
   pointerDown = true; unlockAudio();
   const p = pointFromEvent(e);
@@ -4742,6 +4757,7 @@ canvas.addEventListener('pointerdown', e => {
   try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
 });
 canvas.addEventListener('pointermove', e => {
+  if (e.pointerType !== 'mouse' && padPtr !== null && e.pointerId !== padPtr) return;   // só o dedo que comanda
   const p = pointFromEvent(e);
   if (state === 'ready' && pointerDown) {
     if (Math.hypot(p.x - aimStartX, p.y - aimStartY) > 10) aimDragged = true;
@@ -4750,15 +4766,18 @@ canvas.addEventListener('pointermove', e => {
   else if (state === 'ready' && !pointerDown && e.pointerType === 'mouse') paddle.x = clamp(p.x - paddle.w / 2, 5, W - paddle.w - 5);
 });
 canvas.addEventListener('pointerup', e => {
+  if (padPtr !== null && e.pointerId !== padPtr) return;       // outro dedo levantou: não encerra o toque da plataforma
+  padPtr = null;
   if (state === 'ready' && pointerDown) {
     const p = pointFromEvent(e);
     if (!aimDragged || Math.hypot(p.x - aimStartX, p.y - aimStartY) < 14) launch();
   }
   pointerDown = false;
 });
-canvas.addEventListener('pointercancel', () => { pointerDown = false; });
+canvas.addEventListener('pointercancel', e => { if (padPtr === null || e.pointerId === padPtr) { pointerDown = false; padPtr = null; } });
 
-window.addEventListener('pointerup', () => { moveLeft = moveRight = false; });
+window.addEventListener('pointerup', e => { moveLeft = moveRight = false; if (e.pointerId === padPtr) padPtr = null; });
+window.addEventListener('pointercancel', e => { if (e.pointerId === padPtr) padPtr = null; });
 
 const _ab = $('abilityBtn');
 _ab.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); useAbility(); });
