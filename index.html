@@ -673,7 +673,7 @@ let perfectStreak = 0, comboTier = 0, timeScale = 1, godMode = false, cheated = 
 let runStats = { picks: {}, stages: 0, bosses: [], perfects: 0, maxCombo: 0, rerolls: 0 }, deathCause = 'bola', hudLivesKey = '', hudLivesPrev = 3;
 let curSpecial = '', sectorBanner = null, fervor = 0, resumeCd = 0, lastSpecial = '', specialBag = [], deathBossKind = '';
 let a11y = { shake: false, flash: false, contrast: false };
-const GAME_VERSION = '3.22';
+const GAME_VERSION = '3.23';
 let paddleFlash = 0, regenTimer = 0, tierFlash = 0, bgDirty = true, musicVol = 0.6, windPhase = 0;
 
 const paddle = { x: 0, y: 0, w: 104, h: 13, baseW: 104, speed: 420 };
@@ -4733,14 +4733,14 @@ function pointFromEvent(e) {
 }
 
 /* Só UM dedo comanda a plataforma (o primeiro que tocou). Um segundo dedo (ex.: o polegar do botão da habilidade) nunca a move.
-   Além disso, toques perto do botão da habilidade viram "botão" (ou nada) e não movem a plataforma: errar o botão não faz mais a plataforma pular. */
+   Toques bem em cima do botão (um pouco além do desenho) acionam a habilidade em vez de mover a plataforma. */
 let padPtr = null;
-const AB_HIT = 46, AB_GUARD = 84;       // raio (px) que ainda conta como o botão / raio em que o toque é ignorado para a plataforma
+const AB_HIT = 40;                      // raio (px) a partir do centro que ainda conta como o botão (um pouco maior que o desenho; não alcança a faixa da plataforma)
 function abilityZone(e) {
   if (e.pointerType === 'mouse') return 0;
   const bt = $('abilityBtn'); if (!bt || bt.classList.contains('hidden')) return 0;
   const r = bt.getBoundingClientRect(), d = Math.hypot(e.clientX - (r.left + r.width / 2), e.clientY - (r.top + r.height / 2));
-  return d <= AB_HIT ? 2 : d <= AB_GUARD ? 1 : 0;
+  return d <= AB_HIT ? 2 : 0;
 }
 canvas.addEventListener('pointerdown', e => {
   if (padPtr !== null && !pointerDown) padPtr = null;              // trava de segurança: nunca fica preso a um dedo que já saiu
