@@ -417,6 +417,8 @@ body.has-ability .hint{max-width:calc(100vw - 150px)}
 <script src="js/lang_en.js"></script>
 <script src="js/i18n.js"></script>
 <script src="js/lang_en.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/lang_en.js"></script>
 <script>
 'use strict';
 /* ---- icons.js ---- */
@@ -1509,7 +1511,7 @@ let perfectStreak = 0, comboTier = 0, timeScale = 1, godMode = false, cheated = 
 let runStats = { picks: {}, stages: 0, bosses: [], perfects: 0, maxCombo: 0, rerolls: 0 }, deathCause = 'bola', hudLivesKey = '', hudLivesPrev = 3;
 let curSpecial = '', sectorBanner = null, fervor = 0, resumeCd = 0, lastSpecial = '', specialBag = [], deathBossKind = '';
 let a11y = { shake: false, flash: false, contrast: false };
-const GAME_VERSION = '3.25';
+const GAME_VERSION = '3.26';
 let paddleFlash = 0, regenTimer = 0, tierFlash = 0, bgDirty = true, musicVol = 0.6, windPhase = 0;
 
 const paddle = { x: 0, y: 0, w: 104, h: 13, baseW: 104, speed: 420 };
@@ -2603,8 +2605,8 @@ function drawSectorBanner() {
   ctx.fillStyle = sg; ctx.fillRect(0, y0 + 2, W, bandH - 4);
   ctx.globalAlpha = outK; ctx.textAlign = 'center';
   ctx.fillStyle = acc; ctx.font = '800 11px system-ui';
-  ctx.fillText('S E T O R   ' + sb.n, W / 2, y0 + 28);
-  const name = th.name.split('').join(String.fromCharCode(8202)), shown = Math.min(name.length, Math.floor(Math.max(0, t - .25) / .06) + 1);
+  ctx.fillText((LANG === 'en' ? 'S E C T O R' : 'S E T O R') + '   ' + sb.n, W / 2, y0 + 28);
+  const name = tr(th.name).split('').join(String.fromCharCode(8202)), shown = Math.min(name.length, Math.floor(Math.max(0, t - .25) / .06) + 1);
   ctx.font = '900 34px system-ui'; ctx.shadowBlur = 22; ctx.shadowColor = acc; ctx.fillStyle = '#fff';
   ctx.fillText(name.slice(0, shown), W / 2, y0 + 68); ctx.shadowBlur = 0;
   if (sb.mods.length) {                                                          // modificadores
