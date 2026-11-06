@@ -62,7 +62,7 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none}
 .event-btn h3{margin:4px 0;font-size:15px}
 .event-btn p{margin:0;font-size:12px;color:#a8b8dc}
 .event-btn .tag{font-size:10px;font-weight:900;letter-spacing:1.2px;color:#5ceeff}
-@media(min-width:520px){.cards{grid-template-columns:repeat(3,1fr)}.card{min-height:185px}.panel{padding:26px 22px}}
+body:not(.narrow) .cards{grid-template-columns:repeat(3,1fr)}body:not(.narrow) .card{min-height:185px}body:not(.narrow) .panel{padding:26px 22px}
 @media(max-height:570px){.stat{padding:4px 6px}.stat b{font-size:13px}.brand{top:calc(var(--ti,0px) + 48px);height:44px}.move{width:48px;height:48px;flex-shrink:0}.panel{padding:14px}.panel h1{font-size:27px}.cards{gap:5px}.card{padding:8px}.combo-hud{top:calc(var(--ti,0px) + 48px);height:44px}.combo-hud b{font-size:18px}.side-actions{top:calc(50px + env(safe-area-inset-top));right:8px}.icon-btn{width:32px;height:32px}}
 
 /* ===== v3 ===== */
@@ -171,22 +171,22 @@ canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none}
 .combo-hud b{transform-origin:left center}
 
 /* ===== v3.9b: cards compactos no celular ===== */
-@media(max-width:519px){
- #upgrade .panel{padding:18px 16px}
- #upgrade h1{font-size:28px;margin:4px 0 6px}
- #upgrade .panel>p#upSubtitle{font-size:12px;margin:0 0 4px}
- #upgrade .cards{gap:8px;margin-top:10px}
- #upgrade .card{display:grid;grid-template-columns:46px 1fr;column-gap:12px;padding:10px 12px;align-items:start}
- #upgrade .card .badge{grid-row:1/5;grid-column:1;width:44px;height:44px;margin:0}
- #upgrade .card>*:not(.badge){grid-column:2}
- #upgrade .card .rarity{font-size:9px;letter-spacing:1.6px;padding-right:62px}
- #upgrade .card h3{margin:2px 0 0;font-size:15px}
- #upgrade .card .upgradelevel{position:absolute;top:10px;right:12px;font-size:9px;letter-spacing:.8px}
- #upgrade .card .bar{margin:6px 0;height:5px}
- #upgrade .card p{margin:0;font-size:11.5px}
- #upgrade .card p.tip{display:none}
- #rerollBtn{margin-top:12px}
-}
+/* (layout compacto: vale para a largura da COLUNA do jogo, não da janela do navegador) */
+
+body.narrow #upgrade .panel{padding:18px 16px}
+body.narrow #upgrade h1{font-size:28px;margin:4px 0 6px}
+body.narrow #upgrade .panel>p#upSubtitle{font-size:12px;margin:0 0 4px}
+body.narrow #upgrade .cards{gap:8px;margin-top:10px}
+body.narrow #upgrade .card{display:grid;grid-template-columns:46px 1fr;column-gap:12px;padding:10px 12px;align-items:start}
+body.narrow #upgrade .card .badge{grid-row:1/5;grid-column:1;width:44px;height:44px;margin:0}
+body.narrow #upgrade .card>*:not(.badge){grid-column:2}
+body.narrow #upgrade .card .rarity{font-size:9px;letter-spacing:1.6px;padding-right:62px}
+body.narrow #upgrade .card h3{margin:2px 0 0;font-size:15px}
+body.narrow #upgrade .card .upgradelevel{position:absolute;top:10px;right:12px;font-size:9px;letter-spacing:.8px}
+body.narrow #upgrade .card .bar{margin:6px 0;height:5px}
+body.narrow #upgrade .card p{margin:0;font-size:11.5px}
+body.narrow #upgrade .card p.tip{display:none}
+body.narrow #rerollBtn{margin-top:12px}
 
 /* ===== v3.11: conquistas, estatísticas, continuar, compartilhar ===== */
 .ach-toast{position:fixed;z-index:60;top:calc(var(--ti,0px) + 50px);left:10px;right:10px;max-width:400px;margin:0 auto;height:54px;display:flex;align-items:center;gap:10px;padding:5px 14px 5px 10px;border-radius:15px;background:linear-gradient(160deg,#1b2850f5,#0b1230f7);border:1px solid var(--tc,#ffd56a);box-shadow:0 8px 28px #000a,0 0 22px -6px var(--tc,#ffd56a),inset 0 1px 0 #ffffff14;opacity:0;transform:translateY(-18px) scale(.97);transition:opacity .3s,transform .38s cubic-bezier(.2,1.3,.4,1);pointer-events:none;overflow:hidden}
@@ -255,6 +255,13 @@ body.has-ability .hint{max-width:calc(100vw - 150px)}
 #rotateMsg{position:fixed;inset:0;z-index:500;display:none;align-items:center;justify-content:center;text-align:center;background:#080b1c;color:#c5d0ef}
 #rotateMsg.on{display:flex}
 #rotateMsg b{display:block;font-size:18px;letter-spacing:3px;color:#5ceeff;margin-bottom:8px}#rotateMsg span{font-size:13px;color:#8fa3d0}
+
+/* idioma */
+.seg{display:flex;gap:0;border:1px solid #3d5488;border-radius:10px;overflow:hidden;flex-shrink:0}
+.seg button{background:#0d1530;color:#8fa3d0;border:0;padding:8px 14px;font-weight:800;letter-spacing:1px;font-size:12px}
+.seg button.on{background:linear-gradient(135deg,#35d6ff,#7a7aff);color:#06122a}
+.lang-mini{display:block;margin:10px auto 0;background:none;border:0;color:#8fa3d0;font-size:11px;letter-spacing:2px;font-weight:700;padding:6px 10px}
+.lang-mini .on{color:#5ceeff}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#090d20">
@@ -293,6 +300,7 @@ body.has-ability .hint{max-width:calc(100vw - 150px)}
     <button class="primary cont hidden" id="continueBtn"><span>CONTINUAR</span><small id="contInfo"></small></button>
     <button class="primary" id="start">COMEÇAR JOGO</button>
     <div class="btn-row"><button class="secondary" id="glMenu">GLOSSÁRIO</button><button class="secondary" id="achMenu">CONQUISTAS</button><button class="secondary" id="statsMenu">ESTATÍSTICAS</button></div>
+    <button class="lang-mini" id="langMenu" type="button" aria-label="Idioma · Language"></button>
     <p class="tip">3 vidas · 6 chefes únicos · 7 fases especiais · setores em ordem aleatória<br>Upgrade a cada 3 fases e após cada chefe · troque a oferta por 1 vida<br>Arraste para mirar · Toque para lançar</p>
   </div>
 </div>
@@ -326,6 +334,7 @@ body.has-ability .hint{max-width:calc(100vw - 150px)}
     <div class="eyebrow">PAUSADO</div>
     <h1>CONFIGURAÇÕES</h1>
     <p>Ajuste som, vibração e continue quando estiver pronto.</p>
+    <div class="setting-row"><div><label>Idioma · Language</label><small>Português / English</small></div><div class="seg"><button id="langPT" type="button">PT</button><button id="langEN" type="button">EN</button></div></div>
     <div class="setting-row"><div><label>Efeitos</label><small id="volLabel">80%</small></div><input type="range" id="volSlider" min="0" max="100" value="80"></div>
     <div class="setting-row"><div><label>Música</label><small id="musLabel">60%</small></div><input type="range" id="musSlider" min="0" max="100" value="60"></div>
     <div class="setting-row"><div><label>Vibração</label><small>Feedback tátil (se o aparelho permitir)</small></div><label class="toggle"><input type="checkbox" id="vibToggle" checked><span></span></label></div>
@@ -400,6 +409,14 @@ body.has-ability .hint{max-width:calc(100vw - 150px)}
 </div>
 <div id="rotateMsg"><div><b>GIRE O APARELHO</b><span>O BREAKPOINT é jogado na vertical.</span></div></div>
 
+<script src="js/i18n.js"></script>
+<script src="js/lang_en.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/lang_en.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/lang_en.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/lang_en.js"></script>
 <script>
 'use strict';
 /* ---- icons.js ---- */
@@ -490,6 +507,825 @@ function iconSVG(name, size = 18, color = 'currentColor', extra = '') {
   return '<svg class="ic" viewBox="0 0 24 24" width="' + size + '" height="' + size + '" fill="' + color
     + '" fill-rule="evenodd" style="' + extra + '"><path d="' + (ICON_PATHS[name] || ICON_PATHS.sparkle) + '"/></svg>';
 }
+
+/* ---- i18n.js ---- */
+/* ===== Idiomas (PT / EN) =====
+   O código do jogo escreve os textos em português. Este módulo traduz tudo o que chega à tela:
+   - texto do DOM (um MutationObserver traduz cada nó de texto novo ou alterado);
+   - texto desenhado no canvas (fillText/strokeText/measureText);
+   usando o dicionário EN (lang_en.js) e regras com números (EN_RULES). Texto sem tradução aparece em português. */
+let LANG = 'pt';
+const EN = {};            // 'texto em português' -> 'English text'
+const EN_RULES = [];      // [regex, string com $1.. | função (match...) => string]
+const _trc = new Map();
+function trCore(s) {
+  const m = s.match(/^(\s*)([\s\S]*?)(\s*)$/), core = m[2];
+  if (!core || !/[A-Za-zÀ-ÿ]{2}/.test(core)) return s;
+  const e = EN[core]; if (e !== undefined) return m[1] + e + m[3];
+  for (const [re, fn] of EN_RULES) {
+    const x = core.match(re);
+    if (x) return m[1] + (typeof fn === 'function' ? fn(...x) : core.replace(re, fn)) + m[3];
+  }
+  for (const sep of [' · ', ' — ', '\n']) {                 // textos compostos: traduz cada pedaço
+    if (core.includes(sep)) {
+      const parts = core.split(sep), out = parts.map(p => tr(p));
+      if (out.some((p, i) => p !== parts[i])) return m[1] + out.join(sep) + m[3];
+    }
+  }
+  return s;
+}
+function tr(s) {
+  if (LANG !== 'en' || typeof s !== 'string' || s.length < 2) return s;
+  let r = _trc.get(s); if (r !== undefined) return r;
+  r = trCore(s);
+  if (_trc.size > 6000) _trc.clear();
+  _trc.set(s, r); return r;
+}
+/* canvas */
+(function patchCanvas() {
+  const P = CanvasRenderingContext2D.prototype;
+  for (const k of ['fillText', 'strokeText']) {
+    const o = P[k]; P[k] = function (t, ...a) { return o.call(this, typeof t === 'string' ? tr(t) : t, ...a); };
+  }
+  const mt = P.measureText; P.measureText = function (t) { return mt.call(this, typeof t === 'string' ? tr(t) : t); };
+})();
+/* DOM */
+function trNode(n) {
+  const v = n.nodeValue;
+  if (n.__t !== undefined && n.__t === v) { if (LANG === 'en') return; }
+  const o = (n.__t !== undefined && n.__t === v && n.__o !== undefined) ? n.__o : v;
+  n.__o = o;
+  const r = LANG === 'en' ? tr(o) : o;
+  if (r !== v) { n.__t = r; n.nodeValue = r; } else n.__t = undefined;
+}
+function trWalk(n) {
+  if (n.nodeType === 3) return trNode(n);
+  if (n.nodeType !== 1 || /^(SCRIPT|STYLE|TEXTAREA)$/.test(n.tagName)) return;
+  for (let c = n.firstChild; c; c = c.nextSibling) trWalk(c);
+}
+const TR_ATTRS = ['title', 'aria-label', 'placeholder'];
+function trAttrs(root) {
+  for (const el of root.querySelectorAll('[title],[aria-label],[placeholder]')) for (const a of TR_ATTRS) {
+    if (!el.hasAttribute(a)) continue;
+    const k = '_o_' + a; if (el[k] === undefined) el[k] = el.getAttribute(a);
+    el.setAttribute(a, LANG === 'en' ? tr(el[k]) : el[k]);
+  }
+}
+let _trObs = null;
+function startI18nObserver() {
+  if (_trObs) return;
+  _trObs = new MutationObserver(ms => {
+    if (LANG !== 'en') return;
+    for (const m of ms) {
+      if (m.type === 'characterData') trNode(m.target);
+      else for (const n of m.addedNodes) trWalk(n);
+    }
+  });
+  _trObs.observe(document.body, { childList: true, characterData: true, subtree: true });
+}
+function detectLang() {
+  try { const s = localStorage.getItem('breakpointLang'); if (s === 'pt' || s === 'en') return s; } catch (e) {}
+  const n = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
+  return n.startsWith('pt') ? 'pt' : 'en';
+}
+function setLang(l, save = true) {
+  if (l !== 'pt' && l !== 'en') return;
+  LANG = l; _trc.clear();
+  document.documentElement.lang = l === 'pt' ? 'pt-BR' : 'en';
+  if (save) { try { localStorage.setItem('breakpointLang', l); } catch (e) {} }
+  trWalk(document.body); trAttrs(document);
+  const set = (id, on) => { const e = document.getElementById(id); if (e) e.classList.toggle('on', on); };
+  set('langPT', l === 'pt'); set('langEN', l === 'en');
+  const lm = document.getElementById('langMenu'); if (lm) lm.innerHTML = '<span class="' + (l === 'pt' ? 'on' : '') + '">PT</span> · <span class="' + (l === 'en' ? 'on' : '') + '">EN</span>';
+  if (typeof refreshMenu === 'function') { try { refreshMenu(); } catch (e) {} }
+  if (typeof bgDirty !== 'undefined') bgDirty = true;
+  if (typeof updateHud === 'function') { try { updateHud(); } catch (e) {} }
+}
+function initLang() { startI18nObserver(); setLang(detectLang(), false); }
+
+/* ---- lang_en.js ---- */
+/* Dicionário PT -> EN (gerado). Números: vírgula decimal vira ponto. */
+Object.assign(EN, {
+"A Sentinela avisa cada raio com uma coluna piscando. Saia da faixa e, depois do disparo, acerte o núcleo superaquecido.": "The Sentinel warns of each beam with a flashing column. Leave the lane and, after the shot, hit the overheated core.",
+"A bola atravessa blocos e também a blindagem dos chefes.": "The ball passes through blocks and also through boss shields.",
+"A gravidade curva a bola · cuidado com o teleporte": "Gravity bends the ball · beware of teleporting",
+"A plataforma fica maior por alguns segundos.": "The paddle gets bigger for a few seconds.",
+"ABISMO": "ABYSS",
+"ACELERAÇÃO": "SPEED UP",
+"ACELERAÇÃO!": "SPEED UP!",
+"AMPLA": "WIDE",
+"AMPLA!": "WIDE!",
+"AQUECENDO": "HEATING UP",
+"AQUECENDO!": "HEATING UP!",
+"Acerte o núcleo do chefe!": "Hit the boss core!",
+"Acerte os blocos!": "Hit the blocks!",
+"Acumulador": "Hoarder",
+"Adaptável": "Adaptable",
+"Ajuda a acertar o núcleo dos chefes.": "Helps you hit the boss core.",
+"Ajuste som, vibração e continue quando estiver pronto.": "Adjust sound and vibration, and continue when you are ready.",
+"Algoz de Elites": "Elite Slayer",
+"Além do Limite": "Beyond the Limit",
+"Ampla": "Wide",
+"Anel preto/branco em bombas e listras nos raios (daltonismo)": "Black/white ring on bombs and stripes on beams (colorblind)",
+"Antes do chefe, uma decisão define o tom do combate.": "Before the boss, a decision sets the tone of the fight.",
+"Aposta Alta": "High Stakes",
+"Aquecendo": "Heating Up",
+"Aquecimento": "Warm-Up",
+"Arquiteto": "Architect",
+"Arraste para mirar": "Drag to aim",
+"Arraste para mirar · Toque para lançar": "Drag to aim · Tap to launch",
+"Arraste para mirar · toque para lançar": "Drag to aim · tap to launch",
+"Arrombador": "Lockpicker",
+"Arsenal Completo": "Full Arsenal",
+"Assombração": "Haunting",
+"Atirador de Elite": "Sharpshooter",
+"Ative uma sinergia entre upgrades.": "Trigger a synergy between upgrades.",
+"Atrator de Poder": "Power Attractor",
+"Atração forte: poucos power-ups escapam.": "Strong pull: few power-ups escape.",
+"Atração mais forte e de mais longe.": "Stronger pull from farther away.",
+"Azarado": "Unlucky",
+"BEM-VINDO": "WELCOME",
+"BLINDADOS": "ARMORED",
+"BLOCOS": "BLOCKS",
+"BLOCOS VIVOS": "LIVING BLOCKS",
+"BOLA": "BALL",
+"BOLAS ESPECIAIS": "SPECIAL BALLS",
+"BOLAS ESPECIAIS · uma por partida": "SPECIAL BALLS · one per run",
+"BOMBA!": "BOMB!",
+"Banho de Poder": "Power Bath",
+"Blocos": "Blocks",
+"Blocos explosivos em cadeia": "Chain-exploding blocks",
+"Blocos explosivos em cadeia · combo gigante": "Chain-exploding blocks · giant combo",
+"Blocos feridos se curam com o tempo": "Wounded blocks heal over time",
+"Blocos longe da bola ficam escuros": "Blocks far from the ball go dark",
+"Bola Fantasma": "Phantom Ball",
+"Bola de Fogo": "Fireball",
+"Bola de Gelo": "Frost Ball",
+"Bola especial: a bola vira fantasma até o fim da partida. Substitui outra bola especial.": "Special ball: the ball turns phantom until the end of the run. Replaces another special ball.",
+"Bola especial: a bola vira fogo até o fim da partida. Substitui outra bola especial.": "Special ball: the ball turns to fire until the end of the run. Replaces another special ball.",
+"Bola especial: a bola vira gelo até o fim da partida. Substitui outra bola especial.": "Special ball: the ball turns to ice until the end of the run. Replaces another special ball.",
+"Bolas e habilidades": "Balls and abilities",
+"Bomba": "Bomb",
+"Bombas e chefe desacelerados": "Bombs and boss slowed down",
+"Bombas em padrões · mire o núcleo dourado": "Bombs in patterns · aim for the golden core",
+"Bombas só machucam se encostarem na plataforma. Deslize para o lado e deixe cair.": "Bombs only hurt if they touch the paddle. Slide aside and let them fall.",
+"Build Madura": "Mature Build",
+"Bônus permanente de pontos. Sinergia com Multiball.": "Permanent score bonus. Synergy with Multiball.",
+"CAMPO MINADO": "MINEFIELD",
+"CARGA": "CHARGE",
+"CAÇADA AOS ELITES": "ELITE HUNT",
+"CHEFE DERROTADO": "BOSS DEFEATED",
+"CHEFE DERROTADO!": "BOSS DEFEATED!",
+"CHEFE · ABISSAL": "BOSS · ABYSSAL",
+"CHEFE · FORJADOR": "BOSS · FORGEMASTER",
+"CHEFE · GUARDIÃO": "BOSS · GUARDIAN",
+"CHEFE · RAIDER": "BOSS · RAIDER",
+"CHEFE · SENTINELA": "BOSS · SENTINEL",
+"CHEFE · SINGULARIDADE": "BOSS · SINGULARITY",
+"CHEFES": "BOSSES",
+"CHEFES · um por setor": "BOSSES · one per sector",
+"CHUVA DE PODER": "POWER RAIN",
+"COFRE!": "VAULT!",
+"COMBO MÁX": "MAX COMBO",
+"COMEÇAR JOGO": "START GAME",
+"COMPARTILHAR RESULTADO": "SHARE RESULT",
+"COMUM": "COMMON",
+"CONFIGURAÇÕES": "SETTINGS",
+"CONQUISTA DESBLOQUEADA": "ACHIEVEMENT UNLOCKED",
+"CONQUISTAS": "ACHIEVEMENTS",
+"CONTINUAR": "CONTINUE",
+"CORAÇÃO!": "HEART!",
+"CORREDOR": "CORRIDOR",
+"CRISTALINO": "CRYSTALLINE",
+"CRONOS": "CHRONOS",
+"CRONOS!": "CHRONOS!",
+"CRÍTICO": "CRITICAL",
+"Cada impacto explode em área": "Every impact explodes in an area",
+"Campo Limpo": "Clear Field",
+"Campo Magnético": "Magnetic Field",
+"Campo Minado": "Minefield",
+"Campo de Resgate": "Rescue Field",
+"Carga": "Charge",
+"Carrasco": "Executioner",
+"Cartógrafo": "Cartographer",
+"Catador": "Scavenger",
+"Catalisador": "Catalyst",
+"Cauteloso": "Cautious",
+"Caça Concluída": "Hunt Complete",
+"Caça aos Elites": "Elite Hunt",
+"Caçador de Chefes": "Boss Hunter",
+"Caçador de Combos": "Combo Hunter",
+"Caçador de Elites": "Elite Hunter",
+"Chance de congelar o bloco. Bloco congelado que quebra explode em estilhaços que ferem os vizinhos (sem reação em cadeia). Chefes atingidos ficam mais lentos.": "Chance to freeze the block. A frozen block that breaks bursts into shards that hurt its neighbors (no chain reaction). Bosses it hits move slower.",
+"Chefe Perfeito": "Perfect Boss",
+"Chefe no ritmo normal. Sem bônus extra, sem penalidade.": "Boss at the normal pace. No extra bonus, no penalty.",
+"Chefe um pouco mais agressivo. Após a vitória, a próxima oferta de upgrades tem raridade melhor.": "Slightly more aggressive boss. After the victory, the next upgrade offer has better rarity.",
+"Chefes": "Bosses",
+"Chuva de Bolas": "Ball Rain",
+"Chuva de Poder": "Power Rain",
+"Chuva de Pontos": "Point Rain",
+"Ciclo Completo": "Full Cycle",
+"Cofre": "Vault",
+"Cofres cheios de power-ups": "Vaults full of power-ups",
+"Cofres cheios de power-ups · abra todos": "Vaults full of power-ups · open them all",
+"Colapso": "Collapse",
+"Colecionador de Builds": "Build Collector",
+"Colecionador de Poderes": "Power Collector",
+"Combo Lendário": "Legendary Combo",
+"Combos mais fáceis de manter. Sinergia com Caçador de Combos.": "Combos are easier to keep. Synergy with Combo Hunter.",
+"Comece sua primeira partida.": "Start your first run.",
+"Conclua a fase especial Campo Minado.": "Clear the Minefield special stage.",
+"Conclua a fase especial Caça aos Elites.": "Clear the Elite Hunt special stage.",
+"Conclua a fase especial Chuva de Poder.": "Clear the Power Rain special stage.",
+"Conclua a fase especial Corredor.": "Clear the Corridor special stage.",
+"Conclua a fase especial Fortaleza.": "Clear the Fortress special stage.",
+"Conclua a fase especial Sala dos Cofres.": "Clear the Vault Room special stage.",
+"Conclua a fase especial Tempestade de Cristais.": "Clear the Crystal Storm special stage.",
+"Condutor Elétrico": "Electric Conductor",
+"Configurações": "Settings",
+"Conquista secreta": "Secret achievement",
+"Constelação": "Constellation",
+"Corajoso": "Brave",
+"Coração": "Heart",
+"Coração Cheio": "Full Heart",
+"Coração Reserva": "Spare Heart",
+"Coração de Ouro": "Heart of Gold",
+"Corredor": "Corridor",
+"Correntes laterais curvam a bola": "Side currents bend the ball",
+"Coruja": "Night Owl",
+"Cristais em cadeia": "Chain Crystals",
+"Cristais em cadeia · cuidado com o combo": "Chain crystals · watch your combo",
+"Cristal": "Crystal",
+"Cristal Quebrado": "Broken Crystal",
+"Cronista": "Chronicler",
+"Cronos": "Chronos",
+"Câmara Fria": "Cold Chamber",
+"DADOS DO JOGO": "GAME DATA",
+"DESAFIOS": "CHALLENGES",
+"DICA": "TIP",
+"De tempos em tempos a bola atravessa um bloco sem quicar (um anel aparece em volta dela). Ótima para manter a bola no teto.": "From time to time the ball passes through a block without bouncing (a ring appears around it). Great for keeping the ball at the ceiling.",
+"Dedicado": "Dedicated",
+"Demolidor": "Demolisher",
+"Demolidor Novato": "Novice Demolisher",
+"Derrote o Forjador de Magma.": "Defeat the Magma Forgemaster.",
+"Derrote o Guardião de Cristal.": "Defeat the Crystal Guardian.",
+"Derrote o Leviatã Abissal.": "Defeat the Abyssal Leviathan.",
+"Derrote o Raider Orbital.": "Defeat the Orbital Raider.",
+"Derrote o Sentinela Solar.": "Defeat the Solar Sentinel.",
+"Derrote o Singularidade.": "Defeat the Singularity.",
+"Derrote seu primeiro chefe.": "Defeat your first boss.",
+"Derrote um chefe depois de escolher Pressão Máxima.": "Defeat a boss after choosing Max Pressure.",
+"Derrote um chefe sem perder vida.": "Defeat a boss without losing a life.",
+"Desacelera bombas e o chefe, e derruba o escudo dele.": "Slows bombs and the boss, and knocks down its shield.",
+"Desafios": "Challenges",
+"Desbloqueie conquistas para ganhar títulos.": "Unlock achievements to earn titles.",
+"Desbloqueie todas as outras conquistas.": "Unlock all the other achievements.",
+"Desvie dos raios · depois de disparar, o núcleo superaquece": "Dodge the beams · after firing, the core overheats",
+"Dispara um raio vertical que fere todos os blocos da coluna (e o chefe, se estiver alinhado).": "Fires a vertical beam that hurts every block in the column (and the boss, if aligned).",
+"Divide a bola em várias.": "Splits the ball into several.",
+"Dois raios por disparo": "Two beams per shot",
+"E ou Shift usam a habilidade": "E or Shift use the ability",
+"EM CHAMAS": "ON FIRE",
+"EM CHAMAS!": "ON FIRE!",
+"EQUILÍBRIO": "BALANCE",
+"ESCOLHA SEU RUMO": "CHOOSE YOUR PATH",
+"ESCOLHA UM UPGRADE": "CHOOSE AN UPGRADE",
+"ESCUDO": "SHIELD",
+"ESCUDO ATIVO": "SHIELD ACTIVE",
+"ESCUDO CONGELADO!": "SHIELD FROZEN!",
+"ESCUDO!": "SHIELD!",
+"ESTATÍSTICAS": "STATISTICS",
+"ESTRELA!": "STAR!",
+"EVENTO DE SETOR": "SECTOR EVENT",
+"EXPLOSÃO!": "EXPLOSION!",
+"EXPOSTO": "EXPOSED",
+"Eclipse Total": "Total Eclipse",
+"Eclético": "Eclectic",
+"Eco Fragmentado": "Fragmented Echo",
+"Efeito Dominó": "Domino Effect",
+"Efeitos": "Effects",
+"Elites reforçados": "Reinforced elites",
+"Elites reforçados · recompensas melhores": "Reinforced elites · better rewards",
+"Em Chamas": "On Fire",
+"Engenheiro": "Engineer",
+"Enxame": "Swarm",
+"Escolha Caminho Seguro.": "Choose Safe Path.",
+"Escolha Pressão Máxima.": "Choose Max Pressure.",
+"Escolha Saque Rápido.": "Choose Quick Grab.",
+"Escolha um upgrade lendário.": "Choose a legendary upgrade.",
+"Escolha uma melhoria para sua build. Ela permanece até o Game Over.": "Pick an improvement for your build. It lasts until Game Over.",
+"Escudeiro": "Shield Bearer",
+"Escudo intermitente · ★ Estrela e Cronos quebram": "Flickering shield · ★ Star and Chronos break it",
+"Espaço lança": "Space launches",
+"Especialista em elites. Sinergia com Reciclador.": "Elite specialist. Synergy with Recycler.",
+"Estilhaços mirados em sequência": "Aimed shards in sequence",
+"Estrategista": "Strategist",
+"Estrela": "Star",
+"Estrela Duradoura": "Lasting Star",
+"Estrelado": "Starry",
+"Estrelas da fase": "Stage stars",
+"Explode ao quebrar e danifica os blocos próximos.": "Explodes when broken and damages nearby blocks.",
+"Explosivo": "Explosive",
+"Explosões mais fortes. Sinergia com Condutor.": "Stronger explosions. Synergy with Conductor.",
+"FARTURA": "BOUNTY",
+"FASE": "STAGE",
+"FASE CONCLUÍDA": "STAGE CLEARED",
+"FASE FINAL": "FINAL STAGE",
+"FASE FINAL DO CHEFE!": "FINAL BOSS STAGE!",
+"FASE FINAL · ABISMO": "FINAL STAGE · ABYSS",
+"FASE FINAL · COLAPSO": "FINAL STAGE · COLLAPSE",
+"FASE FINAL · FORNALHA": "FINAL STAGE · FURNACE",
+"FASE FINAL · FÚRIA": "FINAL STAGE · FURY",
+"FASE FINAL · FÚRIA!": "FINAL STAGE · FURY!",
+"FASE FINAL · REFRAÇÃO": "FINAL STAGE · REFRACTION",
+"FASE FINAL · SUPERNOVA": "FINAL STAGE · SUPERNOVA",
+"FASE MÉDIA": "AVERAGE STAGE",
+"FASES ESPECIAIS": "SPECIAL STAGES",
+"FECHAR": "CLOSE",
+"FIM DE JOGO": "GAME OVER",
+"FORJADOR DE MAGMA": "MAGMA FORGEMASTER",
+"FORTALEZA": "FORTRESS",
+"FRENESI": "FRENZY",
+"Fase Perfeita": "Perfect Stage",
+"Fase perfeita": "Perfect stage",
+"Faxineiro": "Sweeper",
+"Faísca": "Spark",
+"Feedback tátil (se o aparelho permitir)": "Haptic feedback (if the device allows)",
+"Fervor Perfeito": "Perfect Fervor",
+"Fim dos Tempos": "End of Time",
+"Forja Apagada": "Forge Extinguished",
+"Forjador de Magma": "Magma Forgemaster",
+"Fortaleza": "Fortress",
+"Fortaleza Caída": "Fortress Fallen",
+"Fragmento": "Fragment",
+"Fragmentos em ritmo rápido — faixas seguras": "Fast-paced fragments — safe lanes",
+"Fragmentos lentos, leia o padrão": "Slow fragments, read the pattern",
+"Fragmentos são lentos: leia o padrão e use as faixas livres.": "Fragments are slow: read the pattern and use the free lanes.",
+"FÚRIA": "FURY",
+"FÚRIA!": "FURY!",
+"Fábrica de Pontos": "Point Factory",
+"Fênix": "Phoenix",
+"GANÂNCIA": "GREED",
+"GIRE O APARELHO": "ROTATE YOUR DEVICE",
+"GLOSSÁRIO": "GLOSSARY",
+"GRANADA": "GRENADE",
+"GRANADA ATIVA": "GRENADE ACTIVE",
+"GRANADA!": "GRENADE!",
+"GUARDIÃO DE CRISTAL": "CRYSTAL GUARDIAN",
+"GUIA RÁPIDO": "QUICK GUIDE",
+"Ganancioso": "Greedy",
+"Gatilho": "Trigger",
+"Granada": "Grenade",
+"Gravidade mais forte": "Stronger gravity",
+"Guardião de Cristal": "Crystal Guardian",
+"HABILIDADE": "ABILITY",
+"HABILIDADES ATIVAS": "ACTIVE ABILITIES",
+"HABILIDADES ATIVAS · botão redondo": "ACTIVE ABILITIES · round button",
+"Habilidade": "Ability",
+"Hora Bem Gasta": "Time Well Spent",
+"IMPARÁVEL": "UNSTOPPABLE",
+"IMPARÁVEL!": "UNSTOPPABLE!",
+"INCOMUM": "UNCOMMON",
+"Idioma": "Language",
+"Imaculado": "Spotless",
+"Imparável": "Unstoppable",
+"Impecável": "Flawless",
+"Impecável · sem perder vida": "Flawless · no lives lost",
+"Impulso Cinético": "Kinetic Boost",
+"Inabalável": "Unshakable",
+"Incinerador": "Incinerator",
+"Indeciso": "Indecisive",
+"Intocável": "Untouchable",
+"Joalheiro": "Jeweler",
+"LENDÁRIA": "LEGENDARY",
+"LENDÁRIO": "LEGENDARY",
+"LEVIATÃ ABISSAL": "ABYSSAL LEVIATHAN",
+"Laser da Plataforma": "Paddle Laser",
+"Lenda do Vazio": "Void Legend",
+"Lente do Núcleo": "Core Lens",
+"Leque de lava mais amplo": "Wider lava fan",
+"Leviatã Abissal": "Abyssal Leviathan",
+"Leviatã Afogado": "Drowned Leviathan",
+"MECÂNICAS": "MECHANICS",
+"MEDALHAS E TÍTULOS": "MEDALS AND TITLES",
+"MELHOR COMBO": "BEST COMBO",
+"MELHOR FASE": "BEST STAGE",
+"MELHOR PONTUAÇÃO": "BEST SCORE",
+"MELHOR SETOR": "BEST SECTOR",
+"Mais bolas. Sinergia com Caçador de Combos.": "More balls. Synergy with Combo Hunter.",
+"Mais power-ups… e mais bombas": "More power-ups… and more bombs",
+"Mais pressão, com faixas seguras": "More pressure, with safe lanes",
+"Mais resistente. Sempre solta um power-up e pode soltar coração.": "Tougher. Always drops a power-up and may drop a heart.",
+"Mais vidas máximas. Elites e cofres podem soltar corações.": "More max lives. Elites and vaults may drop hearts.",
+"Maratonista": "Marathoner",
+"Maxado": "Maxed Out",
+"Mestre das Bombas": "Bomb Master",
+"Mestre do Cofre": "Vault Master",
+"Mestre dos Desafios": "Challenge Master",
+"Mestre dos Números": "Master of Numbers",
+"Mira Afiada": "Sharp Aim",
+"Montador": "Assembler",
+"Monte uma build, cause reações em cadeia e enfrente chefes com identidade própria. Cada run muda": "Build a loadout, set off chain reactions and face bosses with identities of their own. Every run changes",
+"Monte uma build, cause reações em cadeia e enfrente chefes com identidade própria. Cada run muda — upgrades, sinergias, modificadores de setor e fases especiais.": "Build a loadout, set off chain reactions and face bosses with identities of their own. Every run changes — upgrades, synergies, sector modifiers and special stages.",
+"Muito power-up… e muita bomba": "Lots of power-ups… and lots of bombs",
+"Muito power-up… e muita bomba · fique atento": "Lots of power-ups… and lots of bombs · stay alert",
+"Muito resistente; sempre solta power-up e tem chance alta de coração.": "Very tough; always drops a power-up and has a high chance of a heart.",
+"Multiball orgânico. Sinergia com Multiball+.": "Organic multiball. Synergy with Multiball+.",
+"Multibola": "Multiball",
+"MÃOS VAZIAS": "EMPTY HANDS",
+"Música": "Music",
+"NOVA PARTIDA": "NEW GAME",
+"Na Corda Bamba": "On the Tightrope",
+"Na Singularidade a gravidade curva a bola. Ajuste a rebatida e atenção ao teleporte, que avisa antes.": "In the Singularity, gravity bends the ball. Adjust your bounce and watch for the teleport, which warns beforehand.",
+"Nenhum": "None",
+"Nenhuma melhoria nesta run": "No improvements in this run",
+"No Leviatã o núcleo troca de encaixe. O próximo encaixe pisca antes da troca: mire o que estiver aceso.": "On the Leviathan the core changes sockets. The next socket flashes before the switch: aim for the lit one.",
+"Novos Horizontes": "New Horizons",
+"NÚCLEO EXPOSTO!": "CORE EXPOSED!",
+"Não atrai bombas. Sinergia com Reciclador.": "Does not attract bombs. Synergy with Recycler.",
+"Não deixe tocar na plataforma: custa uma vida.": "Do not let them touch the paddle: it costs a life.",
+"Núcleo Instável": "Unstable Core",
+"O BREAKPOINT é jogado na vertical.": "BREAKPOINT is played in portrait.",
+"O Guardião liga e desliga o escudo. Espere cair, ou use Estrela ou Cronos para furar.": "The Guardian turns its shield on and off. Wait for it to drop, or use Star or Chronos to break through.",
+"O Raider solta mísseis em faixas. Fique fora do alinhamento e acerte o núcleo dourado.": "The Raider drops missiles in lanes. Stay out of the lineup and hit the golden core.",
+"O combo expira mais rápido": "Combo expires faster",
+"O núcleo muda de lugar · siga o brilho": "The core changes place · follow the glow",
+"O núcleo troca mais rápido": "The core switches faster",
+"OURO": "GOLD",
+"Orbes mais rápidos": "Faster orbs",
+"Os próximos acertos causam dano extra.": "The next hits deal extra damage.",
+"P ou Esc abrem as configurações ·": "P or Esc open the settings ·",
+"PARTIDAS": "RUNS",
+"PAUSADO": "PAUSED",
+"PENUMBRA": "TWILIGHT",
+"PERFEITAS": "PERFECTS",
+"PERFEITO": "PERFECT",
+"PERFURA": "PIERCE",
+"PONTOS": "POINTS",
+"PONTUAÇÃO": "SCORE",
+"PRATA": "SILVER",
+"PRECISÃO": "ACCURACY",
+"PROGRESSO": "PROGRESS",
+"PULAR": "SKIP",
+"Padrões mais rápidos": "Faster patterns",
+"Padrões mais rápidos — ainda há espaço": "Faster patterns — there is still room",
+"Passagem Livre": "Free Passage",
+"Passe pelo vão central": "Go through the center gap",
+"Passe pelo vão central · elite no fundo": "Go through the center gap · elite at the back",
+"Perfeccionista": "Perfectionist",
+"Perfuração mais longa. Sinergia com Condutor.": "Longer piercing. Synergy with Conductor.",
+"Perigos em destaque": "Hazards highlighted",
+"Persistente": "Persistent",
+"Pirotécnico": "Pyrotechnician",
+"Plataforma Ampla": "Wide Paddle",
+"Plataforma base maior.": "Bigger base paddle.",
+"Poeira Estelar": "Stardust",
+"Pontuador": "Scorer",
+"Por alguns segundos, as bolas que descem curvam suavemente em direção à plataforma.": "For a few seconds, falling balls curve gently toward the paddle.",
+"Por um Fio": "By a Thread",
+"Power-up Cronos mais forte. Sinergia com Campo Magnético.": "Stronger Chronos power-up. Synergy with Magnetic Field.",
+"Power-up Granada mais forte. Sinergia com Núcleo.": "Stronger Grenade power-up. Synergy with Core.",
+"Power-up Sobrecarga mais longo. Sinergia com Condutor.": "Longer Overcharge power-up. Synergy with Conductor.",
+"Power-ups e corações são levemente puxados para a plataforma.": "Power-ups and hearts are gently pulled toward the paddle.",
+"Precisão": "Precision",
+"Premia a precisão com dano extra. Sinergia com Reflexo Cristalino.": "Rewards precision with extra damage. Synergy with Crystal Reflex.",
+"Primeiros Passos": "First Steps",
+"Progresso": "Progress",
+"Projétil lento dos chefes (como o Guardião de Cristal). Funciona como a bomba: custa uma vida se tocar na plataforma.": "Slow boss projectile (like the Crystal Guardian's). Works like the bomb: costs a life if it touches the paddle.",
+"Protege contra perdas de bola. Recarrega a cada fase.": "Protects against lost balls. Recharges every stage.",
+"Pulso Cinético": "Kinetic Pulse",
+"Quanto mais fundo, mais resistente": "The deeper, the tougher",
+"Quanto mais fundo, mais resistente · elite na ponta": "The deeper, the tougher · elite at the tip",
+"Quebra-Chefes": "Boss Breaker",
+"Quebra-Gelo": "Icebreaker",
+"Quebre os orbes para expor o núcleo": "Break the orbs to expose the core",
+"RAIDER ORBITAL": "ORBITAL RAIDER",
+"RARO": "RARE",
+"RECORDE": "BEST",
+"RISCO": "RISK",
+"RITMO ACELERADO": "FAST PACE",
+"ROTA": "ROUTE",
+"RUN COM DEBUG": "DEBUG RUN",
+"Raider Abatido": "Raider Downed",
+"Raider Orbital": "Orbital Raider",
+"Raio": "Beam",
+"Raio Certeiro": "Pinpoint Beam",
+"Raios avisam antes de cair. Saia da coluna que estiver piscando.": "Beams warn before they fall. Leave the column that is flashing.",
+"Raios cruzados — procure o vão": "Crossing beams — look for the gap",
+"Raios entre blocos. Sinergia com Núcleo e Estrela.": "Bolts between blocks. Synergy with Core and Star.",
+"Reação Máxima": "Maximum Reaction",
+"Reação em Cadeia": "Chain Reaction",
+"Rebata perto do CENTRO da plataforma: dá ângulo e ainda conta como rebatida perfeita.": "Bounce near the CENTER of the paddle: it gives angle and still counts as a perfect bounce.",
+"Rebatida perfeita": "Perfect bounce",
+"Rebatidas perfeitas mais fáceis e mais valiosas. Sinergia com Caçador de Combos.": "Easier and more valuable perfect bounces. Synergy with Combo Hunter.",
+"Reciclador": "Recycler",
+"Recompensa do chefe! Escolha uma melhoria para continuar.": "Boss reward! Pick an improvement to continue.",
+"Recruta": "Rookie",
+"Reduzir flashes": "Reduce flashes",
+"Reduzir tremor": "Reduce shake",
+"Reflexo Cristalino": "Crystal Reflex",
+"Reflexos de Aço": "Steel Reflexes",
+"Relojoeiro": "Clockmaker",
+"Relâmpago": "Lightning",
+"Residente": "Resident",
+"Ritmo Constante": "Steady Rhythm",
+"Ritmo Firme": "Firm Rhythm",
+"SALA DO COFRE": "VAULT ROOM",
+"SEGREDOS": "SECRETS",
+"SENTINELA SOLAR": "SOLAR SENTINEL",
+"SEQ. PERFEITA": "PERFECT STREAK",
+"SETOR": "SECTOR",
+"SETORES": "SECTORS",
+"SEU HISTÓRICO": "YOUR HISTORY",
+"SEU HISTÓRICO · SÓ NESTE APARELHO": "YOUR HISTORY · ONLY ON THIS DEVICE",
+"SINGULARIDADE": "SINGULARITY",
+"SOBRECARGA": "OVERCHARGE",
+"SOBRECARGA!": "OVERCHARGE!",
+"Sala Esvaziada": "Emptied Room",
+"Sala dos Cofres": "Vault Room",
+"Segredos": "Secrets",
+"Segunda Chance": "Second Chance",
+"Sem Arranhão": "Not a Scratch",
+"Sem Pressa": "No Rush",
+"Sem Volta": "No Way Back",
+"Sem balanço de tela e de cartas": "No screen shake and card tilt",
+"Sem piscadas rápidas e clarões": "No fast blinking and glare",
+"Senhor das Condições": "Lord of Conditions",
+"Sentinela Solar": "Solar Sentinel",
+"Sequência": "Streak",
+"Sequência Dourada": "Golden Streak",
+"Seus acertos explodem e ferem os blocos em volta (e o chefe).": "Your hits explode and hurt the surrounding blocks (and the boss).",
+"Sinergia!": "Synergy!",
+"Sinergias ativam quando combinações de itens se encontram.": "Synergies trigger when item combinations meet.",
+"Singularidade": "Singularity",
+"Sobrecarga": "Overcharge",
+"Sobrevivente": "Survivor",
+"Sorte Lendária": "Legendary Luck",
+"Sortear de novo": "Reroll",
+"SÓ NESTE APARELHO": "ONLY ON THIS DEVICE",
+"TEMPESTADE DE CRISTAIS": "CRYSTAL STORM",
+"TEMPO JOGADO": "TIME PLAYED",
+"TOQUE P/ LANÇAR": "TAP TO LAUNCH",
+"TOQUE PARA LANÇAR": "TAP TO LAUNCH",
+"TOTAL DA FASE": "STAGE TOTAL",
+"TROCAS": "TRADES",
+"Teclado: ← → ou A D movem": "Keyboard: ← → or A D move",
+"Teclado: ← → ou A D movem · Espaço lança · E ou Shift usam a habilidade · P ou Esc abrem as configurações ·": "Keyboard: ← → or A D move · Space launches · E or Shift use the ability · P or Esc open the settings ·",
+"Teleporte ativado": "Teleport active",
+"Tempestade Domada": "Storm Tamed",
+"Tempestade de Cristais": "Crystal Storm",
+"Terremoto": "Earthquake",
+"Toque para acelerar": "Tap to speed up",
+"Toque para lançar": "Tap to launch",
+"Transcendente": "Transcendent",
+"Troque a oferta de upgrades uma vez.": "Reroll the upgrade offer once.",
+"TÍTULO EQUIPADO": "TITLE EQUIPPED",
+"Uma onda destrói bombas e fragmentos perto da plataforma.": "A wave destroys bombs and fragments near the paddle.",
+"Uma proteção por fase contra bola perdida.": "One shield per stage against a lost ball.",
+"VAZIO": "VOID",
+"VENTO ESTELAR": "STELLAR WIND",
+"VIDA PERDIDA": "LIFE LOST",
+"VIDAS": "LIVES",
+"Varredura": "Sweep",
+"Velocidade da bola.": "Ball speed.",
+"Velocista": "Sprinter",
+"Veterano": "Veteran",
+"Viajante Estelar": "Star Traveler",
+"Vibração": "Vibration",
+"Vida": "Life",
+"ZERAR PROGRESSO": "RESET PROGRESS",
+"abra todos": "open them all",
+"ainda há espaço": "there is still room",
+"botão redondo": "round button",
+"combo gigante": "giant combo",
+"cuidado com o combo": "watch your combo",
+"elite na ponta": "elite at the tip",
+"elite no fundo": "elite at the back",
+"espere cair ou use ★ Estrela / Cronos": "wait for it to drop or use ★ Star / Chronos",
+"fique atento": "stay alert",
+"recompensa a caminho": "reward on the way",
+"recompensas melhores": "better rewards",
+"recorde não salvo": "record not saved",
+"run com debug": "debug run",
+"run com debug · recorde não salvo": "debug run · record not saved",
+"sem perder vida": "no lives lost",
+"setores em ordem aleatória": "sectors in random order",
+"toque para lançar": "tap to launch",
+"um por setor": "one per sector",
+"uma por partida": "one per run",
+"upgrades, sinergias, modificadores de setor e fases especiais.": "upgrades, synergies, sector modifiers and special stages.",
+"ÓRBITA": "ORBIT",
+"Última Chance": "Last Chance",
+"‹ VOLTAR": "‹ BACK",
+"★ Recruta": "★ Rookie",
+"★ Recruta ★": "★ Rookie ★",
+"💰 Saque Rápido": "💰 Quick Grab",
+"🔥 Pressão Máxima": "🔥 Max Pressure",
+"🛡 Caminho Seguro": "🛡 Safe Path"
+});
+(function(){
+ const dot=x=>String(x).replace(',','.');
+ const R=[
+ [/^Valem\ só\ para\ a\ partida\ atual\ e\ ocupam\ um\ espaço\ cada:\ pegar\ outra\ do\ mesmo\ tipo\ substitui\ a\ anterior\.\ Cada\ rebatida\ perfeita\ acelera\ a\ recarga\ da\ habilidade\ em\ (\d+(?:[.,]\d+)?)s\.$/, (m,a1)=>"They only last for the current run and take one slot each: picking another of the same type replaces the previous one. Each perfect bounce speeds up the ability cooldown by "+dot(a1)+"s."],
+ [/^Chance\ de\ incendiar\ o\ bloco\ atingido:\ ele\ perde\ (\d+(?:[.,]\d+)?)\ de\ vida\ a\ cada\ instante\ enquanto\ queima\.\ No\ nível\ (\d+(?:[.,]\d+)?)\ o\ fogo\ salta\ para\ um\ vizinho\.\ Também\ queima\ chefes\.$/, (m,a1,a2)=>"Chance to ignite the block it hits: it loses "+dot(a1)+" health every moment while burning. At level "+dot(a2)+" the fire jumps to a neighbor. Also burns bosses."],
+ [/^Quebre\ blocos\ em\ sequência\ sem\ deixar\ o\ tempo\ acabar:\ \+(\d+(?:[.,]\d+)?)%\ de\ pontos\ por\ degrau\ \(até\ \+(\d+(?:[.,]\d+)?)%\)\ e\ mais\ chance\ de\ power\-up\ a\ cada\ nível\ do\ combo\.$/, (m,a1,a2)=>"Break blocks in a row without letting the timer run out: +"+dot(a1)+"% points per step (up to +"+dot(a2)+"%) and a better power-up chance at each combo level."],
+ [/^Acerte\ o\ centro\ da\ plataforma:\ pontos\ crescem\ na\ sequência\ e\ a\ cada\ (\d+(?:[.,]\d+)?)\ seguidas\ você\ ganha\ \+(\d+(?:[.,]\d+)?)\ hits\ de\ sobrecarga\.\ (\d+(?:[.,]\d+)?)\ por\ fase\ =\ (\d+(?:[.,]\d+)?)\ estrela\.$/, (m,a1,a2,a3,a4)=>"Hit the center of the paddle: points grow in a streak and every "+dot(a1)+" in a row gives you +"+dot(a2)+" overcharge hits. "+dot(a3)+" per stage = "+dot(a4)+" star."],
+ [/^(\d+(?:[.,]\d+)?)%\ de\ chance\ de\ congelar\ \(garantido\ a\ cada\ (\d+(?:[.,]\d+)?)\)\.\ Bloco\ congelado\ que\ quebra\ explode\ em\ estilhaços\ que\ ferem\ os\ vizinhos\.$/, (m,a1,a2)=>dot(a1)+"% chance to freeze (guaranteed every "+dot(a2)+"). A frozen block that breaks bursts into shards that hurt its neighbors."],
+ [/^Habilidade\ ativa:\ toque\ no\ botão\ redondo\.\ Cada\ rebatida\ perfeita\ reduz\ (\d+(?:[.,]\d+)?)s\ da\ recarga\.\ Substitui\ outra\ habilidade\.$/, (m,a1)=>"Active ability: tap the round button. Each perfect bounce cuts "+dot(a1)+"s from the cooldown. Replaces another ability."],
+ [/^Chance\ de\ (\d+(?:[.,]\d+)?)%\ \(garantido\ a\ cada\ (\d+(?:[.,]\d+)?)\):\ (\d+(?:[.,]\d+)?)\ de\ dano\ por\ segundo\ durante\ (\d+(?:[.,]\d+)?)s,\ e\ o\ fogo\ salta\ para\ vizinhos\.$/, (m,a1,a2,a3,a4)=>dot(a1)+"% chance (guaranteed every "+dot(a2)+"): "+dot(a3)+" damage per second for "+dot(a4)+"s, and the fire jumps to neighbors."],
+ [/^(\d+(?:[.,]\d+)?)%\ de\ chance\ \(garantido\ a\ cada\ (\d+(?:[.,]\d+)?)\);\ explosão\ um\ pouco\ maior,\ e\ chefes\ atingidos\ ficam\ mais\ lentos\.$/, (m,a1,a2)=>dot(a1)+"% chance (guaranteed every "+dot(a2)+"); slightly bigger blast, and bosses it hits move slower."],
+ [/^Acertos\ têm\ (\d+(?:[.,]\d+)?)%\ de\ chance\ de\ incendiar\ o\ bloco\ \(garantido\ a\ cada\ (\d+(?:[.,]\d+)?)\):\ (\d+(?:[.,]\d+)?)\ de\ dano\ a\ cada\ (\d+(?:[.,]\d+)?)s\ por\ (\d+(?:[.,]\d+)?)s\.$/, (m,a1,a2,a3,a4,a5)=>"Hits have a "+dot(a1)+"% chance to ignite the block (guaranteed every "+dot(a2)+"): "+dot(a3)+" damage every "+dot(a4)+"s for "+dot(a5)+"s."],
+ [/^Botão:\ por\ (\d+(?:[.,]\d+)?)s,\ bolas\ que\ descem\ perto\ da\ plataforma\ são\ levemente\ guiadas\ até\ ela\.\ Recarga\ (\d+(?:[.,]\d+)?)s\.$/, (m,a1,a2)=>"Button: for "+dot(a1)+"s, balls falling near the paddle are gently guided to it. Cooldown "+dot(a2)+"s."],
+ [/^\+(\d+(?:[.,]\d+)?)\ pontos\ agora\.\ Você\ pula\ a\ próxima\ oferta\ de\ upgrade\ de\ fase\ \(o\ chefe\ ainda\ dá\ recompensa\)\.$/, (m,a1)=>"+"+dot(a1)+" points now. You skip the next stage upgrade offer (the boss still gives a reward)."],
+ [/^★\ =\ cada\ meta\ cumprida:\ tempo,\ perfeitas\ e\ sem\ perder\ vida\.\ (\d+(?:[.,]\d+)?)\ estrelas\ =\ Fase\ perfeita\.$/, (m,a1)=>"★ = each goal met: time, perfect bounces and no lives lost. "+dot(a1)+" stars = Perfect stage."],
+ [/^Tempo\ abaixo\ da\ meta,\ (\d+(?:[.,]\d+)?)\+\ perfeitas\ e\ nenhuma\ vida\ perdida\.\ Cada\ uma\ vale\ uma\ estrela\.$/, (m,a1)=>"Time under the goal, "+dot(a1)+"+ perfect bounces and no lives lost. Each is worth a star."],
+ [/^(\d+(?:[.,]\d+)?)%\ de\ chance\ \(garantido\ a\ cada\ (\d+(?:[.,]\d+)?)\);\ o\ gelo\ contagia\ um\ vizinho\ e\ a\ explosão\ é\ maior\.$/, (m,a1,a2)=>dot(a1)+"% chance (guaranteed every "+dot(a2)+"); the ice spreads to a neighbor and the blast is bigger."],
+ [/^No\ Forjador\ o\ núcleo\ é\ blindado:\ quebre\ os\ (\d+(?:[.,]\d+)?)\ orbes\ \((\d+(?:[.,]\d+)?)\ acertos\ cada\)\ para\ expô\-lo\.$/, (m,a1,a2)=>"On the Forgemaster the core is armored: break the "+dot(a1)+" orbs ("+dot(a2)+" hits each) to expose it."],
+ [/^Já\ usou\ as\ (\d+(?:[.,]\d+)?)\ bolas\ e\ as\ (\d+(?:[.,]\d+)?)\ habilidades\ especiais\ \(cada\ uma\ em\ alguma\ partida\)\.$/, (m,a1,a2)=>"You have used all "+dot(a1)+" balls and "+dot(a2)+" special abilities (each in some run)."],
+ [/^(\d+(?:[.,]\d+)?)\ vidas\ ·\ (\d+(?:[.,]\d+)?)\ chefes\ únicos\ ·\ (\d+(?:[.,]\d+)?)\ fases\ especiais\ ·\ setores\ em\ ordem\ aleatória$/, (m,a1,a2,a3)=>dot(a1)+" lives · "+dot(a2)+" unique bosses · "+dot(a3)+" special stages · sectors in random order"],
+ [/^Botão:\ raio\ vertical\ que\ causa\ (\d+(?:[.,]\d+)?)\ de\ dano\ na\ coluna\ de\ blocos\.\ Recarga\ (\d+(?:[.,]\d+)?)s\.$/, (m,a1,a2)=>"Button: a vertical beam that deals "+dot(a1)+" damage to the column of blocks. Cooldown "+dot(a2)+"s."],
+ [/^Comum\ (\d+(?:[.,]\d+)?)%\ ·\ Incomum\ (\d+(?:[.,]\d+)?)%\ ·\ Raro\ (\d+(?:[.,]\d+)?)%\ ·\ Lendário\ (\d+(?:[.,]\d+)?)%\.\ Sinergias\ ativam\ sozinhas\.$/, (m,a1,a2,a3,a4)=>"Common "+dot(a1)+"% · Uncommon "+dot(a2)+"% · Rare "+dot(a3)+"% · Legendary "+dot(a4)+"%. Synergies trigger on their own."],
+ [/^Botão:\ onda\ que\ destrói\ bombas\ e\ fragmentos\ num\ raio\ de\ (\d+(?:[.,]\d+)?)px\.\ Recarga\ (\d+(?:[.,]\d+)?)s\.$/, (m,a1,a2)=>"Button: a wave that destroys bombs and fragments within "+dot(a1)+"px. Cooldown "+dot(a2)+"s."],
+ [/^Upgrade\ a\ cada\ (\d+(?:[.,]\d+)?)\ fases\ e\ após\ cada\ chefe\ ·\ troque\ a\ oferta\ por\ (\d+(?:[.,]\d+)?)\ vida$/, (m,a1,a2)=>"Upgrade every "+dot(a1)+" stages and after each boss · reroll the offer for "+dot(a2)+" life"],
+ [/^A\ cada\ (\d+(?:[.,]\d+)?)\ acertos,\ atravessa\ o\ próximo\ bloco\ e\ causa\ \+(\d+(?:[.,]\d+)?)\ de\ dano\ nele\.$/, (m,a1,a2)=>"Every "+dot(a1)+" hits, it passes through the next block and deals +"+dot(a2)+" damage to it."],
+ [/^Rebatida\ perfeita:\ os\ próximos\ (\d+(?:[.,]\d+)?)\ blocos\ atingidos\ levam\ \+(\d+(?:[.,]\d+)?)\ de\ dano\.$/, (m,a1,a2)=>"Perfect bounce: the next "+dot(a1)+" blocks you hit take +"+dot(a2)+" damage."],
+ [/^Área\ de\ acerto\ do\ núcleo\ \+(\d+(?:[.,]\d+)?)\ e\ crítico\ solta\ power\-up\ mais\ fácil\.$/, (m,a1)=>"Boss core hit area +"+dot(a1)+" and crits drop power-ups more easily."],
+ [/^A\ cada\ (\d+(?:[.,]\d+)?)\ acertos,\ a\ bola\ atravessa\ o\ próximo\ bloco\ sem\ quicar\.$/, (m,a1)=>"Every "+dot(a1)+" hits, the ball passes through the next block without bouncing."],
+ [/^Chance\ de\ (\d+(?:[.,]\d+)?)%\ \(garantido\ a\ cada\ (\d+(?:[.,]\d+)?)\):\ (\d+(?:[.,]\d+)?)\ de\ dano\ a\ cada\ (\d+(?:[.,]\d+)?)s\ por\ (\d+(?:[.,]\d+)?)s\.$/, (m,a1,a2,a3,a4,a5)=>dot(a1)+"% chance (guaranteed every "+dot(a2)+"): "+dot(a3)+" damage every "+dot(a4)+"s for "+dot(a5)+"s."],
+ [/^Estando\ com\ (\d+(?:[.,]\d+)?)\ vida,\ recupere\ até\ ter\ (\d+(?:[.,]\d+)?)\ vidas\ na\ mesma\ partida\.$/, (m,a1,a2)=>"While at "+dot(a1)+" life, recover until you have "+dot(a2)+" lives in the same run."],
+ [/^Raio\ de\ (\d+(?:[.,]\d+)?)px\ e\ a\ onda\ também\ ganha\ (\d+(?:[.,]\d+)?)\ pts\ por\ bomba\.\ Recarga\ (\d+(?:[.,]\d+)?)s\.$/, (m,a1,a2,a3)=>dot(a1)+"px radius, and the wave also gives "+dot(a2)+" pts per bomb. Cooldown "+dot(a3)+"s."],
+ [/^Rebatida\ perfeita:\ o\ próximo\ bloco\ atingido\ leva\ \+(\d+(?:[.,]\d+)?)\ de\ dano\.$/, (m,a1)=>"Perfect bounce: the next block you hit takes +"+dot(a1)+" damage."],
+ [/^Zona\ perfeita\ \+(\d+(?:[.,]\d+)?)%,\ perfeitas\ valem\ o\ dobro\ e\ dão\ \+(\d+(?:[.,]\d+)?)\ combo\.$/, (m,a1,a2)=>"Perfect zone +"+dot(a1)+"%, perfects are worth double and give +"+dot(a2)+" combo."],
+ [/^Dura\ (\d+(?:[.,]\d+)?)s,\ guia\ com\ mais\ força\ e\ de\ mais\ longe\.\ Recarga\ (\d+(?:[.,]\d+)?)s\.$/, (m,a1,a2)=>"Lasts "+dot(a1)+"s, guides with more force and from farther away. Cooldown "+dot(a2)+"s."],
+ [/^Dura\ (\d+(?:[.,]\d+)?)s,\ leva\ a\ bola\ ao\ centro\ da\ plataforma\.\ Recarga\ (\d+(?:[.,]\d+)?)s\.$/, (m,a1,a2)=>"Lasts "+dot(a1)+"s, brings the ball to the center of the paddle. Cooldown "+dot(a2)+"s."],
+ [/^(\d+(?:[.,]\d+)?)%\ de\ chance;\ a\ bola\ extra\ herda\ um\ pouco\ da\ velocidade\.$/, (m,a1)=>dot(a1)+"% chance; the extra ball inherits some of the speed."],
+ [/^Escolha\ cada\ um\ dos\ (\d+(?:[.,]\d+)?)\ eventos\ de\ setor\ ao\ menos\ uma\ vez\.$/, (m,a1)=>"Choose each of the "+dot(a1)+" sector events at least once."],
+ [/^Raio\ com\ (\d+(?:[.,]\d+)?)\ de\ dano\ \((\d+(?:[.,]\d+)?)\ em\ raridade\ Lendária\)\.\ Recarga\ (\d+(?:[.,]\d+)?)s\.$/, (m,a1,a2,a3)=>"Beam with "+dot(a1)+" damage ("+dot(a2)+" at Legendary rarity). Cooldown "+dot(a3)+"s."],
+ [/^(\d+(?:[.,]\d+)?)%\ de\ chance\ de\ soltar\ uma\ bola\ extra\ ao\ quebrar\ bloco\.$/, (m,a1)=>dot(a1)+"% chance to drop an extra ball when a block breaks."],
+ [/^Conclua\ fases\ com\ (\d+(?:[.,]\d+)?)\ modificadores\ de\ setor\ diferentes\.$/, (m,a1)=>"Clear stages with "+dot(a1)+" different sector modifiers."],
+ [/^Quebra\ com\ (\d+(?:[.,]\d+)?)\ acerto\ e\ estoura\ os\ vizinhos\ em\ cadeia\.$/, (m,a1)=>"Breaks with "+dot(a1)+" hit and bursts its neighbors in a chain."],
+ [/^A\ cada\ (\d+(?:[.,]\d+)?)\ acertos,\ a\ bola\ atravessa\ o\ próximo\ bloco\.$/, (m,a1)=>"Every "+dot(a1)+" hits, the ball passes through the next block."],
+ [/^Sobrecarga:\ \+(\d+(?:[.,]\d+)?)\ hits\ e\ \+(\d+(?:[.,]\d+)?)%\ de\ pontos\ enquanto\ ativa\.$/, (m,a1,a2)=>"Overcharge: +"+dot(a1)+" hits and +"+dot(a2)+"% points while active."],
+ [/^Melhores\ drops\.\ (\d+(?:[.,]\d+)?)º\ power\ da\ fase\ quase\ garantido\.$/, (m,a1)=>"Better drops. The "+dot(a1)+"th power-up of the stage is almost guaranteed."],
+ [/^(\d+(?:[.,]\d+)?)\ em\ cada\ (\d+(?:[.,]\d+)?)\ blocos\ ganha\ \+(\d+(?:[.,]\d+)?)\ de\ vida\ ·\ pontos\ \+(\d+(?:[.,]\d+)?)%$/, (m,a1,a2,a3,a4)=>dot(a1)+" every "+dot(a2)+" blocks gains +"+dot(a3)+" health · points +"+dot(a4)+"%"],
+ [/^(\d+(?:[.,]\d+)?)\ estrelas\ em\ (\d+(?:[.,]\d+)?)\ fases\ seguidas\ na\ mesma\ partida\.$/, (m,a1,a2)=>dot(a1)+" stars in "+dot(a2)+" stages in a row in the same run."],
+ [/^\+(\d+(?:[.,]\d+)?)\ vida\ máxima\ e\ cura\ TODAS\ as\ vidas\ \(total\ \+(\d+(?:[.,]\d+)?)\)\.$/, (m,a1,a2)=>"+"+dot(a1)+" max life and heals ALL lives (total +"+dot(a2)+")."],
+ [/^Duas\ proteções\ por\ fase\ e\ mantém\ o\ bônus\ de\ \+(\d+(?:[.,]\d+)?)%\.$/, (m,a1)=>"Two shields per stage and keeps the +"+dot(a1)+"% bonus."],
+ [/^(\d+(?:[.,]\d+)?)%\ de\ chance;\ o\ raio\ pode\ atingir\ dois\ blocos\.$/, (m,a1)=>dot(a1)+"% chance; the bolt can hit two blocks."],
+ [/^Alcance\ o\ setor\ (\d+(?:[.,]\d+)?):\ você\ passou\ pelos\ (\d+(?:[.,]\d+)?)\ mundos\.$/, (m,a1,a2)=>"Reach sector "+dot(a1)+": you have been through all "+dot(a2)+" worlds."],
+ [/^Conclua\ fases\ com\ os\ (\d+(?:[.,]\d+)?)\ modificadores\ de\ setor\.$/, (m,a1)=>"Clear stages with all "+dot(a1)+" sector modifiers."],
+ [/^Leve\ mais\ de\ (\d+(?:[.,]\d+)?)\ minutos\ para\ concluir\ uma\ fase\.$/, (m,a1)=>"Take more than "+dot(a1)+" minutes to clear a stage."],
+ [/^Termine\ uma\ fase\ comum\ em\ menos\ de\ (\d+(?:[.,]\d+)?)\ segundos\.$/, (m,a1)=>"Finish a regular stage in under "+dot(a1)+" seconds."],
+ [/^Derrote\ cada\ um\ dos\ (\d+(?:[.,]\d+)?)\ chefes\ sem\ perder\ vida\.$/, (m,a1)=>"Defeat each of the "+dot(a1)+" bosses without losing a life."],
+ [/^Elites\ tomam\ \+(\d+(?:[.,]\d+)?)\ de\ dano,\ \+(\d+(?:[.,]\d+)?)\ pts\ e\ drop\ extra\.$/, (m,a1,a2)=>"Elites take +"+dot(a1)+" damage, +"+dot(a2)+" pts and an extra drop."],
+ [/^Explosões\ causam\ \+(\d+(?:[.,]\d+)?)\ de\ dano\ e\ \+(\d+(?:[.,]\d+)?)%\ de\ alcance\.$/, (m,a1,a2)=>"Explosions deal +"+dot(a1)+" damage and +"+dot(a2)+"% range."],
+ [/^Tenha\ (\d+(?:[.,]\d+)?)\ upgrades\ diferentes\ na\ mesma\ partida\.$/, (m,a1)=>"Have "+dot(a1)+" different upgrades in the same run."],
+ [/^Tenha\ (\d+(?:[.,]\d+)?)\ upgrades\ no\ nível\ (\d+(?:[.,]\d+)?)\ na\ mesma\ partida\.$/, (m,a1,a2)=>"Have "+dot(a1)+" upgrades at level "+dot(a2)+" in the same run."],
+ [/^(\d+(?:[.,]\d+)?)%\ de\ chance\ de\ um\ raio\ atingir\ outro\ bloco\.$/, (m,a1)=>dot(a1)+"% chance for a bolt to hit another block."],
+ [/^\+(\d+(?:[.,]\d+)?)\ vida\ máxima\ e\ recupera\ (\d+(?:[.,]\d+)?)\ vida\ \(total\ \+(\d+(?:[.,]\d+)?)\)\.$/, (m,a1,a2,a3)=>"+"+dot(a1)+" max life and restores "+dot(a2)+" life (total +"+dot(a3)+")."],
+ [/^Granada\ \+(\d+(?:[.,]\d+)?)s,\ \+(\d+(?:[.,]\d+)?)%\ raio\ e\ \+(\d+(?:[.,]\d+)?)\ dano\ na\ explosão\.$/, (m,a1,a2,a3)=>"Grenade +"+dot(a1)+"s, +"+dot(a2)+"% radius and +"+dot(a3)+" explosion damage."],
+ [/^Zona\ perfeita\ \+(\d+(?:[.,]\d+)?)%\ e\ perfeitas\ valem\ \+(\d+(?:[.,]\d+)?)%\ pts\.$/, (m,a1,a2)=>"Perfect zone +"+dot(a1)+"% and perfects are worth +"+dot(a2)+"% pts."],
+ [/^Comece\ uma\ partida\ entre\ (\d+(?:[.,]\d+)?)h\ e\ (\d+(?:[.,]\d+)?)h\ da\ manhã\.$/, (m,a1,a2)=>"Start a run between "+dot(a1)+"am and "+dot(a2)+"am."],
+ [/^Conquiste\ (\d+(?:[.,]\d+)?)\ estrelas\ em\ uma\ fase\ de\ chefe\.$/, (m,a1)=>"Earn "+dot(a1)+" stars in a boss stage."],
+ [/^Conclua\ (\d+(?:[.,]\d+)?)\ fases\ seguidas\ sem\ perder\ vida\.$/, (m,a1)=>"Clear "+dot(a1)+" stages in a row without losing a life."],
+ [/^Uma\ proteção\ por\ fase\ e\ \+(\d+(?:[.,]\d+)?)%\ de\ pontuação\.$/, (m,a1)=>"One shield per stage and +"+dot(a1)+"% score."],
+ [/^Cronos\ dura\ \+(\d+(?:[.,]\d+)?)s\ e\ desacelera\ ainda\ mais\.$/, (m,a1)=>"Chronos lasts +"+dot(a1)+"s and slows down even more."],
+ [/^Derrote\ um\ chefe\ em\ menos\ de\ (\d+(?:[.,]\d+)?)\ segundos\.$/, (m,a1)=>"Defeat a boss in under "+dot(a1)+" seconds."],
+ [/^Upgrade\ a\ cada\ (\d+(?:[.,]\d+)?)\ fases\ e\ após\ cada\ chefe$/, (m,a1)=>"Upgrade every "+dot(a1)+" stages and after each boss"],
+ [/^Atravesse\ (\d+(?:[.,]\d+)?)\ blocos\ com\ a\ bola\ fantasma\.$/, (m,a1)=>"Pass through "+dot(a1)+" blocks with the phantom ball."],
+ [/^Elites\ tomam\ \+(\d+(?:[.,]\d+)?)\ de\ dano\ e\ valem\ \+(\d+(?:[.,]\d+)?)\ pts\.$/, (m,a1,a2)=>"Elites take +"+dot(a1)+" damage and are worth +"+dot(a2)+" pts."],
+ [/^Lendário\ (\d+(?:[.,]\d+)?)%\.\ Sinergias\ ativam\ sozinhas\.$/, (m,a1)=>"Legendary "+dot(a1)+"%. Synergies trigger on their own."],
+ [/^O\ combo\ expira\ mais\ rápido\ ·\ pontos\ \+(\d+(?:[.,]\d+)?)%$/, (m,a1)=>"Combo expires faster · points +"+dot(a1)+"%"],
+ [/^Destrua\ (\d+(?:[.,]\d+)?)\ bombas\ com\ o\ Pulso\ Cinético\.$/, (m,a1)=>"Destroy "+dot(a1)+" bombs with the Kinetic Pulse."],
+ [/^Núcleo\ do\ chefe\ com\ área\ de\ acerto\ \+(\d+(?:[.,]\d+)?)\.$/, (m,a1)=>"Boss core hit area +"+dot(a1)+"."],
+ [/^Substitui:\ Laser\ da\ Plataforma\ \(Nv\.(\d+(?:[.,]\d+)?)\)$/, (m,a1)=>"Replaces: Paddle Laser (Lv."+dot(a1)+")"],
+ [/^Tenha\ (\d+(?:[.,]\d+)?)\ bolas\ em\ jogo\ ao\ mesmo\ tempo\.$/, (m,a1)=>"Have "+dot(a1)+" balls in play at the same time."],
+ [/^Use\ a\ proteção\ Última\ Chance\ (\d+(?:[.,]\d+)?)\ vezes\.$/, (m,a1)=>"Use the Last Chance shield "+dot(a1)+" times."],
+ [/^Acerte\ um\ chefe\ com\ o\ Laser\ (\d+(?:[.,]\d+)?)\ vezes\.$/, (m,a1)=>"Hit a boss with the Laser "+dot(a1)+" times."],
+ [/^Troque\ a\ oferta\ de\ upgrades\ (\d+(?:[.,]\d+)?)\ vezes\.$/, (m,a1)=>"Reroll the upgrade offer "+dot(a1)+" times."],
+ [/^Conclua\ uma\ fase\ com\ apenas\ (\d+(?:[.,]\d+)?)\ vida\.$/, (m,a1)=>"Clear a stage with only "+dot(a1)+" life."],
+ [/^Derrote\ um\ chefe\ com\ apenas\ (\d+(?:[.,]\d+)?)\ vida\.$/, (m,a1)=>"Defeat a boss with only "+dot(a1)+" life."],
+ [/^Destrua\ (\d+(?:[.,]\d+)?)\ blocos\ apenas\ com\ o\ fogo\.$/, (m,a1)=>"Destroy "+dot(a1)+" blocks with fire alone."],
+ [/^Provoque\ uma\ cadeia\ de\ (\d+(?:[.,]\d+)?)\ explosões\.$/, (m,a1)=>"Trigger a chain of "+dot(a1)+" explosions."],
+ [/^\+(\d+(?:[.,]\d+)?)\ vida\ máxima\ e\ recupera\ (\d+(?:[.,]\d+)?)\ vida\.$/, (m,a1,a2)=>"+"+dot(a1)+" max life and restores "+dot(a2)+" life."],
+ [/^Bola\ \+(\d+(?:[.,]\d+)?)%\ mais\ rápida\ ·\ pontos\ \+(\d+(?:[.,]\d+)?)%$/, (m,a1,a2)=>"Ball +"+dot(a1)+"% faster · points +"+dot(a2)+"%"],
+ [/^Conquiste\ (\d+(?:[.,]\d+)?)\ estrelas\ em\ uma\ fase\.$/, (m,a1)=>"Earn "+dot(a1)+" stars in a single stage."],
+ [/^Perca\ (\d+(?:[.,]\d+)?)\ vezes\ para\ o\ mesmo\ chefe\.$/, (m,a1)=>"Lose "+dot(a1)+" times to the same boss."],
+ [/^\+(\d+(?:[.,]\d+)?)\ vida\.\ Cai\ de\ elites\ e\ cofres\.$/, (m,a1)=>"+"+dot(a1)+" life. Drops from elites and vaults."],
+ [/^Conquiste\ (\d+(?:[.,]\d+)?)\ estrelas\ em\ (\d+(?:[.,]\d+)?)\ fases\.$/, (m,a1,a2)=>"Earn "+dot(a1)+" stars in "+dot(a2)+" stages."],
+ [/^(\d+(?:[.,]\d+)?)\ rebatidas\ perfeitas\ seguidas\.$/, (m,a1)=>dot(a1)+" perfect bounces in a row."],
+ [/^Derrote\ os\ (\d+(?:[.,]\d+)?)\ chefes\ diferentes\.$/, (m,a1)=>"Defeat all "+dot(a1)+" different bosses."],
+ [/^Perca\ a\ partida\ na\ fase\ (\d+(?:[.,]\d+)?)\ ou\ (\d+(?:[.,]\d+)?)\.$/, (m,a1,a2)=>"Lose the run at stage "+dot(a1)+" or "+dot(a2)+"."],
+ [/^Raio\ com\ (\d+(?:[.,]\d+)?)\ de\ dano\.\ Recarga\ (\d+(?:[.,]\d+)?)s\.$/, (m,a1,a2)=>"Beam with "+dot(a1)+" damage. Cooldown "+dot(a2)+"s."],
+ [/^Rebatidas\ perfeitas\ ×(\d+(?:[.,]\d+)?)\ ·\ meta\ (\d+(?:[.,]\d+)?)$/, (m,a1,a2)=>"Perfect bounces ×"+dot(a1)+" · goal "+dot(a2)],
+ [/^Substitui:\ Bola\ Fantasma\ \(Nv\.(\d+(?:[.,]\d+)?)\)$/, (m,a1)=>"Replaces: Phantom Ball (Lv."+dot(a1)+")"],
+ [/^Use\ habilidades\ ativas\ (\d+(?:[.,]\d+)?)\ vezes\.$/, (m,a1)=>"Use active abilities "+dot(a1)+" times."],
+ [/^Colete\ os\ (\d+(?:[.,]\d+)?)\ tipos\ de\ power\-up\.$/, (m,a1)=>"Collect all "+dot(a1)+" power-up types."],
+ [/^Estilhace\ (\d+(?:[.,]\d+)?)\ blocos\ congelados\.$/, (m,a1)=>"Shatter "+dot(a1)+" frozen blocks."],
+ [/^Substitui:\ Bola\ de\ Gelo\ \(Nv\.(\d+(?:[.,]\d+)?)\)$/, (m,a1)=>"Replaces: Frost Ball (Lv."+dot(a1)+")"],
+ [/^Zona\ de\ rebatida\ perfeita\ \+(\d+(?:[.,]\d+)?)%\.$/, (m,a1)=>"Perfect-bounce zone +"+dot(a1)+"%."],
+ [/^\+(\d+(?:[.,]\d+)?)\ pts\ ·\ recompensa\ a\ caminho$/, (m,a1)=>"+"+dot(a1)+" pts · reward on the way"],
+ [/^Conclua\ as\ (\d+(?:[.,]\d+)?)\ fases\ especiais\.$/, (m,a1)=>"Clear all "+dot(a1)+" special stages."],
+ [/^Faça\ (\d+(?:[.,]\d+)?)\ pontos\ em\ uma\ partida\.$/, (m,a1)=>"Score "+dot(a1)+" points in a single run."],
+ [/^Destrua\ (\d+(?:[.,]\d+)?)\ blocos\ de\ cristal\.$/, (m,a1)=>"Destroy "+dot(a1)+" crystal blocks."],
+ [/^Explosões\ causam\ \+(\d+(?:[.,]\d+)?)\ de\ dano\.$/, (m,a1)=>"Explosions deal +"+dot(a1)+" damage."],
+ [/^Área\ de\ acerto\ do\ núcleo\ \+(\d+(?:[.,]\d+)?)\.$/, (m,a1)=>"Boss core hit area +"+dot(a1)+"."],
+ [/^(\d+(?:[.,]\d+)?)%\ de\ chance\ de\ bola\ extra\.$/, (m,a1)=>dot(a1)+"% chance of an extra ball."],
+ [/^Detone\ (\d+(?:[.,]\d+)?)\ blocos\ explosivos\.$/, (m,a1)=>"Detonate "+dot(a1)+" explosive blocks."],
+ [/^Faça\ (\d+(?:[.,]\d+)?)\ rebatidas\ perfeitas\.$/, (m,a1)=>"Make "+dot(a1)+" perfect bounces."],
+ [/^Leve\ um\ upgrade\ ao\ nível\ (\d+(?:[.,]\d+)?)\.$/, (m,a1)=>"Take an upgrade to level "+dot(a1)+"."],
+ [/^Sobrecarga:\ \+(\d+(?:[.,]\d+)?)\ hits\ extras\.$/, (m,a1)=>"Overcharge: +"+dot(a1)+" extra hits."],
+ [/^Derrote\ (\d+(?:[.,]\d+)?)\ chefes\ no\ total\.$/, (m,a1)=>"Defeat "+dot(a1)+" bosses in total."],
+ [/^troque\ a\ oferta\ por\ (\d+(?:[.,]\d+)?)\ vida$/, (m,a1)=>"reroll the offer for "+dot(a1)+" life"],
+ [/^RAIDER\ ORBITAL\ \ ·\ \ FASE\ (\d+(?:[.,]\d+)?)$/, (m,a1)=>"ORBITAL RAIDER  ·  STAGE "+dot(a1)],
+ [/^Acumule\ (\d+(?:[.,]\d+)?)\ horas\ de\ jogo\.$/, (m,a1)=>"Accumulate "+dot(a1)+" hours of play."],
+ [/^Ative\ sinergias\ (\d+(?:[.,]\d+)?)\ vezes\.$/, (m,a1)=>"Trigger synergies "+dot(a1)+" times."],
+ [/^O\ combo\ dura\ \+(\d+(?:[.,]\d+)?)s\ a\ mais\.$/, (m,a1)=>"Combo lasts +"+dot(a1)+"s longer."],
+ [/^Raio\ de\ (\d+(?:[.,]\d+)?)px\.\ Recarga\ (\d+(?:[.,]\d+)?)s\.$/, (m,a1,a2)=>dot(a1)+"px radius. Cooldown "+dot(a2)+"s."],
+ [/^Acumule\ (\d+(?:[.,]\d+)?)\ hora\ de\ jogo\.$/, (m,a1)=>"Accumulate "+dot(a1)+" hour of play."],
+ [/^Destrua\ (\d+(?:[.,]\d+)?)\ blocos\ elite\.$/, (m,a1)=>"Destroy "+dot(a1)+" elite blocks."],
+ [/^Granada\ \+(\d+(?:[.,]\d+)?)s\ e\ \+(\d+(?:[.,]\d+)?)%\ raio\.$/, (m,a1,a2)=>"Grenade +"+dot(a1)+"s and +"+dot(a2)+"% radius."],
+ [/^Bolas\ (\d+(?:[.,]\d+)?)%\ mais\ rápidas\.$/, (m,a1)=>"Balls "+dot(a1)+"% faster."],
+ [/^Rebatidas\ perfeitas\ ×(\d+(?:[.,]\d+)?)$/, (m,a1)=>"Perfect bounces ×"+dot(a1)],
+ [/^Tenha\ (\d+(?:[.,]\d+)?)\ vidas\ máximas\.$/, (m,a1)=>"Have "+dot(a1)+" max lives."],
+ [/^(\d+(?:[.,]\d+)?)\ hits\ com\ dano\ extra$/, (m,a1)=>dot(a1)+" hits with extra damage"],
+ [/^(\d+(?:[.,]\d+)?)\ vida\(s\)\ restante\(s\)$/, (m,a1)=>dot(a1)+" life(s) left"],
+ [/^\+(\d+(?:[.,]\d+)?)\ hits\ de\ sobrecarga$/, (m,a1)=>"+"+dot(a1)+" overcharge hits"],
+ [/^Chegue\ a\ um\ combo\ ×(\d+(?:[.,]\d+)?)\.$/, (m,a1)=>"Reach a ×"+dot(a1)+" combo."],
+ [/^(\d+(?:[.,]\d+)?)%\ power\ \/\ (\d+(?:[.,]\d+)?)%\ bomba\.$/, (m,a1,a2)=>dot(a1)+"% power-up / "+dot(a2)+"% bomb."],
+ [/^Bola\ \+(\d+(?:[.,]\d+)?)%\ mais\ rápida$/, (m,a1)=>"Ball +"+dot(a1)+"% faster"],
+ [/^FASE\ (\d+(?:[.,]\d+)?)\ ·\ ACELERAÇÃO!$/, (m,a1)=>"STAGE "+dot(a1)+" · SPEED UP!"],
+ [/^Colete\ (\d+(?:[.,]\d+)?)\ power\-ups\.$/, (m,a1)=>"Collect "+dot(a1)+" power-ups."],
+ [/^Escolha\ (\d+(?:[.,]\d+)?)\ upgrades\.$/, (m,a1)=>"Choose "+dot(a1)+" upgrades."],
+ [/^FASE\ (\d+(?:[.,]\d+)?)\ ·\ ACELERAÇÃO$/, (m,a1)=>"STAGE "+dot(a1)+" · SPEED UP"],
+ [/^Incendeie\ (\d+(?:[.,]\d+)?)\ blocos\.$/, (m,a1)=>"Ignite "+dot(a1)+" blocks."],
+ [/^Limite\ de\ bolas:\ (\d+(?:[.,]\d+)?)\.$/, (m,a1)=>"Ball limit: "+dot(a1)+"."],
+ [/^Alcance\ o\ setor\ (\d+(?:[.,]\d+)?)\.$/, (m,a1)=>"Reach sector "+dot(a1)+"."],
+ [/^Colete\ (\d+(?:[.,]\d+)?)\ corações\.$/, (m,a1)=>"Collect "+dot(a1)+" hearts."],
+ [/^FASE\ (\d+(?:[.,]\d+)?)\ ·\ HORIZONTE$/, (m,a1)=>"STAGE "+dot(a1)+" · HORIZON"],
+ [/^Tempo\ (\d+(?:[.,]\d+)?)s\ ·\ meta\ (\d+(?:[.,]\d+)?)s$/, (m,a1,a2)=>"Time "+dot(a1)+"s · goal "+dot(a2)+"s"],
+ [/^(\d+(?:[.,]\d+)?)\ fases\ especiais$/, (m,a1)=>dot(a1)+" special stages"],
+ [/^\+(\d+(?:[.,]\d+)?)%\ de\ pontuação\.$/, (m,a1)=>"+"+dot(a1)+"% score."],
+ [/^Congele\ (\d+(?:[.,]\d+)?)\ blocos\.$/, (m,a1)=>"Freeze "+dot(a1)+" blocks."],
+ [/^Destrua\ (\d+(?:[.,]\d+)?)\ blocos\.$/, (m,a1)=>"Destroy "+dot(a1)+" blocks."],
+ [/^FASE\ (\d+(?:[.,]\d+)?)\ ·\ FUNDIÇÃO$/, (m,a1)=>"STAGE "+dot(a1)+" · FOUNDRY"],
+ [/^Jogue\ (\d+(?:[.,]\d+)?)\ partidas\.$/, (m,a1)=>"Play "+dot(a1)+" runs."],
+ [/^Chegue\ à\ fase\ (\d+(?:[.,]\d+)?)\.$/, (m,a1)=>"Reach stage "+dot(a1)+"."],
+ [/^Conclua\ (\d+(?:[.,]\d+)?)\ fases\.$/, (m,a1)=>"Clear "+dot(a1)+" stages."],
+ [/^Cronos\ dura\ \+(\d+(?:[.,]\d+)?)s\.$/, (m,a1)=>"Chronos lasts +"+dot(a1)+"s."],
+ [/^Estrela\ dura\ (\d+(?:[.,]\d+)?)s\.$/, (m,a1)=>"Star lasts "+dot(a1)+"s."],
+ [/^SETOR\ (\d+(?:[.,]\d+)?)\ ·\ ABISMO$/, (m,a1)=>"SECTOR "+dot(a1)+" · ABYSS"],
+ [/^SETOR\ (\d+(?:[.,]\d+)?)\ ·\ ÓRBITA$/, (m,a1)=>"SECTOR "+dot(a1)+" · ORBIT"],
+ [/^(\d+(?:[.,]\d+)?)\ chefes\ únicos$/, (m,a1)=>dot(a1)+" unique bosses"],
+ [/^(\d+(?:[.,]\d+)?)\ vit\.\ ·\ (\d+(?:[.,]\d+)?)\ der\.$/, (m,a1,a2)=>dot(a1)+" wins · "+dot(a2)+" def."],
+ [/^Combo\ máximo\ ×(\d+(?:[.,]\d+)?)$/, (m,a1)=>"Max combo ×"+dot(a1)],
+ [/^EXPOSTO\ \ ·\ \ (\d+(?:[.,]\d+)?)\/(\d+(?:[.,]\d+)?)$/, (m,a1,a2)=>"EXPOSED  ·  "+dot(a1)+"/"+dot(a2)],
+ [/^FASE\ (\d+(?:[.,]\d+)?)\ ·\ CLARÃO$/, (m,a1)=>"STAGE "+dot(a1)+" · GLARE"],
+ [/^FASE\ (\d+(?:[.,]\d+)?)\ ·\ PRISMA$/, (m,a1)=>"STAGE "+dot(a1)+" · PRISM"],
+ [/^Plataforma\ \+(\d+(?:[.,]\d+)?)%\.$/, (m,a1)=>"Paddle +"+dot(a1)+"%."],
+ [/^SETOR\ (\d+(?:[.,]\d+)?)\ ·\ MAGMA$/, (m,a1)=>"SECTOR "+dot(a1)+" · MAGMA"],
+ [/^SETOR\ (\d+(?:[.,]\d+)?)\ ·\ SOLAR$/, (m,a1)=>"SECTOR "+dot(a1)+" · SOLAR"],
+ [/^SETOR\ (\d+(?:[.,]\d+)?)\ ·\ VAZIO$/, (m,a1)=>"SECTOR "+dot(a1)+" · VOID"],
+ [/^Abra\ (\d+(?:[.,]\d+)?)\ cofres\.$/, (m,a1)=>"Open "+dot(a1)+" vaults."],
+ [/^ESCUDO\ \ ·\ \ (\d+(?:[.,]\d+)?)\/(\d+(?:[.,]\d+)?)$/, (m,a1,a2)=>"SHIELD  ·  "+dot(a1)+"/"+dot(a2)],
+ [/^LENDÁRIO\ ·\ \+(\d+(?:[.,]\d+)?)%$/, (m,a1)=>"LEGENDARY · +"+dot(a1)+"%"],
+ [/^AQUECENDO\ \+(\d+(?:[.,]\d+)?)%$/, (m,a1)=>"HEATING UP +"+dot(a1)+"%"],
+ [/^EM\ CHAMAS\ \+(\d+(?:[.,]\d+)?)%$/, (m,a1)=>"ON FIRE +"+dot(a1)+"%"],
+ [/^FASE\ (\d+(?:[.,]\d+)?)\ ·\ MARÉ$/, (m,a1)=>"STAGE "+dot(a1)+" · TIDE"],
+ [/^IMPARÁVEL\ \+(\d+(?:[.,]\d+)?)%$/, (m,a1)=>"UNSTOPPABLE +"+dot(a1)+"%"],
+ [/^INCOMUM\ ·\ \+(\d+(?:[.,]\d+)?)%$/, (m,a1)=>"UNCOMMON · +"+dot(a1)+"%"],
+ [/^SETOR\ (\d+(?:[.,]\d+)?)\ LIMPO$/, (m,a1)=>"SECTOR "+dot(a1)+" CLEARED"],
+ [/^gasta\ (\d+(?:[.,]\d+)?)\ vida$/, (m,a1)=>"costs "+dot(a1)+" life"],
+ [/^NÍVEL\ (\d+(?:[.,]\d+)?)\ \/\ (\d+(?:[.,]\d+)?)$/, (m,a1,a2)=>"LEVEL "+dot(a1)+" / "+dot(a2)],
+ [/^PERFEITO\ ×(\d+(?:[.,]\d+)?)$/, (m,a1)=>"PERFECT ×"+dot(a1)],
+ [/^PRECISÃO\ ×(\d+(?:[.,]\d+)?)$/, (m,a1)=>"ACCURACY ×"+dot(a1)],
+ [/^CADEIA\ ×(\d+(?:[.,]\d+)?)!$/, (m,a1)=>"CHAIN ×"+dot(a1)+"!"],
+ [/^CRÍTICO\ ×(\d+(?:[.,]\d+)?)$/, (m,a1)=>"CRITICAL ×"+dot(a1)],
+ [/^Incomum\ (\d+(?:[.,]\d+)?)%$/, (m,a1)=>"Uncommon "+dot(a1)+"%"],
+ [/^RARO\ ·\ \+(\d+(?:[.,]\d+)?)%$/, (m,a1)=>"RARE · +"+dot(a1)+"%"],
+ [/^pontos\ \+(\d+(?:[.,]\d+)?)%$/, (m,a1)=>"points +"+dot(a1)+"%"],
+ [/^COMBO\ \+(\d+(?:[.,]\d+)?)%$/, (m,a1)=>"COMBO +"+dot(a1)+"%"],
+ [/^COMBO\ ×(\d+(?:[.,]\d+)?)$/, (m,a1)=>"COMBO ×"+dot(a1)],
+ [/^Comum\ (\d+(?:[.,]\d+)?)%$/, (m,a1)=>"Common "+dot(a1)+"%"],
+ [/^FASES\ (\d+(?:[.,]\d+)?)★$/, (m,a1)=>dot(a1)+"★ STAGES"],
+ [/^Tempo\ (\d+(?:[.,]\d+)?)s$/, (m,a1)=>"Time "+dot(a1)+"s"],
+ [/^(\d+(?:[.,]\d+)?)\ vidas$/, (m,a1)=>dot(a1)+" lives"],
+ [/^\+(\d+(?:[.,]\d+)?)\ VIDA$/, (m,a1)=>"+"+dot(a1)+" LIFE"],
+ [/^Raro\ (\d+(?:[.,]\d+)?)%$/, (m,a1)=>"Rare "+dot(a1)+"%"],
+ [/^SETOR\ (\d+(?:[.,]\d+)?)$/, (m,a1)=>"SECTOR "+dot(a1)],
+ [/^meta\ (\d+(?:[.,]\d+)?)s$/, (m,a1)=>"goal "+dot(a1)+"s"],
+ [/^(\d+(?:[.,]\d+)?)\ der\.$/, (m,a1)=>dot(a1)+" def."],
+ [/^(\d+(?:[.,]\d+)?)\ vit\.$/, (m,a1)=>dot(a1)+" win."],
+ [/^\+(\d+(?:[.,]\d+)?)\ pts$/, (m,a1)=>"+"+dot(a1)+" pts"],
+ [/^FASE\ (\d+(?:[.,]\d+)?)$/, (m,a1)=>"STAGE "+dot(a1)],
+ [/^meta\ (\d+(?:[.,]\d+)?)$/, (m,a1)=>"goal "+dot(a1)],
+ [/^(\d+(?:[.,]\d+)?)min$/, (m,a1)=>dot(a1)+"min"],
+ ];
+ for(const r of R) EN_RULES.push(r);
+})();
+/* regras genéricas (nomes de itens traduzidos pelo dicionário) */
+EN_RULES.push([/^Substitui: (.+) \(Nv\.(\d+)\)$/, (m, n, l) => 'Replaces: ' + tr(n) + ' (Lv.' + l + ')']);
+EN['Idioma · Language'] = 'Language';
 
 /* ---- config.js ---- */
 const catalog = [
@@ -673,7 +1509,7 @@ let perfectStreak = 0, comboTier = 0, timeScale = 1, godMode = false, cheated = 
 let runStats = { picks: {}, stages: 0, bosses: [], perfects: 0, maxCombo: 0, rerolls: 0 }, deathCause = 'bola', hudLivesKey = '', hudLivesPrev = 3;
 let curSpecial = '', sectorBanner = null, fervor = 0, resumeCd = 0, lastSpecial = '', specialBag = [], deathBossKind = '';
 let a11y = { shake: false, flash: false, contrast: false };
-const GAME_VERSION = '3.23';
+const GAME_VERSION = '3.25';
 let paddleFlash = 0, regenTimer = 0, tierFlash = 0, bgDirty = true, musicVol = 0.6, windPhase = 0;
 
 const paddle = { x: 0, y: 0, w: 104, h: 13, baseW: 104, speed: 420 };
@@ -1825,6 +2661,7 @@ function resize() {
   H = (ph > 300 && ph < innerHeight) ? ph : innerHeight;
   const wide = innerWidth / H > .66;                                // tela larga: coluna vertical centralizada
   W = wide ? Math.min(innerWidth, Math.max(340, Math.round(H * .62))) : innerWidth;
+  document.body.classList.toggle('narrow', W < 760);               // layout compacto das cartas/painéis segue a largura da coluna do jogo
   const st = document.getElementById('stage');
   if (st) { st.style.setProperty('--sw', W + 'px'); st.classList.toggle('wide', wide && W < innerWidth); }
   document.documentElement.style.setProperty('--vh', H + 'px');
@@ -4782,6 +5619,9 @@ window.addEventListener('pointercancel', e => { if (e.pointerId === padPtr) padP
 const _ab = $('abilityBtn');
 _ab.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); useAbility(); });
 _ab.addEventListener('click', e => e.stopPropagation());
+$('langPT').addEventListener('click', () => setLang('pt'));
+$('langEN').addEventListener('click', () => setLang('en'));
+$('langMenu').addEventListener('click', () => setLang(LANG === 'pt' ? 'en' : 'pt'));
 $('start').addEventListener('click', () => {
   unlockAudio();
   const st = $('start');
@@ -5008,7 +5848,7 @@ function loop(now) {
 best = getBest();
 ui.best.textContent = best;
 loadSettings();
-buildLegend(); updateBrand(); refreshMenu();
+buildLegend(); updateBrand(); refreshMenu(); initLang();
 
 resize();
 aimX = 0; aimY = -1;
